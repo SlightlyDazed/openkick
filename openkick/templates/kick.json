@@ -1,0 +1,10 @@
+{
+  "id": "kick", "order": 1,
+  "name": {"es": "Patada", "en": "Kick"},
+  "description": {"es": "Rodilla, cadera y tobillo · 4 fases", "en": "Knee, hip and ankle · 4 phases"},
+  "angles": [["right_hip", "right_knee", "right_ankle"], ["right_shoulder", "right_hip", "right_knee"]],
+  "trajectories": ["right_ankle"],
+  "phases": [{"es": "Carrera", "en": "Run-up"}, {"es": "Apoyo", "en": "Plant"}, {"es": "Golpeo", "en": "Strike"}, {"es": "Seguimiento", "en": "Follow-through"}],
+  "color": "#C6F24E",
+  "icon": "M22 11a3 3 0 1 0 0-6a3 3 0 0 0 0 6M22 11l-1 13M22 14l6 5M22 14l-6 5M21 24l2 9-1 9M21 24l-6 7-6-4M37 44a3 3 0 1 0 0-6a3 3 0 0 0 0 6"
+}

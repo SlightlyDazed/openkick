@@ -1,0 +1,8 @@
+{
+  "id": "blank", "order": 9,
+  "name": {"es": "En blanco", "en": "Blank"},
+  "description": {"es": "Sin mediciones predefinidas", "en": "No predefined measurements"},
+  "angles": [], "trajectories": [], "phases": [],
+  "color": "#8B94A3",
+  "icon": "M24 14v20M14 24h20"
+}

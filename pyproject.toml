@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openkick"
+version = "0.1.0"
+description = "Open-source biomechanics video analysis with automatic pose detection (MediaPipe). Kinovea-compatible."
+readme = "README.md"
+license = { text = "GPL-3.0-or-later" }
+authors = [{ name = "Gabriel Alexander Laurente (SlightlyDazed)", email = "alexlaurente1232@gmail.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    # PySide6 6.12.0 takes a reference from None on every QPainter.drawRect: on Python 3.10/3.11
+    # (where None can be freed) the app aborts with "deallocating None" while a timeline paints
+    "PySide6>=6.6,<6.12; python_version < '3.12'",
+    "PySide6>=6.6; python_version >= '3.12'",
+    "av>=12",
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "opencv-python>=4.8",
+    "mediapipe>=0.10.14",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+# 3D from two videos (experimental): pose detection with feet; OpenSim scaling and inverse kinematics
+multiview = ["rtmlib>=0.0.13", "onnxruntime>=1.17"]
+opensim = ["pose2sim>=0.10", "opensim>=4.5", "vtk>=9"]
+
+[project.scripts]
+openkick = "openkick.app:main"
+
+[tool.setuptools.packages.find]
+include = ["openkick*"]
+
+[tool.setuptools.package-data]
+openkick = ["assets/*.svg", "assets/fonts/*", "templates/*.json", "locale/*.json"]

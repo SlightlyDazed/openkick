@@ -1,0 +1,11 @@
+{
+  "id": "cycling", "order": 5,
+  "name": {"es": "Ciclismo", "en": "Cycling"},
+  "description": {"es": "Pedalada de perfil: rodilla, cadera y postura", "en": "Side-on pedal stroke: knee, hip and posture"},
+  "side": "camera",
+  "angles": [["right_hip", "right_knee", "right_ankle"], ["right_shoulder", "right_hip", "right_knee"], ["right_knee", "right_ankle", "right_foot_index"], ["right_shoulder", "right_elbow", "right_wrist"], ["right_elbow", "right_shoulder", "right_hip"]],
+  "trajectories": ["right_ankle"],
+  "phases": [{"es": "Ajuste 1", "en": "Setting 1"}, {"es": "Ajuste 2", "en": "Setting 2"}, {"es": "Ajuste 3", "en": "Setting 3"}],
+  "color": "#FACC15",
+  "icon": "M30 11a3 3 0 1 0 0-6a3 3 0 0 0 0 6M5 35a7 7 0 1 0 14 0a7 7 0 1 0-14 0M29 35a7 7 0 1 0 14 0a7 7 0 1 0-14 0M12 35l6-14 6 14h-12M18 21h15l3 14M18 20l9-6 6 7M18 20l8 7-2 8"
+}

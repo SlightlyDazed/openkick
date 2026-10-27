@@ -1,0 +1,28 @@
+# Builds the Windows installer on GitHub (runs on tags like v0.1.0, or manually).
+name: Windows installer
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyinstaller PySide6-Essentials av numpy scipy mediapipe pytest onnxruntime tqdm
+      - run: pip install --no-deps rtmlib   # 3D; its OpenCV is the one mediapipe brings
+      - run: pytest -q
+      - name: Download MediaPipe model
+        run: |
+          New-Item -ItemType Directory -Force packaging/models | Out-Null
+          Invoke-WebRequest https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_heavy/float16/latest/pose_landmarker_heavy.task -OutFile packaging/models/pose_landmarker_heavy.task
+      - run: pyinstaller packaging/openkick.spec --noconfirm --distpath dist
+      - run: choco install innosetup -y --no-progress
+      - run: iscc /DDistDir=..\dist /O..\dist-windows packaging\openkick.iss
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OpenKick-Setup
+          path: dist-windows/*.exe

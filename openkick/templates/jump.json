@@ -1,0 +1,10 @@
+{
+  "id": "jump", "order": 4,
+  "name": {"es": "Salto vertical", "en": "Vertical jump"},
+  "description": {"es": "Impulso, vuelo y aterrizaje", "en": "Push-off, flight and landing"},
+  "angles": [["right_hip", "right_knee", "right_ankle"], ["right_shoulder", "right_hip", "right_knee"]],
+  "trajectories": ["right_hip"],
+  "phases": [{"es": "Contramovimiento", "en": "Countermovement"}, {"es": "Impulso", "en": "Push-off"}, {"es": "Vuelo", "en": "Flight"}, {"es": "Aterrizaje", "en": "Landing"}],
+  "color": "#A78BFA",
+  "icon": "M24 9a3 3 0 1 0 0-6a3 3 0 0 0 0 6M24 9v13M24 11l-6-8M24 11l6-8M24 22l-3 9 3 7M24 22l3 9 1 7M10 45h28"
+}

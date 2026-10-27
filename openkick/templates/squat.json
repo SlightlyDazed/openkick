@@ -1,0 +1,10 @@
+{
+  "id": "squat", "order": 3,
+  "name": {"es": "Sentadilla", "en": "Squat"},
+  "description": {"es": "Flexión de rodilla y cadera", "en": "Knee and hip flexion"},
+  "angles": [["right_hip", "right_knee", "right_ankle"], ["right_shoulder", "right_hip", "right_knee"], ["right_knee", "right_ankle", "right_foot_index"]],
+  "trajectories": ["right_hip"],
+  "phases": [{"es": "Descenso", "en": "Descent"}, {"es": "Posición baja", "en": "Bottom"}, {"es": "Ascenso", "en": "Ascent"}],
+  "color": "#FF8A3D",
+  "icon": "M20 13a3 3 0 1 0 0-6a3 3 0 0 0 0 6M20 13l4 12M21 16l11 2M24 25l9 2-3 13M26 40h7"
+}

@@ -1,0 +1,38 @@
+
+KNEE  — MAE° (bias°) [ROM error %]   n = trials x cameras
+engine                                  squats                     STS                      DJ                 walking
+mediapipe                6.7 ( -5.1) [ -12%] n=18    7.9 ( -7.0) [  -7%] n=18    5.3 ( -3.1) [  -5%] n=54   10.2 ( -2.0) [ +20%] n=54 
+rtmpose-lightweight      6.9 ( -6.3) [  -9%] n=18    8.5 ( -7.9) [  -6%] n=18    5.2 ( -3.3) [  -6%] n=54    7.9 ( -4.0) [ +18%] n=54 
+rtmpose-balanced         5.8 ( -5.3) [ -10%] n=18    8.1 ( -7.7) [  -9%] n=18    4.7 ( -3.5) [  -5%] n=54    6.6 ( -3.0) [ +13%] n=54 
+rtmpose-performance      6.3 ( -5.6) [ -11%] n=18    8.8 ( -8.4) [ -11%] n=18    5.3 ( -4.4) [  -8%] n=54    6.4 ( -2.3) [ +14%] n=54 
+
+HIP  — MAE° (bias°) [ROM error %]   n = trials x cameras
+engine                                  squats                     STS                      DJ                 walking
+mediapipe                6.7 ( -5.6) [  -6%] n=18    9.7 ( -9.1) [  -8%] n=18    7.2 ( -5.5) [  -7%] n=54    9.9 ( +3.8) [ +31%] n=54 
+rtmpose-lightweight      9.1 ( -7.6) [  -8%] n=18   12.3 (-11.6) [  -9%] n=18    8.3 ( -6.7) [ -10%] n=54    5.0 ( -2.1) [ -11%] n=54 
+rtmpose-balanced         7.9 ( -7.0) [  -8%] n=18   11.0 (-10.5) [  -9%] n=18    7.8 ( -6.3) [  -9%] n=54    5.1 ( -2.5) [ -12%] n=54 
+rtmpose-performance      7.9 ( -6.7) [  -7%] n=18   11.9 (-11.4) [  -9%] n=18    8.3 ( -6.4) [  -9%] n=54    5.0 ( -2.1) [  -6%] n=54 
+
+ANKLE  — MAE° (bias°) [ROM error %]   n = trials x cameras
+engine                                  squats                     STS                      DJ                 walking
+mediapipe               19.5 (+19.5) [ +36%] n=18   19.0 (+18.9) [ +33%] n=18   16.8 (+15.4) [ -14%] n=54   12.8 ( +7.3) [ +39%] n=54 
+rtmpose-lightweight     15.8 (+15.8) [ +39%] n=18   15.8 (+15.8) [ +37%] n=18   12.1 ( +8.9) [ -13%] n=54   11.8 ( +7.2) [ +33%] n=54 
+rtmpose-balanced        18.5 (+18.5) [ +21%] n=18   17.8 (+17.8) [ +16%] n=18   12.9 (+11.7) [  -7%] n=54   10.6 ( +7.2) [ +11%] n=54 
+rtmpose-performance     13.9 (+13.9) [ +22%] n=18   11.8 (+11.8) [ +16%] n=18   10.8 (+10.4) [  -5%] n=54    8.9 ( +6.0) [ +17%] n=54 
+
+Estimated camera view angle (degrees from profile), mean by movement and camera (MediaPipe run)
+  squats   Cam0:   33°  (min 29°, max 37°)
+  squats   Cam4:   39°  (min 29°, max 51°)
+  STS      Cam0:   30°  (min 25°, max 38°)
+  STS      Cam4:   39°  (min 29°, max 49°)
+  DJ       Cam0:   30°  (min 22°, max 48°)
+  DJ       Cam4:   38°  (min 26°, max 52°)
+  walking  Cam0:   13°  (min 7°, max 29°)
+  walking  Cam4:   18°  (min 6°, max 41°)
+
+KNEE error vs camera view (0° = perfect profile). Squats + STS + DJ, all engines pooled per engine
+engine                               0-30°              30-40°              40-50°              50-91°   corr(view, MAE)
+mediapipe                      5.1° (n=27)         5.7° (n=39)         7.6° (n=21)          8.1° (n=3)              0.55
+rtmpose-lightweight            6.6° (n=15)         5.8° (n=54)         7.1° (n=19)          5.5° (n=2)              0.09
+rtmpose-balanced                4.1° (n=2)         4.9° (n=46)         6.4° (n=38)          6.7° (n=4)              0.35
+rtmpose-performance            5.0° (n=17)         6.1° (n=53)         6.9° (n=18)          9.5° (n=2)              0.42

@@ -1,0 +1,194 @@
+18 trials: squats subject10, squats subject11, squats subject2, squats subject3, squats subject4, squats subject5, squats subject7, squats subject8, squats subject9, walking subject10, walking subject11, walking subject2, walking subject3, walking subject4, walking subject5, walking subject7, walking subject8, walking subject9
+
+[squats] ÁNGULOS GEOMÉTRICOS vs marcadores del laboratorio (grados)
+        error     desfase     desf.DE    sin_desf   corr.fija    ganancia  sin_lineal  retraso_ms    sin_retr           r       %>10°    racha_ms
+  rodilla  1 detección               3.67       -2.62        2.49        1.96        2.81        1.01        1.42        0.46        1.94        1.00        0.02      400.00
+  rodilla  2 modelo                  5.04       -1.79        1.97        4.87        5.07        1.15        1.82       -0.93        4.85        1.00        4.68      166.67
+  rodilla  3 medidas                 6.63       -6.04        2.13        3.96        4.39        1.12        1.56       -0.46        3.94        1.00        2.49      191.67
+  cadera   1 detección               8.30       -8.12        1.72        4.54        4.75        1.13        1.65       -1.39        4.52        1.00        2.91       83.33
+  cadera   2 modelo                  5.45       -4.03        1.67        4.25        4.61        1.11        1.57       -0.93        4.22        1.00        3.09      150.00
+  cadera   3 medidas                 6.77       -6.31        1.66        3.85        4.15        1.09        1.78       -1.85        3.84        1.00        1.52      283.33
+  tobillo  1 detección               4.63        4.27        3.06        1.24        3.06        0.93        0.87        6.48        1.21        0.98        0.00        0.00
+  tobillo  2 modelo                  7.09        6.96        2.87        1.71        3.02        1.06        1.31      -12.50        1.67        0.97        0.00        0.00
+  tobillo  3 medidas                13.80       13.80        2.64        2.96        3.67        1.32        1.91      -10.19        2.92        0.97        0.16      150.00
+
+[walking] ÁNGULOS GEOMÉTRICOS vs marcadores del laboratorio (grados)
+        error     desfase     desf.DE    sin_desf   corr.fija    ganancia  sin_lineal  retraso_ms    sin_retr           r       %>10°    racha_ms
+  rodilla  1 detección               4.70       -3.57        3.08        2.65        3.66        1.03        2.20        0.93        2.44        0.99        0.33      333.33
+  rodilla  2 modelo                  8.15       -8.08        2.20        2.53        3.26        1.03        2.22       -1.39        2.16        0.99        0.16      366.67
+  rodilla  3 medidas                11.38      -11.35        2.13        2.29        2.99        0.93        1.77        0.93        2.03        0.99        0.48       33.33
+  cadera   1 detección               6.89       -6.57        2.42        2.95        3.56        0.82        2.59      -16.20        2.47        0.79        0.58      100.00
+  cadera   2 modelo                  4.84       -3.93        2.61        3.10        3.77        0.57        2.14      -18.98        2.57        0.73        0.85      108.33
+  cadera   3 medidas                 5.31       -4.27        2.74        3.81        4.50        0.43        2.43      -36.57        3.12        0.59        1.94      183.33
+  tobillo  1 detección               4.21        0.66        2.33        3.51        4.24        0.94        3.42       20.37        2.97        0.86        2.71       91.67
+  tobillo  2 modelo                  8.02        7.67        2.93        3.58        4.42        0.88        3.29       12.50        3.19        0.87        2.02      216.67
+  tobillo  3 medidas                14.77       14.76        2.89        3.47        4.33        0.86        3.15       10.19        3.13        0.88        1.39      200.00
+
+[squats] desfase por persona (media de las dos piernas), grados
+  rodilla  1 detección     -2.3   -5.1   -1.9   -0.7   -5.3   +1.8   -3.6   -1.0   -5.4
+  rodilla  2 modelo        -3.0   -0.7   -0.4   -0.3   -2.7   +0.2   -5.4   -1.5   -2.3
+  rodilla  3 medidas       -8.5   -5.0   -5.7   -3.5   -6.9   -3.2   -9.0   -5.5   -6.9
+  cadera   1 detección     -8.3   -9.0   -7.8   -8.3  -10.9   -4.9   -8.8   -7.0   -8.1
+  cadera   2 modelo        -4.7   -2.8   -6.0   -2.9   -5.3   -1.8   -5.6   -3.6   -3.6
+  cadera   3 medidas       -8.3   -5.2   -6.8   -5.3   -7.6   -3.0   -7.4   -6.2   -7.0
+  tobillo  1 detección     -1.1   +7.8   +8.2   +1.9   +6.3   +5.3   +4.3   +3.1   +2.4
+  tobillo  2 modelo        +2.2   +8.9   +9.7   +5.7   +8.0   +7.2   +9.1   +7.6   +4.2
+  tobillo  3 medidas      +10.9  +15.5  +17.1  +11.1  +15.1  +13.2  +15.7  +15.0  +10.6
+
+[walking] desfase por persona (media de las dos piernas), grados
+  rodilla  1 detección     -4.9   -7.8   -3.1   -0.5   -5.1   +0.8   -4.8   -1.0   -5.6
+  rodilla  2 modelo        -8.5  -10.2   -9.5   -7.1   -9.5   -5.2   -9.0   -4.4   -9.3
+  rodilla  3 medidas      -11.8  -13.8  -12.6   -8.9  -13.4   -9.0  -12.0   -8.2  -12.4
+  cadera   1 detección     -9.3   -7.0   -6.6   -2.9   -7.7   -4.9   -7.2   -5.1   -8.5
+  cadera   2 modelo        -5.0   -4.6   -3.2   +0.3   -6.8   -1.1   -4.9   -3.4   -6.8
+  cadera   3 medidas       -5.5   -4.9   -3.2   +0.3   -7.5   -1.2   -5.4   -3.9   -7.1
+  tobillo  1 detección     -2.4   +2.1   +3.1   -1.9   +2.3   +1.0   +0.7   +2.5   -1.5
+  tobillo  2 modelo        +5.4   +8.2  +12.9   +6.3   +7.6   +9.7   +7.1   +7.2   +4.7
+  tobillo  3 medidas      +13.5  +16.5  +19.4  +12.0  +14.7  +17.6  +13.4  +14.4  +11.5
+
+[squats] error con signo según cuánto se dobla la rodilla (laboratorio), grados; media por persona
+  rodilla  1 detección     0-20 :  -2.6  20-40 :  -3.7  40-60 :  -3.1  60-80 :  -2.9  80-100:  -1.9 100-140:  -2.2
+  rodilla  2 modelo        0-20 :  -8.4  20-40 :  -4.3  40-60 :  -0.4  60-80 :  +2.4  80-100:  +3.6 100-140:  +2.1
+  rodilla  3 medidas       0-20 :  -9.7  20-40 : -10.9  40-60 :  -7.8  60-80 :  -3.7  80-100:  -1.0 100-140:  -1.6
+  cadera   1 detección     0-20 : -13.7  20-40 : -10.8  40-60 :  -8.0  60-80 :  -6.3  80-100:  -2.5 100-140:  -2.1
+  cadera   2 modelo        0-20 :  -8.8  20-40 :  -7.1  40-60 :  -4.6  60-80 :  -2.0  80-100:  +1.0 100-140:  +1.1
+  cadera   3 medidas       0-20 :  -8.9  20-40 : -10.4  40-60 :  -9.2  60-80 :  -5.8  80-100:  -1.7 100-140:  -1.8
+  tobillo  1 detección     0-20 :  +3.4  20-40 :  +3.7  40-60 :  +4.7  60-80 :  +5.1  80-100:  +4.8 100-140:  +4.1
+  tobillo  2 modelo        0-20 :  +7.2  20-40 :  +8.4  40-60 :  +7.2  60-80 :  +6.4  80-100:  +6.3 100-140:  +6.2
+  tobillo  3 medidas       0-20 : +16.0  20-40 : +18.1  40-60 : +14.8  60-80 : +11.9  80-100: +10.4 100-140:  +9.6
+
+[squats] error con signo al bajar / abajo-arriba quieto / al subir, grados
+  rodilla  1 detección   bajando:   -2.9 quieto:   -2.0 subiendo:   -2.8
+  rodilla  2 modelo      bajando:   -0.3 quieto:   -5.2 subiendo:   -0.4
+  rodilla  3 medidas     bajando:   -5.7 quieto:   -6.8 subiendo:   -5.8
+  cadera   1 detección   bajando:   -7.3 quieto:  -10.2 subiendo:   -7.5
+  cadera   2 modelo      bajando:   -3.2 quieto:   -5.9 subiendo:   -3.4
+  cadera   3 medidas     bajando:   -6.1 quieto:   -6.5 subiendo:   -6.4
+  tobillo  1 detección   bajando:   +4.6 quieto:   +3.7 subiendo:   +4.5
+  tobillo  2 modelo      bajando:   +7.1 quieto:   +6.5 subiendo:   +7.5
+  tobillo  3 medidas     bajando:  +13.8 quieto:  +13.9 subiendo:  +14.2
+
+[walking] error con signo con el pie en el suelo (apoyo) y en el aire (balanceo), y según la flexión de rodilla (lab.), grados
+  rodilla  1 detección   apoyo   -3.9  balanceo   -3.0   0-10:  +0.9 10-20:  -4.9 20-30:  -3.0 30-45:  -2.1 45-75:  -3.2
+  rodilla  2 modelo      apoyo   -8.5  balanceo   -7.3   0-10:  -5.5 10-20:  -9.2 20-30:  -7.1 30-45:  -7.0 45-75:  -7.5
+  rodilla  3 medidas     apoyo  -10.8  balanceo  -12.2   0-10:  -6.0 10-20: -11.1 20-30: -11.3 30-45: -13.0 45-75: -13.6
+  cadera   1 detección   apoyo   -5.3  balanceo   -8.5   0-10:  -3.1 10-20:  -5.3 20-30:  -7.8 30-45:  -8.5 45-75: -10.2
+  cadera   2 modelo      apoyo   -2.7  balanceo   -5.7   0-10:  +0.8 10-20:  -2.7 20-30:  -6.5 30-45:  -4.6 45-75:  -6.5
+  cadera   3 medidas     apoyo   -2.8  balanceo   -6.3   0-10:  +0.6 10-20:  -2.9 20-30:  -7.1 30-45:  -5.1 45-75:  -7.0
+  tobillo  1 detección   apoyo   +0.7  balanceo   +0.6   0-10:  +2.2 10-20:  +1.6 20-30:  +0.9 30-45:  -2.3 45-75:  -1.7
+  tobillo  2 modelo      apoyo   +7.6  balanceo   +7.7   0-10:  +7.8 10-20:  +8.5 20-30:  +6.9 30-45:  +7.8 45-75:  +6.2
+  tobillo  3 medidas     apoyo  +15.0  balanceo  +14.4   0-10: +14.4 10-20: +15.7 20-30: +14.8 30-45: +16.3 45-75: +12.5
+
+[squats] ÁNGULOS DE OPENSIM vs OpenSim del laboratorio (grados)
+        error     desfase     desf.DE    sin_desf    ganancia  retraso_ms           r
+  rodilla  2 modelo                  2.69        0.47        2.14        2.06        1.03        0.46        1.00
+  rodilla  3 medidas                 4.20       -3.92        2.04        2.04        1.00       -0.46        1.00
+  rodilla  OpenCap 2 cám.            3.11       -1.63        1.65        2.57        0.97        3.70        1.00
+  cadera   2 modelo                  9.40        8.27        3.28        6.99        1.18       -2.78        1.00
+  cadera   3 medidas                 7.72        5.64        3.22        6.67        1.16       -2.78        1.00
+  cadera   OpenCap 2 cám.            5.70        2.93        4.20        3.56        1.00       10.19        1.00
+  tobillo  2 modelo                  3.31        1.25        2.39        2.50        0.83       -4.63        0.98
+  tobillo  3 medidas                 5.18       -5.09        2.14        1.97        0.96       -5.09        0.98
+  tobillo  OpenCap 2 cám.            3.06        1.60        2.53        2.04        1.08      -13.89        0.98
+  pelvis(inclin.) 2 modelo           9.41        2.87       13.35        7.66        1.15       12.96        0.75
+  pelvis(inclin.) 3 medidas          9.41        2.92       13.07        7.70        1.16       14.81        0.75
+  pelvis(inclin.) OpenCap 2 cám.       6.44       -4.31        4.72        3.50        1.20       12.96        0.98
+
+[walking] ÁNGULOS DE OPENSIM vs OpenSim del laboratorio (grados)
+        error     desfase     desf.DE    sin_desf    ganancia  retraso_ms           r
+  rodilla  2 modelo                  4.25       -2.77        3.04        2.59        0.91        3.70        0.99
+  rodilla  3 medidas                 6.56       -6.09        3.27        3.53        0.82        5.09        0.99
+  rodilla  OpenCap 2 cám.            3.36        1.50        2.52        2.36        0.98        2.31        0.99
+  cadera   2 modelo                  3.54        0.68        2.54        2.69        0.94       13.43        0.98
+  cadera   3 medidas                 4.01       -0.81        2.75        3.18        0.90       20.83        0.97
+  cadera   OpenCap 2 cám.            7.39        5.00        6.28        2.00        1.01        3.24        0.99
+  tobillo  2 modelo                  5.28        4.13        2.87        3.26        0.92        7.41        0.91
+  tobillo  3 medidas                 4.19       -2.38        2.86        3.02        0.91        5.09        0.92
+  tobillo  OpenCap 2 cám.            4.13        3.08        1.95        2.80        0.81       -2.31        0.93
+  pelvis(inclin.) 2 modelo           4.35        3.13        2.81        2.81        0.86      -33.33        0.21
+  pelvis(inclin.) 3 medidas          4.32        3.14        2.94        2.69        0.79      -28.70        0.17
+  pelvis(inclin.) OpenCap 2 cám.       6.21       -4.18        5.43        1.52        0.81      -62.96        0.39
+
+[squats] LO QUE MUESTRA OPENKICK (geométrico) vs OpenSim del laboratorio (grados; tobillo: vale 'sin_desf')
+        error     desfase     desf.DE    sin_desf    ganancia  sin_lineal           r
+  rodilla  marcadores lab.           4.54        1.40        2.76        4.02        0.89        1.09        1.00
+  rodilla  1 detección               4.66       -1.22        1.85        4.06        0.90        1.87        1.00
+  rodilla  2 modelo                  2.54       -0.39        2.06        2.05        1.02        1.59        1.00
+  rodilla  3 medidas                 4.89       -4.64        1.98        2.46        0.99        2.14        1.00
+  tobillo  marcadores lab.          91.19      -91.19        1.95        3.11        0.73        1.19        0.98
+  tobillo  1 detección              95.46      -95.46        2.53        3.69        0.68        1.27        0.97
+  tobillo  2 modelo                 98.15      -98.15        2.29        2.90        0.77        1.19        0.98
+  tobillo  3 medidas               104.99     -104.99        1.89        1.78        0.96        1.14        0.99
+  rodilla, error con signo según la flexión (OpenSim lab.):
+    marcadores lab.   0-20 :  +6.7  20-40 :  +2.5  40-60 :  +0.7  60-80 :  -1.4  80-100:  -3.0 100-140:  -3.3
+    1 detección       0-20 :  +4.1  20-40 :  -1.0  40-60 :  -2.4  60-80 :  -4.3  80-100:  -5.0 100-140:  -5.3
+    2 modelo          0-20 :  -1.4  20-40 :  -1.0  40-60 :  +0.4  60-80 :  +0.7  80-100:  +0.6 100-140:  -0.4
+    3 medidas         0-20 :  -3.0  20-40 :  -8.0  40-60 :  -7.0  60-80 :  -5.4  80-100:  -4.1 100-140:  -4.2
+
+[walking] LO QUE MUESTRA OPENKICK (geométrico) vs OpenSim del laboratorio (grados; tobillo: vale 'sin_desf')
+        error     desfase     desf.DE    sin_desf    ganancia  sin_lineal           r
+  rodilla  marcadores lab.           5.53        3.85        4.54        2.37        0.88        0.96        1.00
+  rodilla  1 detección               4.00        0.26        3.37        2.77        0.90        2.06        0.99
+  rodilla  2 modelo                  5.00       -4.24        2.96        2.65        0.91        2.10        0.99
+  rodilla  3 medidas                 7.73       -7.50        3.21        3.63        0.82        1.90        0.99
+  tobillo  marcadores lab.          87.26      -87.26        3.36        1.89        0.88        1.51        0.97
+  tobillo  1 detección              87.92      -87.92        2.70        3.37        0.87        3.16        0.88
+  tobillo  2 modelo                 94.93      -94.93        2.92        3.50        0.81        2.96        0.89
+  tobillo  3 medidas               102.03     -102.03        2.93        3.43        0.79        2.79        0.89
+
+[squats] DÓNDE ESTÁ CADA PUNTO respecto al laboratorio, cm  (media fija ± lo que varía de fotograma a fotograma)
+  + delante / + hacia arriba a lo largo del hueso / + hacia fuera;  ojo: la rodilla y el tobillo del laboratorio son marcadores por fuera de la articulación
+  shoulder 1 detección   delante  -0.4 ±0.8   arriba  -1.2 ±1.0   fuera  +4.3 ±1.6
+  shoulder 2 modelo      delante  -0.9 ±1.2   arriba  +1.1 ±1.6   fuera  +3.6 ±0.8
+  shoulder 3 medidas     delante  -1.0 ±1.0   arriba  +1.8 ±1.9   fuera  +3.9 ±0.8
+  hip      1 detección   delante  +0.1 ±1.2   arriba  +2.2 ±2.0   fuera  +6.2 ±1.9
+  hip      2 modelo      delante  -0.7 ±1.4   arriba  -0.0 ±1.2   fuera  +1.7 ±0.7
+  hip      3 medidas     delante  -0.2 ±1.6   arriba  -0.4 ±1.5   fuera  +1.9 ±0.7
+  knee     1 detección   delante  +0.7 ±1.5   arriba  +1.2 ±1.3   fuera  -6.4 ±1.1
+  knee     2 modelo      delante  +0.4 ±1.3   arriba  +0.2 ±1.0   fuera  -6.8 ±1.0
+  knee     3 medidas     delante  -1.1 ±0.9   arriba  +0.6 ±1.0   fuera  -6.3 ±1.0
+  ankle    1 detección   delante  -0.4 ±0.5   arriba  -0.4 ±0.4   fuera  -2.6 ±1.1
+  ankle    2 modelo      delante  -0.6 ±0.4   arriba  -0.5 ±0.7   fuera  -4.3 ±1.0
+  ankle    3 medidas     delante  +0.0 ±0.3   arriba  +0.3 ±0.9   fuera  -3.9 ±1.0
+  heel     1 detección   delante  +0.6 ±0.5   arriba  -3.0 ±0.6   fuera  +2.6 ±1.1
+  heel     2 modelo      delante  +2.0 ±0.4   arriba  +1.8 ±0.9   fuera  +1.3 ±1.1
+  heel     3 medidas     delante  +2.5 ±0.3   arriba  +2.7 ±0.9   fuera  +1.5 ±1.3
+  toe      1 detección   delante  +1.9 ±0.5   arriba  -4.8 ±0.4   fuera  -0.8 ±0.9
+  toe      2 modelo      delante  +2.3 ±0.4   arriba  -1.7 ±0.4   fuera  -1.0 ±0.8
+  toe      3 medidas     delante  +2.8 ±0.4   arriba  -2.7 ±0.5   fuera  -0.6 ±0.8
+
+  ax[1].plot(wmid, m, "o-", color=COLOR[mode], label=LABEL[mode], ls=ls)
+
+  + delante / + hacia arriba a lo largo del hueso / + hacia fuera;  ojo: la rodilla y el tobillo del laboratorio son marcadores por fuera de la articulación
+  shoulder 1 detección   delante  -0.5 ±1.7   arriba  -2.3 ±0.7   fuera  +1.0 ±1.8
+  shoulder 2 modelo      delante  +0.0 ±1.4   arriba  -2.3 ±0.7   fuera  +3.7 ±1.2
+  shoulder 3 medidas     delante  +0.1 ±1.7   arriba  -2.3 ±0.7   fuera  +4.0 ±1.2
+  hip      1 detección   delante  +1.2 ±2.6   arriba  +0.0 ±1.4   fuera  +0.7 ±1.8
+  hip      2 modelo      delante  +0.9 ±2.3   arriba  +1.3 ±1.0   fuera  -2.0 ±1.3
+  hip      3 medidas     delante  +1.0 ±2.8   arriba  +0.5 ±1.1   fuera  -1.9 ±1.3
+  knee     1 detección   delante  -0.1 ±2.7   arriba  +1.8 ±1.7   fuera  -8.2 ±1.7
+  knee     2 modelo      delante  -0.6 ±2.6   arriba  +1.5 ±1.2   fuera  -7.6 ±1.2
+  knee     3 medidas     delante  -1.6 ±2.9   arriba  +1.6 ±1.4   fuera  -7.2 ±1.2
+  ankle    1 detección   delante  +0.2 ±2.1   arriba  +0.1 ±2.1   fuera  -3.9 ±0.9
+  ankle    2 modelo      delante  +0.6 ±1.8   arriba  -0.9 ±1.6   fuera  -5.0 ±1.0
+  ankle    3 medidas     delante  +1.0 ±2.1   arriba  +0.2 ±1.7   fuera  -4.8 ±1.0
+  heel     1 detección   delante  +0.8 ±3.3   arriba  -2.8 ±2.2   fuera  +1.1 ±1.2
+  heel     2 modelo      delante  +2.7 ±2.2   arriba  +0.8 ±2.2   fuera  +0.8 ±1.2
+  heel     3 medidas     delante  +3.1 ±2.5   arriba  +2.0 ±2.6   fuera  +0.8 ±1.2
+  toe      1 detección   delante  +2.6 ±3.0   arriba  -2.6 ±1.8   fuera  -2.1 ±1.6
+  toe      2 modelo      delante  +3.4 ±2.8   arriba  -1.3 ±1.9   fuera  -2.0 ±1.5
+  toe      3 medidas     delante  +3.6 ±3.2   arriba  -2.2 ±2.0   fuera  -1.9 ±1.5
+
+[todas] largo de los huesos: laboratorio vs cada opción (cm, media por persona) y cuánto varía (DE, cm)
+  squats   muslo   lab  40.5 (±1.4) | 1 detección  39.5 (±2.0, dif -1.0) | 2 modelo  43.1 (±0.1, dif +2.6) | 3 medidas  41.0 (±0.1, dif +0.5)
+  squats   pierna  lab  41.5 (±1.1) | 1 detección  43.2 (±1.0, dif +1.7) | 2 modelo  44.3 (±0.0, dif +2.8) | 3 medidas  41.8 (±0.0, dif +0.3)
+  walking  muslo   lab  41.5 (±0.4) | 1 detección  40.7 (±1.8, dif -0.8) | 2 modelo  43.1 (±0.1, dif +1.6) | 3 medidas  41.3 (±0.1, dif -0.1)
+  walking  pierna  lab  42.3 (±0.6) | 1 detección  43.3 (±2.0, dif +1.0) | 2 modelo  44.3 (±0.0, dif +2.0) | 3 medidas  42.3 (±0.0, dif +0.0)
+
+figuras en /tmp/claude-1000/-home-lex-Documentos-OpenKick/29eee832-81e7-452f-a87b-9afc1ada34f1/scratchpad/frames_fig
+
+[walking] rodilla que muestra OpenKick vs OpenSim del laboratorio: apoyo / balanceo / por flexión (grados)
+  marcadores lab. apoyo   +4.9  balanceo   +2.3   0-10:  +8.0 10-20:  +3.1 20-30:  -1.3 30-45:  +0.8 45-75:  +0.2
+  1 detección     apoyo   +1.0  balanceo   -0.7   0-10:  +2.6 10-20:  -0.0 20-30:  -1.9 30-45:  -1.2 45-75:  -3.0
+  2 modelo        apoyo   -3.6  balanceo   -5.0   0-10:  -1.8 10-20:  -4.3 20-30:  -6.4 30-45:  -6.1 45-75:  -7.2
+  3 medidas       apoyo   -5.9  balanceo   -9.9   0-10:  -2.9 10-20:  -7.3 20-30: -10.9 30-45: -11.7 45-75: -13.3
