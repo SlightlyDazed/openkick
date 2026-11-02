@@ -20,9 +20,15 @@ TRAVEL = 0.5              # the pelvis moves at least this fraction of the leg i
 #                           overground (on a treadmill it stays put and there is no stride length)
 COLOR_STANCE = "#10B981"
 COLOR_SWING = "#2563EB"
+# From a side camera the toes are furthest behind the pelvis a little before they leave the ground:
+# against the OpenCap force plates (60 fps, 94 toe offs) the 2D toe off came 23 ms early, and moving
+# it by the median learned on the other people took the error from 30 to 21 ms. In 3D it was 9 ms
+# early and is left alone; the initial contact (+7 ms) is too, a shift there gained 1 ms.
+TOE_OFF_DELAY_2D = 0.023
 
-# What can be reported for each stride: key, name, unit. Angles are measured inside the joint, so
-# 180° is a straight limb; "*" marks what the detector places least reliably.
+# What can be reported for each stride: key, name, unit. Angles are clinical ones (core/joints.py):
+# 0° is a straight knee and a thigh in line with the body, + is flexion; "*" marks what the
+# detector places least reliably.
 MEASURES = {
     "stride_time": ("Stride time", "s"),
     "cadence": ("Cadence", "steps/min"),
@@ -32,6 +38,7 @@ MEASURES = {
     "knee_swing": ("Knee, swing", "°"),              # most bent during the swing
     "knee_rom": ("Knee range", "°"),
     "hip_rom": ("Hip range", "°"),
+    "hip_extension": ("Hip, most extended", "°"),     # in the stance; below 0 = behind the body
     "ankle_rom": ("Ankle range *", "°"),
     "trunk": ("Trunk lean", "°"),                    # forward of the vertical
     "step_length": ("Step length", "m"),             # from the other heel to this one, both on the ground
@@ -39,7 +46,8 @@ MEASURES = {
     "stride_length": ("Stride length", "m"),
     "speed": ("Walking speed", "m/s"),
 }
-BY_SIDE = ("stride_time", "stance", "knee_contact", "knee_swing", "knee_rom", "hip_rom", "step_length")
+BY_SIDE = ("stride_time", "stance", "knee_contact", "knee_swing", "knee_rom", "hip_rom", "hip_extension",
+           "step_length")
 SHOWN = ("stride_time", "cadence", "stance", "knee_contact", "knee_swing")
 
 
@@ -94,11 +102,15 @@ def events(rel: np.ndarray, fps: float, leg: float) -> list[tuple[int, float]]:
     return [(int(i), vertex(filled, int(i))) for i in peaks if seen[i]]
 
 
-def pair(contacts: list, offs: list, t: np.ndarray, seen: np.ndarray) -> list[dict]:
+def pair(contacts: list, offs: list, t: np.ndarray, seen: np.ndarray, toe_off_delay: float = 0.0) -> list[dict]:
     """Strides of one foot: from one initial contact to the next, with one toe off in between.
     Each is {"a", "fa", "b", "fb", "o", "fo", "seconds", "stance"} (frames within the arrays given,
-    the f* ones with their fraction; stance as a share of the stride)."""
+    the f* ones with their fraction; stance as a share of the stride). `toe_off_delay` (seconds)
+    moves every toe off later, to undo a known bias of the method (TOE_OFF_DELAY_2D)."""
     frames = np.arange(len(t))
+    if toe_off_delay and len(t) > 1:
+        shift = toe_off_delay / float(np.median(np.diff(t)))
+        offs = [(min(len(t) - 1, int(round(fo + shift))), min(len(t) - 1.0, fo + shift)) for _, fo in offs]
     gaps = np.diff([a for a, _ in contacts])
     out = []
     for n, ((a, fa), (b, fb)) in enumerate(zip(contacts[:-1], contacts[1:])):
@@ -116,7 +128,8 @@ def pair(contacts: list, offs: list, t: np.ndarray, seen: np.ndarray) -> list[di
 
 
 def joint_measures(s: dict, knee: np.ndarray, hip: np.ndarray, ankle: np.ndarray, trunk: np.ndarray) -> dict:
-    """The angles of one stride (`s` from pair()), from per-frame series of the stride's leg."""
+    """The angles of one stride (`s` from pair()), from per-frame series of the stride's leg, in
+    the clinical convention (knee and hip flexion, ankle dorsiflexion)."""
     a, b, o = s["a"], s["b"], s["o"]
     sl = slice(a, b + 1)
     frames = np.arange(len(knee))
@@ -125,9 +138,10 @@ def joint_measures(s: dict, knee: np.ndarray, hip: np.ndarray, ankle: np.ndarray
         return {"stride_time": s["seconds"], "cadence": 120.0 / s["seconds"],
                 "stance": 100 * s["stance"], "swing": 100 * (1 - s["stance"]),
                 "knee_contact": float(np.interp(s["fa"], frames, knee)),
-                "knee_swing": float(np.nanmin(knee[o:b + 1])),
+                "knee_swing": float(np.nanmax(knee[o:b + 1])),
                 "knee_rom": float(np.nanmax(knee[sl]) - np.nanmin(knee[sl])),
                 "hip_rom": float(np.nanmax(hip[sl]) - np.nanmin(hip[sl])),
+                "hip_extension": float(np.nanmin(hip[a:o + 1])),
                 "ankle_rom": float(np.nanmax(ankle[sl]) - np.nanmin(ankle[sl])),
                 "trunk": float(np.nanmean(trunk[sl]))}
 

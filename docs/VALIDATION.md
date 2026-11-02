@@ -24,6 +24,10 @@ participants, 72 recordings (squat, sit-to-stand, drop jump, gait):
   against the lab*.
 - **Dates.** The pooled 3D figures were computed on 2 October 2026. The reconstruction changes of 25 October
   moved the per-movement results by less than 1° (see that section).
+- **Clinical angles since 1 November 2026.** The app now reports the joints with a sign from 0°, and the
+  error is measured against the lab's OpenSim angles: 2D hip in gait 5.5° (it was 16.5° inside the joint),
+  2D ankle 9–20° (it was 27–43°), 3D hip 4.2–7.3°, 3D ankle 4.3–7.5°. See *Clinical angles, gait events
+  and speeds*.
 - **Cycling is not validated.** It has only a consistency test: one rider, two saddle heights, phone videos
   compressed by a messaging app, no lab reference.
 - **Tuning on the same data.** Three settings were checked on held-out participants (*Tuning on some
@@ -626,3 +630,225 @@ found that has all three. Candidates, with what could be checked on their pages:
 scaling and inverse kinematics. `validation/opensim_render.py` draws the resulting model, with its bones,
 without needing the OpenSim application. `openkick/multiview/detect.py` compensates for the motion of a
 hand-held camera using the background.
+
+## Clinical angles, gait events and speeds (1 November 2026)
+
+A biomechanics review of the program (ten points) found that the angles were reported as the angle
+inside the joint (180° = straight), which folds over at 180°: a hip in extension read like one in
+flexion, and its speed showed false peaks where the curve folded. It also asked for the gait events, the
+speeds and the stride length to be checked. Each point was answered by measuring several ways of doing
+it on the OpenCap data and keeping the one with the least error. The scripts are not in the repository;
+they reuse `validation/opencap.py` and `validation/multiview.py`.
+
+**Reference.** Here the reference is the lab's own OpenSim inverse kinematics (`hip_flexion`,
+`knee_angle`, `ankle_angle`, `arm_flex`), which is the clinical convention. The tables in *Results (1
+October 2026)* compared against angles built from the lab markers the way OpenKick built its own, so the
+numbers are not comparable one to one.
+
+**2D, one side camera (MediaPipe as the app runs it).** 9 participants, Cam0 and Cam4, squat (18 videos),
+sit-to-stand (18), drop jump (54) and gait (54; only the trials whose time offset is known from 3D). Mean
+absolute error in degrees, near leg / far leg:
+
+| Joint, way of measuring | Gait | Squat | Sit-to-stand | Drop jump |
+|---|---|---|---|---|
+| Hip, inside the joint (before) | 16.5 / 17.8 | 7.3 / 7.5 | 6.1 / 9.8 | 7.0 / 7.8 |
+| Hip, thigh against the trunk's axis | 9.5 / 12.3 | 7.0 / 7.8 | 6.7 / 8.9 | 7.0 / 7.6 |
+| Hip, thigh against the vertical | **5.5 / 6.0** | 24.8 / 20.9 | 15.6 / 14.4 | 18.1 / 17.7 |
+| Hip, vertical tipped by 0.75 × trunk lean | 9.1 / 10.9 | **8.4 / 6.0** | **6.0 / 6.8** | **5.4 / 5.4** |
+| Knee, inside the joint (180 − angle) | 8.2 / 7.3 | 9.2 / 4.3 | 9.7 / 6.4 | 7.0 / 5.5 |
+| Knee, with a sign | 8.1 / 8.6 | 9.4 / 4.9 | 9.7 / 6.5 | 7.0 / 5.5 |
+| Ankle, foot from ankle to toes (before) | 29.8 / 27.1 | 43.1 / 31.8 | 42.2 / 35.4 | 32.0 / 27.5 |
+| Ankle, foot from heel to toes | **10.9 / 9.4** | **20.4 / 11.3** | **19.1 / 14.5** | **13.0 / 11.2** |
+
+- **Hip.** In gait the folded angle was unusable (correlation with the lab 0.45 near, 0.29 far); against
+  the vertical it is 0.90 and 0.96. Where the trunk bends (squat, sit-to-stand, jump) the vertical alone
+  misses the pelvis tilting with it, and taking three quarters of the trunk's lean as that tilt is best:
+  over both legs 7.2° against 7.4° before in the squat, 6.4° against 8.0° in sit-to-stand, 5.4° against
+  7.4° in the jump. In the frames where the lab hip is in extension the error drops from 10–12° to 5°
+  (squat) and from 24–28° to 5–6° (gait). Other values of the share (0.5, 1.0) and a slowly filtered lean
+  (0.5, 1 and 2 Hz) were also tried and were no better.
+- **Knee.** With or without a sign the error is the same within 0.6°, except the far leg in gait (1.3°
+  more with a sign: on a healthy knee near straight the noise now shows on both sides of 0°). The sign is
+  kept so that a hyperextended knee shows as negative.
+- **Ankle.** The foot from heel to toes removes most of the error. What remains is mostly a constant
+  offset (−4 to −20°) that changes with the movement, so it is not corrected.
+- **Shoulder** (MediaPipe heavy, which keeps the arms; participants 2 to 9, 103 videos). Near side /
+  far side: inside the joint 24.3 / 19.9 in gait, 14.8 / 9.9 squat, 19.9 / 10.7 sit-to-stand, 31.8 /
+  23.7 jump. Against the vertical in gait: **5.1 / 9.7**. Against the trunk's axis in the others: **10.6 /
+  7.5, 14.6 / 7.9, 23.3 / 18.6**. The shoulder in the jump stays unreliable (the arms swing fast and above
+  the head).
+
+**3D, two cameras (Cam0 and Cam4).** 9 participants, one trial of each movement, both legs (n = 18 per
+cell), with the vertical the app itself finds:
+
+| Joint, way of measuring | Gait | Squat | Sit-to-stand | Drop jump |
+|---|---|---|---|---|
+| Hip, inside the joint (before) | 12.8 | 7.6 | 8.9 | 7.6 |
+| Hip, thigh against the vertical, in the pelvis's side plane | **4.3** | 16.9 | 12.0 | 9.2 |
+| Hip, vertical tipped 0.75 of the way to the trunk | 4.2 | **6.0** | **7.3** | **5.3** |
+| Knee, flexion | 4.0 | 4.6 | 5.0 | 4.3 |
+| Ankle, foot from ankle to toes (before) | 17.4 | 25.5 | 26.9 | 18.8 |
+| Ankle, foot from heel to toes | **4.3** | **6.1** | **7.5** | **7.3** |
+
+The hip's adduction was also measured in the same pelvis estimate: 4.9° in gait but with a correlation
+of only 0.40, and a 10° offset in the squat; it is not reported. Rotation cannot be measured from these
+points.
+
+**What the app does now.** Knee, hip, ankle, shoulder and elbow read clinically, in 2D and 3D (see
+`openkick/core/joints.py`): the Gait template measures the hip and the shoulder against the vertical,
+every other template against the vertical tipped by three quarters of the trunk's lean (the shoulder
+against the trunk's axis), the ankle with the foot from heel to toes. Cycling keeps the angle inside
+the joint, the language of bike fitting: when pedalling the hip and the knee never reach 180°, so they do
+not fold. A template can choose (`convention`, `hip_reference`, see [TEMPLATES.md](TEMPLATES.md)). The
+gait tables gained *Hip, most extended*. Projects already saved show the new angles when opened.
+
+**Gait events against the force plates.** The OpenCap gait trials have force plates (2000 Hz): an
+initial contact is the vertical force rising through 20 N, a toe off falling through it. 2D, 60 fps, 9
+participants, both feet; mean (+ = late) and mean absolute error in ms:
+
+| Method | Contact, near foot | Toe off, near foot | Contact, far foot | Toe off, far foot |
+|---|---|---|---|---|
+| Zeni et al. 2008 (the app's) | +13, 17 (45/56 found) | −31, 32 (47/53) | +5, 12 (43/56) | −25, 28 (47/53) |
+| Foot velocity (O'Connor et al. 2007) | −135, 135 (2/56) | −26, 53 (7/53) | none found | −62, 62 (19/53) |
+| Lowest heel / toes lifting | +110, 121 (18/56) | +8, 52 (14/53) | +126, 126 (28/56) | −13, 56 (17/53) |
+
+Zeni's method is kept. Its toe off comes early. Moving it by the median learned on the other
+participants (leaving each one out in turn) took the error from 29.7 to 21.2 ms. The shift was 21–26 ms
+whoever was left out, so 2D toe offs are now moved 23 ms later (`TOE_OFF_DELAY_2D` in
+`openkick/core/gait.py`). For the contact the same correction gained 1 ms (14.9 to 13.8), so it is left
+alone. In 3D (10 contacts, 9 toe offs: the trials are short) the toe off was only 9 ms early
+(contact +5 ms, abs 15; toe off −9 ms, abs 10), and the shift would make it worse. 3D is not shifted.
+
+**Speeds.** A detector jump, a point that leaves for a frame or two and comes back, became a false
+peak of speed (the review found an ankle at 5.86 m/s before the first stride). Before
+differentiating, the app now drops the values further than 3 robust standard deviations from the median
+of the 0.2 s around them. This is a Hampel filter, with a floor: the value must also be more than 5° away
+for an angle, or 2 % of the leg for a point. Against the lab (2D, the same 144 videos):
+
+| | Gait | Squat | Sit-to-stand | Drop jump |
+|---|---|---|---|---|
+| Knee angular speed, error in °/s, before → after | 114 → 89 | 25 → 25 | 29 → 28 | 52 → 53 |
+| Knee, peak speed error in °/s | 222 → 189 | 51 → 51 | 50 → 50 | 59 → 60 |
+| Hip angular speed, error in °/s | 48 → 42 | 21 → 21 | 27 → 26 | 44 → 44 |
+| Ankle speed (lab marker), error in m/s | 0.70 → 0.56 | 0.01 → 0.01 | 0.02 → 0.02 | 0.33 → 0.31 |
+
+The 2D ankle speed was scaled to the lab's metres by one factor per trial, median against median.
+Without the floor, the filter took real speed out of the jumps (knee 52 → 57 °/s). Median filters of 3
+and 5 frames, and a test for out-and-back jumps above 600 or 1000 °/s, gained less. The same filter
+runs before the gait plugin's angles (gait knee angle error, once each trial's own offset is removed,
+6.7 → 5.2°). With the Gait template, the
+velocities plugin reports its peaks over *All strides* instead of the whole clip, so walking into and
+out of the picture is left out.
+
+**Stride length from one camera.** A calibration holds on one line, so someone walking nearer or further
+changes size in the picture and their stride with it. The gait plugin now flags *Stride length steady*
+when the longest and the shortest stride differ by more than 15 % of the median. Walking itself varies
+2–4 % (coefficient of variation) from stride to stride. When the leg's size in the picture also changes
+by more than 10 %, the message gives that as the cause. These two thresholds are not validated: the
+OpenCap gait trials hold one or two strides.
+
+### The back's shape from the person's outline (1 November 2026)
+
+Prompted by a deadlift demo that scores how rounded the back is, a prototype read the back's edge from
+MediaPipe's person mask (heavy model, `output_segmentation_masks`). The edge was taken along the line
+from the mid-hips to the mid-shoulders, on the same 144 side videos. The edge sat on the back in every
+frame checked, standing and at the bottom of the squat. Several measures of its shape were tested: the
+bend between its lower and upper halves, the bulge from the straight line, and the tilt of its lower and
+upper halves. Each was checked as a predictor of the lab's `lumbar_extension` and `pelvis_tilt`, with a
+linear fit learned on the other participants. Error in degrees on the participant left out:
+
+| | Squat | Sit-to-stand | Drop jump | Gait |
+|---|---|---|---|---|
+| Lumbar flexion, from the trunk's lean | 5.5 | 10.0 | 6.6 | 2.9 |
+| Lumbar flexion, lean + best shape measure | 5.5 | 8.8 | 6.4 | 2.8 |
+| Pelvis tilt, from the trunk's lean | 4.3 | 7.7 | 4.5 | 2.6 |
+| Pelvis tilt, lean + best shape measure | 4.3 | 6.8 | 4.5 | 2.6 |
+| Hip flexion, lean + shape (against lean alone) | 5.2 (5.0) | 4.4 (4.4) | 4.9 (4.9) | 5.6 (6.0) |
+
+- **The shape adds almost nothing to what the trunk's lean tells.** It gains about 1° only in
+  sit-to-stand.
+- **The roundness measures do not follow the lab's lumbar flexion within a trial:** the bend and the
+  bulge correlate at r = −0.14 to 0.32.
+- **This does not prove the outline is useless for a rounded back.** The lab model has a single lumbar
+  joint, so it measures the angle between the pelvis and the thorax, not the curve. The participants are
+  healthy, wear tight tops and do not round their backs. Nothing was measured on cycling. **It is not added
+  to the app as a measure.**
+- **A constant offset would help the hip.** Fitting the hip as thigh + a·lean + b gives smaller errors
+  than the app's fixed 0.75 (squat 7.2 → 5.0°, sit-to-stand 6.5 → 4.4°). Most of that is the constant
+  b, which changes with the movement and the camera. Like the ankle's offset, it is left out.
+
+## Every measure against the literature (1 November 2026)
+
+After the hip, every measure the program reports was compared with how the literature defines it. Seven
+things were changed. Each is measured where there was something to measure it against.
+
+**1. The low-pass filter before speeds.** Everything was smoothed at 6 Hz, Winter's value for walking.
+Against the OpenCap lab (lab angles at 100 Hz, filtered at 15 Hz), peak angular speeds of the 2D knee and
+hip, mean of the trials:
+
+| | Lab peak | 6 Hz | 12 Hz | Winter's residual analysis (median cutoff) |
+|---|---|---|---|---|
+| Drop jump, knee | 855 °/s | −25 % | −6 % | −15 % (8 Hz) |
+| Drop jump, hip | 534 °/s | −17 % | −4 % | −11 % (8 Hz) |
+| Squat, knee | 223 °/s | +11 % | +32 % | +17 % (7 Hz) |
+| Gait, knee | 418 °/s | +13 % | +88 % | +17 % (7 Hz) |
+
+- **Fast movements lose their peaks at 6 Hz; slow ones gain noise at higher cutoffs.**
+- **A kick is faster than anything in OpenCap.** A foot reaching 20 m/s in a 70 ms swing, filtered at
+  6 Hz, reads 14.5 m/s at 60 fps and 13.6 at 30 fps, whatever the frame rate. At 15 Hz it reads 18.9 m/s
+  at 60 fps. At 30 fps it cannot go above 16.5 m/s even unfiltered.
+- **Residual analysis chose 7–8 Hz everywhere** and only halved the loss in the jump.
+- **What the app does now.** The cutoff belongs to the template (`cutoff_hz`): 6 Hz by default, 12 Hz in
+  Vertical jump, 15 Hz in Kick, always below half the frame rate. The velocities report says which
+  cutoff was used. It warns when the video has fewer frames per second than the template needs
+  (`min_fps`, 60 in both).
+
+**2. Acceleration.** The velocities plugin reported the rate of change of the speed. That is only the
+part of the acceleration along the path: a foot going round a circle at a steady speed came out at 0.
+It now reports the size of the second derivative of the position, as the literature defines it.
+
+**3. 3D scale of someone who never stands up.** Without tape measures, the 3D is scaled so that the top
+of the head to the heels, in the most upright frames, equals the height. That holds for anyone who
+stands at some moment: in the 36 OpenCap trials the shank comes out 0.973–1.078 of the lab markers'
+(median 1.009). A rider on a trainer never stands: in the sessions at 93 and 95 cm the head-to-heels
+distance is 0.89 of the height. Every length in centimetres would come out 11–12 % too big (checked
+against the same sessions scaled with the tape).
+
+Now, when the head-to-heels distance never reaches 0.90 of the height the legs suggest (riders 0.86–0.87,
+standing people 0.945 or more), the scale comes
+from the legs instead. The detected thigh plus shank is 0.468 of the height in the OpenCap participants
+standing, against 0.491 anatomically (Winter), because the detector puts the hip and the knee a little
+closer.
+- **The two sessions:** −2.9 % and −3.3 % from the tape (they were +12.4 % and +10.6 %).
+- **Standing people:** never trigger it. Their ratio was 0.945 or more, and none of the 36 OpenCap
+  trials changed.
+- **Legs for everyone was tried too:** standing people then came out 7 % off on average.
+
+**4. Height in the 2D OpenSim export.** Without a calibration the export took nose-to-ankle as 94 % of
+the height. In the OpenCap 3D, standing upright, it is 87.6 % (27 trials, 84.4–88.5 %), which matches
+Winter's proportions (nose ≈ 0.91, ankle 0.039 of the height). Everything came out about 7 % small. It
+now uses 0.876.
+
+**5. Body mass index under 18.** The WHO adult classes were shown at any age. Under 18 the BMI is read
+on percentiles for age and sex (WHO growth references), which the program does not hold. The value is
+still shown, but without a class.
+
+**6. Cycling's "bottom" and "top".** The program measures the knee at its most stretched and most bent
+while pedalling, a dynamic value. Bike-fitting ranges are often given for a goniometer with the crank
+held at the bottom (Holmes et al. 1994: 25–35° of knee flexion), which reads differently from the
+dynamic value (Ferrer-Roca et al. 2012 recommend 30–40° for dynamic measures). Recovery and propulsion
+are split at these two moments, not at the crank's position. The reports now say so.
+
+**7. "Beyond the variation" in comparisons.** The ● compares a difference with how much the measure
+changes from one cycle to the next within each recording. Between two recordings, for example two
+saddle heights on two days, it does not include the error of placing the camera again. The note under
+every comparison now says so.
+
+**Checked and left as they were:**
+- the centre of mass: de Leva's 1996 fractions, with the trunk from the mid-shoulders;
+- Perry's eight phases (their shares and events);
+- cadence, stance, stride and step length and step width;
+- the BMI cut-offs for adults;
+- leg length with a tape (ASIS to medial malleolus);
+- the cycling trunk angle (shoulder–hip line above the horizontal);
+- the closed hip angle (trunk–thigh), as bike fitting measures it.

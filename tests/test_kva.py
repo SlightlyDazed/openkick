@@ -47,8 +47,12 @@ def test_export_import_roundtrip(project, tmp_path):
     notes = kva.import_into(q, out)
     assert "skeleton:80" in notes and "angles:2" in notes and "trajectories:1" in notes
     knee_p, knee_q = project.measurements[0], q.measurements[0]
+    # Kinovea's angles come back as free points, measured inside them as Kinovea does: the same
+    # geometry as the skeleton's knee, whose value the template reads clinically
+    a, o, b = (project.pose.xy[:, r.landmark].astype(np.float64) for r in knee_p.points)
+    inside = A.angle_between(a, o, b)
     for f in (0, 33, 79):
-        assert abs(A.value_at(project, knee_p, f) - A.value_at(q, knee_q, f)) < 0.2
+        assert abs(inside[f] - A.value_at(q, knee_q, f)) < 0.2
     assert q.phases[0].name == "Apoyo" and q.phases[0].start == 10
 
 

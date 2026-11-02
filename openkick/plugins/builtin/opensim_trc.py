@@ -62,8 +62,12 @@ class OpenSimTrc(ExportPlugin):
         return tr("OpenSim file written. The depth (Z) comes from a single camera and is approximate.")
 
 
+NOSE_TO_ANKLE = 0.876      # share of the height
+
+
 def _scale_from_height(p, height_m):
-    """px per meter from nose-to-ankle distance in the most upright frames (~94% of height)."""
+    """px per meter from nose-to-ankle distance in the most upright frames: 87.6 % of the height
+    (OpenCap participants, 27 trials; Winter's proportions give 0.87)."""
     xy = p.pose.xy
     nose = xy[:, L.INDEX["nose"], 1]
     ankle = np.nanmean(xy[:, [L.INDEX["left_ankle"], L.INDEX["right_ankle"]], 1], axis=1)
@@ -72,7 +76,7 @@ def _scale_from_height(p, height_m):
     if not len(h):
         return 500.0
     tall = h[h >= np.percentile(h, 75)]
-    return float(np.median(tall)) / (height_m * 0.94)
+    return float(np.median(tall)) / (height_m * NOSE_TO_ANKLE)
 
 
 PLUGINS = [OpenSimTrc()]

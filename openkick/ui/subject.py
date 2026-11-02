@@ -246,7 +246,8 @@ class SubjectDialog(QDialog):
             self.bmi.setText("—")
             self.bmi.setStyleSheet(f"color: {theme.MUTED};")
         else:
-            self.bmi.setText(f"{s.bmi:.1f} kg/m² · {tr(s.bmi_class)}")
+            self.bmi.setText(f"{s.bmi:.1f} kg/m² · " + (tr(s.bmi_class) if s.bmi_class else
+                                                          tr("under 18: read it on the percentiles for age and sex")))
             self.bmi.setStyleSheet("font-weight: 600;")
         d = s.leg_difference()
         if d is None:

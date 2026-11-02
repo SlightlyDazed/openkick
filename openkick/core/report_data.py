@@ -15,7 +15,10 @@ from openkick.i18n import tr
 
 FORMAT_VERSION = 1
 ABOUT = {
-    "angles": "degrees, measured inside the joint: 180 is a straight limb",
+    "angles": "degrees. Cycling: measured inside the joint, 180 is a straight limb. Other activities: clinical, "
+              "0 is the neutral position; knee/elbow flexion, hip flexion (+) and extension (-) of the thigh "
+              "against the vertical (gait) or against the vertical tipped by 3/4 of the trunk's lean, ankle "
+              "dorsiflexion (+) with the sole from heel to toes",
     "lengths": "cm; with different people, '% height' is the length as a share of each one's height",
     "median, spread": "typical value over the cycles and how much it varies from one to the next: "
                       "1.4826 x the median absolute deviation (a standard deviation that wrong cycles do not inflate)",

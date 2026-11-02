@@ -253,7 +253,7 @@ def test_no_gait_rows_when_nobody_walks():
     pytest.importorskip("PySide6.QtWidgets")
     from tests.test_multiview import _app, _on_real_file, make
     app = _app()
-    from openkick.ui.multiview import BARS_H, MultiviewWindow
+    from openkick.ui.multiview import BARS_H, BONES_H, MultiviewWindow
     s, _ = make()                                                 # squats and a knee raise: no strides
     _on_real_file(s)
     s.solve()
@@ -263,7 +263,9 @@ def test_no_gait_rows_when_nobody_walks():
     w.set_session(s)
     app.processEvents()
     assert w.ctl.gait() is None
-    assert set(w.timeline.lanes()) == {"track", "bars"} and w.timeline.height() == BARS_H
+    bones = {"bones"} if w.ctl.show_lengths else set()             # the length guides, walking or not
+    assert set(w.timeline.lanes()) == {"track", "bars"} | bones
+    assert w.timeline.height() == BARS_H + (BONES_H if bones else 0)
     assert not w.panel.gait_card.isVisibleTo(w.panel)
     w.timeline.grab()
     s.saved_revision = s.revision

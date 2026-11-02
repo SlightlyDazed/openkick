@@ -149,8 +149,9 @@ def _report(c: Cycling, quality: dict | None):
     leg = tr("Right leg") if c.side == "right" else tr("Left leg")
     summary = [tr("{leg} · {n} pedal strokes at {rpm} rpm (± {sd}) · {m} strokes of both legs measured in 3D.",
                   leg=leg, n=len(c.strokes), rpm=f"{rpm:.0f}", sd=f"{spread:.1f}", m=len(every)),
-               tr("Angles are measured inside the joint, so 180° is a straight limb. Up is where the phones' "
-                  "own vertical points: on tripods they should stand upright.")]
+               tr("Angles are measured inside the joint, so 180° is a straight limb, at the two ends of the stroke "
+                  "while pedalling (dynamic values, not those of a goniometer with the crank held at the bottom). "
+                  "Up is where the phones' own vertical points: on tripods they should stand upright.")]
     if quality and quality.get("level") == "poor":
         summary.append(tr("The 3D reconstruction is of poor quality: correct the doubtful points before "
                           "relying on these numbers."))

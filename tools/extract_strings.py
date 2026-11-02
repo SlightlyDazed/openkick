@@ -72,6 +72,9 @@ from openkick.core import gait as _gait  # noqa: E402
 for _, full, short, _, _ in _gait.PERRY:
     add(full)
     add(short)
+for _n, _u in _gait.MEASURES.values():
+    add(_n)
+add("steps/min")                     # the other units are the same in every language
 
 from openkick.core import cycling as _cyc  # noqa: E402
 from openkick.core import store as _store  # noqa: E402
@@ -101,7 +104,7 @@ from openkick.multiview.session import STROKE_PARTS as _parts  # noqa: E402
 from openkick.core.models import TITLES as _titles  # noqa: E402
 for _n in _titles.values():
     add(_n)
-for _n in _parts + ("{bone} {cm} cm · tape {usual} · {pct} %",):
+for _n in _parts + ("{bone} {cm} cm · tape {usual} · {pct} %", "{bone} {cm} cm · usual {usual} · {pct} %"):
     add(_n)
 for _n in _rev.WHY.values():
     add(_n)

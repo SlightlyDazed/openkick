@@ -347,12 +347,42 @@ def resample(t, xy, score, t_new):
     return out, sc
 
 
+# The detected thigh plus shank as a share of the height, measured on the OpenCap participants
+# standing (anatomically 0.491, Winter: the detector puts the hip and the knee a little closer).
+LEGS_OF_HEIGHT = 0.468
+# Head-to-heels against the height the legs suggest: 0.945 or more in everyone who stands up at some
+# moment (OpenCap), 0.86-0.87 in a rider who stays seated; below this, the height cannot be used. It
+# sits between the two, leaving room for long legs (a body with legs 0.51 of its height gives 0.91).
+STANDS = 0.90
+
+
+def leg_length(X: np.ndarray) -> float:
+    """Median thigh plus median shank (mean of both legs), in the units of X."""
+    out = []
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        for s in ("left", "right"):
+            th = np.nanmedian(np.linalg.norm(X[:, IDX[f"{s}_hip"]] - X[:, IDX[f"{s}_knee"]], axis=1))
+            sh = np.nanmedian(np.linalg.norm(X[:, IDX[f"{s}_knee"]] - X[:, IDX[f"{s}_ankle"]], axis=1))
+            if np.isfinite(th) and np.isfinite(sh):
+                out.append(th + sh)
+    return float(np.mean(out)) if out else float("nan")
+
+
 def scale_from_height(X: np.ndarray, height_m: float) -> float:
-    """Factor from reconstruction units to metres, from the person's height (top of the head
-    to the heels in the most upright frames)."""
+    """Factor from reconstruction units to metres, from the person's height: the top of the head
+    to the heels in the most upright frames, when they stand up at some moment. Someone who
+    never does (a rider on a trainer) would come out about 11 % too big that way: then it is
+    the legs' length, as a share of the height, that gives the scale."""
     h = np.linalg.norm(X[:, IDX["head"]] - (X[:, IDX["left_heel"]] + X[:, IDX["right_heel"]]) / 2, axis=1)
     h = h[np.isfinite(h)]
-    return height_m / float(np.percentile(h, 90)) if len(h) else 1.0
+    if not len(h):
+        return 1.0
+    tallest = float(np.percentile(h, 90))
+    legs = leg_length(X)
+    if np.isfinite(legs) and legs > 0 and tallest < STANDS * legs / LEGS_OF_HEIGHT:
+        return LEGS_OF_HEIGHT * height_m / legs
+    return height_m / tallest
 
 
 def bone_variation(X: np.ndarray) -> dict:

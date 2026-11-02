@@ -53,6 +53,17 @@ To avoid repeating these steps every time there are **templates**: Cycling, Gait
 Vertical jump already include their angles, trajectories and phases. You can also create your own
 templates in the program, without programming. All of them work in 3D as well.
 
+**How the joint angles read.** The knee, hip, ankle, shoulder and elbow angles use the clinical
+convention: 0° is the neutral position and the sign says the direction. The knee is its flexion (0° =
+straight, a negative value is hyperextension); the hip is the thigh's flexion (+) or extension (−), against
+the vertical in Gait and against the vertical tipped by three quarters of the trunk's lean in the other
+templates; the shoulder is measured like the hip (against the vertical in Gait, against the trunk's
+axis in the others); the ankle is its dorsiflexion (+) or plantar flexion (−), with the foot from heel to toes. On
+the video the arc starts from a dashed reference line. Cycling keeps the angle inside the joint (180° =
+straight), which is how bike fitting is written. An angle between any three points that are not one of
+these joints is always the angle inside them. Why these conventions: *Clinical angles* in
+[VALIDATION.md](VALIDATION.md).
+
 The person's data go in **Analysis › Patient record…**: height, weight (with the body-mass index),
 reason for the visit, pain, the lengths measured with a tape and the equipment (for example the saddle
 height). They appear in the PDF report and in the comparison. A patient already registered is chosen

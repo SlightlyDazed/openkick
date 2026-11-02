@@ -23,7 +23,7 @@ from openkick.i18n import tr
 SAMPLES = 101                  # a cycle resampled from 0 to 100 %
 SIDES = ("left", "right")
 GAIT_KEYS = ("stride_time", "cadence", "stance", "swing", "knee_contact", "knee_swing", "knee_rom", "hip_rom",
-             "ankle_rom", "trunk", "step_length", "step_width", "stride_length", "speed")
+             "hip_extension", "ankle_rom", "trunk", "step_length", "step_width", "stride_length", "speed")
 LENGTH_UNITS = ("cm", "m")     # measures put against height when the people differ
 
 
@@ -117,11 +117,10 @@ def _gait_2d(project) -> tuple[dict, dict, str]:
             for s in GP._strides(ctx, a, b, side, forward):
                 by_side.setdefault(side, []).append(s)
     curves = {}
-    from openkick.core import landmarks as L
+    from openkick.core import joints as J
     xy = p.pose.xy.astype(np.float64)
     for side in by_side:
-        curves[side] = {"knee": A.lowpass(A.angle_between(xy[:, L.INDEX[f"{side}_hip"]], xy[:, L.INDEX[f"{side}_knee"]],
-                                                          xy[:, L.INDEX[f"{side}_ankle"]]), fps)}
+        curves[side] = {"knee": A.lowpass(J.clinical(xy, "knee", side, A.facing(p)), fps)}
     return by_side, curves, "" if by_side else tr("no strides seen from the side")
 
 

@@ -333,8 +333,8 @@ class CompareWindow(QMainWindow):
         lines = K.summary(self.items)
         if len(kinds) > 1:
             lines.insert(0, tr("These analyses are of different activities: only what they share can be compared."))
-        lines.append(tr("● the difference is more than what changes from one cycle to the next. The first analysis "
-                        "is the reference."))
+        from openkick.ui.report import DOT
+        lines.append(tr(DOT))
         s = QLabel("\n".join(lines))
         s.setWordWrap(True)
         s.setStyleSheet(f"color: {theme.MUTED};")

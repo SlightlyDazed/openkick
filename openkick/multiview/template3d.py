@@ -12,6 +12,7 @@ import warnings
 import numpy as np
 
 from openkick.core.analysis import angle_between, lowpass
+from openkick.core.joints import clinical_3d, joint_of
 from openkick.i18n import tr
 from openkick.multiview.geometry import IDX
 
@@ -26,9 +27,15 @@ def _point(name: str) -> int | None:
 
 
 def angles(X: np.ndarray, t: np.ndarray, template) -> list[tuple[str, np.ndarray]]:
-    """(name, per-row angle in degrees) of each angle of the template that the 3D skeleton has."""
+    """(name, per-row angle in degrees) of each angle of the template that the 3D skeleton has: the
+    standard joints in the template's convention (core/joints.py), any other angle inside it."""
+    from openkick.core import landmarks as L
     from openkick.core.templates import angle_name
     fps = 1.0 / float(np.median(np.diff(t))) if len(t) > 1 else 30.0
+    clinical = (template.convention or "clinical") == "clinical"
+    from openkick.core.analysis import CUTOFF_HZ
+    cut = min(template.cutoff_hz or CUTOFF_HZ, 0.45 * fps)          # fast movements keep their peaks
+    up = None
     out = []
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
@@ -36,7 +43,15 @@ def angles(X: np.ndarray, t: np.ndarray, template) -> list[tuple[str, np.ndarray
             ia, io, ib = _point(a), _point(o), _point(b)
             if None in (ia, io, ib):
                 continue
-            out.append((angle_name(o), lowpass(angle_between(X[:, ia], X[:, io], X[:, ib]), fps)))
+            found = joint_of(L.INDEX[a], L.INDEX[o], L.INDEX[b]) if clinical else None
+            if found is None:
+                v = angle_between(X[:, ia], X[:, io], X[:, ib])
+            else:
+                if up is None:
+                    from openkick.multiview.export import to_world
+                    up = to_world(X)[1]["R"][1]
+                v = clinical_3d(X, IDX, found[0], found[1], up, template.hip_reference or "pelvis")
+            out.append((angle_name(o), lowpass(v, fps, cut)))
     return out
 
 
@@ -54,5 +69,8 @@ def report(X: np.ndarray, t: np.ndarray, template):
     table = Table([tr("Angle"), tr("Min"), tr("Max"), tr("ROM"), tr("Mean"), tr("Min at"), tr("Max at")], rows,
                   tr("Angles in 3D"))
     return Result(title=tr("“{name}” in 3D", name=template.label), tables=[table],
-                  summary=tr("The template's angles measured on the 3D reconstruction. Angles are measured inside "
-                             "the joint, so 180° is a straight limb."))
+                  summary=tr("The template's angles measured on the 3D reconstruction. Angles are clinical "
+                             "ones: 0° is a straight knee and a thigh in line with the body, positive is flexion.")
+                  if (template.convention or "clinical") == "clinical" else
+                  tr("The template's angles measured on the 3D reconstruction. Angles are measured inside "
+                     "the joint, so 180° is a straight limb."))

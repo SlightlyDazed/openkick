@@ -37,6 +37,10 @@ class Template:
     color: str = "#C6F24E"
     icon: str = ""                                              # SVG path in a 48x48 box
     side: str = ""                                              # "camera": measure the side turned to the camera
+    convention: str = ""            # joint angles: "" / "clinical" signed from 0, "interior" 180° = straight
+    hip_reference: str = ""         # clinical hip: "" / "pelvis" (vertical tipped by the trunk) or "vertical"
+    cutoff_hz: float = 0.0          # low-pass before speeds; 0 = the usual 6 Hz (analysis.CUTOFF_HZ)
+    min_fps: float = 0.0            # frame rate the movement needs; slower videos are warned about
     builtin: bool = False
     path: Path | None = None
 
@@ -56,6 +60,14 @@ class Template:
              "trajectories": self.trajectories, "phases": self.phases, "color": self.color, "icon": self.icon}
         if self.side:
             d["side"] = self.side
+        if self.convention:
+            d["convention"] = self.convention
+        if self.hip_reference:
+            d["hip_reference"] = self.hip_reference
+        if self.cutoff_hz:
+            d["cutoff_hz"] = self.cutoff_hz
+        if self.min_fps:
+            d["min_fps"] = self.min_fps
         return d
 
     @classmethod
@@ -63,7 +75,9 @@ class Template:
         return cls(id=d["id"], name=d["name"], description=d.get("description", ""),
                    angles=d.get("angles", []), trajectories=d.get("trajectories", []),
                    phases=d.get("phases", []), color=d.get("color", "#C6F24E"), icon=d.get("icon", ""),
-                   side=d.get("side", ""), builtin=builtin, path=path)
+                   side=d.get("side", ""), convention=d.get("convention", ""),
+                   hip_reference=d.get("hip_reference", ""), cutoff_hz=float(d.get("cutoff_hz", 0) or 0),
+                   min_fps=float(d.get("min_fps", 0) or 0), builtin=builtin, path=path)
 
 
 def list_templates() -> list[Template]:

@@ -14,12 +14,13 @@ from dataclasses import dataclass, field
 import numpy as np
 
 from openkick.core import gait as G
-from openkick.core.analysis import angle_between, lowpass
+from openkick.core.analysis import lowpass
+from openkick.core.joints import clinical_3d
 from openkick.i18n import tr
 from openkick.multiview.geometry import IDX
 
 KEYS = ("stride_time", "cadence", "stance", "swing", "step_length", "step_width", "stride_length", "speed",
-        "knee_contact", "knee_swing", "knee_rom", "hip_rom", "ankle_rom", "trunk")
+        "knee_contact", "knee_swing", "knee_rom", "hip_rom", "hip_extension", "ankle_rom", "trunk")
 HEADING_HZ = 0.5          # the direction of walking changes slower than this (it may turn round)
 
 
@@ -100,9 +101,8 @@ def analyse(X: np.ndarray, t: np.ndarray) -> Gait | None:
         if len(contacts) < 2 or not offs:
             continue
         hip, knee, ankle = P(f"{side}_hip"), P(f"{side}_knee"), P(f"{side}_ankle")
-        knee_a = lowpass(angle_between(hip, knee, ankle), fps)
-        hip_a = lowpass(angle_between(P(f"{side}_shoulder"), hip, knee), fps)
-        ankle_a = lowpass(angle_between(knee, ankle, toe), fps)
+        knee_a, hip_a, ankle_a = (lowpass(clinical_3d(X, IDX, j, side, up, "vertical"), fps)
+                                  for j in ("knee", "hip", "ankle"))
         for s in G.pair(contacts, offs, t, np.isfinite(knee_a)):
             a, b = s["a"], s["b"]
             gap = heel[a] - P(f"{other}_heel")[a]          # both feet on the ground at contact
@@ -155,5 +155,6 @@ def _report(g: Gait, X: np.ndarray, t: np.ndarray):
         tr("Found in 3D, so the cameras may stand anywhere: the direction of walking is taken from the feet "
            "and every length is in metres, scaled from the height of the person. Initial contact and toe off "
            "come from where the heel and the toes are against the pelvis (Zeni et al., 2008). Angles are "
-           "measured inside the joint, so 180° is a straight limb; the measures marked * are the least reliable.")]
+           "clinical ones: 0° is a straight knee and a thigh in line with the body, positive is flexion and a "
+           "negative hip is behind the body; the measures marked * are the least reliable.")]
     return Result(title=tr("Gait analysis"), summary="\n".join(summary), tables=tables)

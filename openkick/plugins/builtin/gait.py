@@ -11,6 +11,7 @@ import warnings
 import numpy as np
 
 from openkick.core import gait as G
+from openkick.core import joints as J
 from openkick.i18n import tr
 from openkick.plugins import AnalysisPlugin, Result, Table
 from openkick.plugins.builtin.cycling import _runs
@@ -19,9 +20,12 @@ MIN_STRIDES = 3           # a walk across the picture seldom holds more than thr
 MIN_STRETCH_S = 1.5       # side-on stretches shorter than this are skipped
 FOOT_SIDE_ON = 0.18       # heel to toes at least this long across the picture, against the leg: the feet
 #                           are seen from the side (0.23-0.31 crossing a wide picture; about 0.06 head-on)
+STRIDE_SPREAD = 0.15      # longest minus shortest stride, against the median: walking varies 2-4 % from
+#                           stride to stride (CV), so more than this is the recording, not the walk
+SIZE_CHANGE = 0.10        # the leg's length in the picture changing more than this between strides
 JOINTS = ("shoulder", "hip", "knee", "ankle", "heel", "foot_index")
 KEYS = ("stride_time", "cadence", "stance", "swing", "knee_contact", "knee_swing", "knee_rom", "hip_rom",
-        "ankle_rom", "trunk", "stride_length", "speed")
+        "hip_extension", "ankle_rom", "trunk", "stride_length", "speed")
 BY_PHASE = ("stride_time", "cadence", "stance", "knee_swing", "knee_rom")
 
 
@@ -82,29 +86,31 @@ def _strides(ctx, first: int, last: int, side: str, forward: float) -> list[dict
     for s in (side, _other(side)):           # this foot's strides need the other foot's events too
         heel, toe = xy[:, index[f"{s}_heel"]], xy[:, index[f"{s}_foot_index"]]
         feet[s] = {"contacts": [f for f, _ in G.events(low(forward * (heel[:, 0] - pelvis)), fps, leg)],
-                   "offs": [f for f, _ in G.events(low(-forward * (toe[:, 0] - pelvis)), fps, leg)],
+                   "offs": [int(round(f + G.TOE_OFF_DELAY_2D * fps))
+                            for _, f in G.events(low(-forward * (toe[:, 0] - pelvis)), fps, leg)],
                    "heel_y": low(heel[:, 1]), "ankle_x": low(xy[:, index[f"{s}_ankle"], 0]),
                    "knee_x": low(xy[:, index[f"{s}_knee"], 0])}
     contacts = G.events(low(forward * (P["heel"][:, 0] - pelvis)), fps, leg)
     offs = G.events(low(-forward * (P["foot_index"][:, 0] - pelvis)), fps, leg)
     if len(contacts) < 2 or not offs:
         return []
-    knee = low(A.angle_between(P["hip"], P["knee"], P["ankle"]))
-    hip = low(A.angle_between(P["shoulder"], P["hip"], P["knee"]))
-    ankle = low(A.angle_between(P["knee"], P["ankle"], P["foot_index"]))
+    knee, hip, ankle = (low(A.despike(J.clinical(xy, j, side, forward, "vertical"), fps, A.DESPIKE_FLOOR_DEG))
+                        for j in ("knee", "hip", "ankle"))
     up = P["shoulder"] - P["hip"]
     trunk = np.degrees(np.arctan2(forward * up[:, 0], -up[:, 1]))
     pelvis = low(pelvis)
     frames = np.arange(len(knee))
+    legs = np.linalg.norm(P["hip"] - P["ankle"], axis=1)      # the leg's size in the picture, for _checks
     cal = p.calibration
     out = []
-    for s in G.pair(contacts, offs, t, np.isfinite(knee)):
+    for s in G.pair(contacts, offs, t, np.isfinite(knee), G.TOE_OFF_DELAY_2D):
         travel = abs(float(np.interp(s["fb"], frames, pelvis) - np.interp(s["fa"], frames, pelvis)))
         length = travel / cal.px_per_m if cal and travel >= G.TRAVEL * leg else float("nan")
         found = G.gait_events(s, feet[side], feet[_other(side)], forward, leg)
         out.append({"side": side, "first": first + s["a"], "last": first + s["b"] - 1, "off": first + s["o"],
                     "time": float(t[s["a"]]), **G.joint_measures(s, knee, hip, ankle, trunk),
                     "stride_length": length, "speed": length / s["seconds"],
+                    "leg_px": float(np.nanmedian(legs[s["a"]:s["b"] + 1])),
                     "events": {k: first + f for k, f in found["events"].items()}, "estimated": found["estimated"]})
     return out
 
@@ -171,8 +177,9 @@ class GaitCycle(AnalysisPlugin):
             tr("{side} · {n} strides · {c} steps/min · stance {s} % of the stride.", side=side, n=len(strides),
                c=f"{cadence:.0f}", s=f"{stance:.0f}"),
             tr("Initial contact and toe off are found from where the heel and the toes are against the pelvis "
-               "(Zeni et al., 2008). Angles are measured inside the joint, so 180° is a straight limb. The "
-               "measures marked * are the ones the detector places least reliably.")]
+               "(Zeni et al., 2008). Angles are clinical ones: 0° is a straight knee and a thigh in line with the "
+               "body, positive is flexion and a negative hip is behind the body. The measures marked * are the "
+               "ones the detector places least reliably.")]
         guessed = sum(len(s.get("estimated", [])) for s in strides)
         summary.append(tr("Each stride is split into the eight phases of Perry and Burnfield. You can drag their "
                           "edges on the timeline."))
@@ -218,6 +225,21 @@ class GaitCycle(AnalysisPlugin):
                 tr("correct the doubtful frames (Tab jumps to the next one), or film with more light and tighter clothes."))
         add(tr("Strides"), str(len(strides)), ok if len(strides) >= MIN_STRIDES else review,
             tr("record at least {n} strides: film from further away, or on a treadmill.", n=MIN_STRIDES))
+        lengths = [s["stride_length"] for s in strides if np.isfinite(s["stride_length"])]
+        if len(lengths) >= 2:
+            # one calibration holds on one line: someone walking nearer to or further from the
+            # camera changes size in the picture, and their strides with it
+            lo, hi, mid = min(lengths), max(lengths), float(np.median(lengths))
+            sizes = [s["leg_px"] for s in strides if np.isfinite(s["stride_length"]) and np.isfinite(s["leg_px"])]
+            change = (max(sizes) - min(sizes)) / float(np.median(sizes)) if len(sizes) >= 2 else 0.0
+            steady = (hi - lo) <= STRIDE_SPREAD * mid
+            add(tr("Stride length steady"), f"{lo:.2f}–{hi:.2f} m", ok if steady else review,
+                tr("the person's size in the picture changes {n} % from one stride to another: they come nearer to "
+                   "or go away from the camera, and a calibration only holds on one line. Put the camera square to "
+                   "the walkway and the calibration reference on the line walked.", n=f"{100 * change:.0f}")
+                if change > SIZE_CHANGE else
+                tr("the strides differ more than walking does. Check that the calibration reference lies on the "
+                   "line walked and that the camera is square to it."))
         if len(strides) >= 2:
             mid, _ = G.typical(s["stride_time"] for s in strides)
             per = fps * mid if np.isfinite(mid) else 0.0

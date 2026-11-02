@@ -238,6 +238,27 @@ def _qt_angle(o: QPointF, q: QPointF) -> float:
     return math.degrees(math.atan2(-(q.y() - o.y()), q.x() - o.x()))
 
 
+def _clinical_rays(project: Project, m: Measurement, frame: int, o: tuple, length: float, view: View):
+    """For a standard joint measured the clinical way: the screen points at the end of its
+    reference line and of its moving segment, both from the vertex. None otherwise."""
+    from openkick.core import joints as J
+    found = A.joint(m)
+    if found is None or A.convention(project)[0] != "clinical":
+        return None
+    xy = project.pose.xy[frame:frame + 1].astype(np.float64)
+    ref, seg = J.references(xy, found[0], found[1], A.facing(project)[frame:frame + 1], A.convention(project)[1])
+    out = []
+    for v in (ref[0], seg[0]):
+        n = float(np.hypot(*v))
+        if not np.isfinite(n) or n < 1e-6:
+            return None
+        q = view.map(o[0] + v[0] / n, o[1] + v[1] / n)
+        c = view.map(*o)
+        d = math.hypot(q.x() - c.x(), q.y() - c.y()) or 1.0
+        out.append(QPointF(c.x() + (q.x() - c.x()) / d * length, c.y() + (q.y() - c.y()) / d * length))
+    return out
+
+
 def _angle(p: QPainter, project: Project, m: Measurement, frame: int, view: View, opts: Options):
     pts = [project.point(r, frame) for r in m.points]
     if any(pt is None for pt in pts):
@@ -256,6 +277,12 @@ def _angle(p: QPainter, project: Project, m: Measurement, frame: int, view: View
         p.drawLine(O, A_)
         p.drawLine(O, B)
     r = min(28 * k, 0.45 * min(la, lb))
+    ref = _clinical_rays(project, m, frame, pts[1], min(la, lb), view)
+    if ref is not None:             # the reference line of the clinical angle, dashed
+        A_, B = ref
+        la = lb = math.hypot(A_.x() - O.x(), A_.y() - O.y())
+        p.setPen(_pen(m.color, 1.4 * k, Qt.DashLine, alpha=200))
+        p.drawLine(O, A_)
     a1, a2 = _qt_angle(O, A_), _qt_angle(O, B)
     sweep = (a2 - a1 + 540) % 360 - 180
     path = QPainterPath(O)

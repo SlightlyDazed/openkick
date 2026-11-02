@@ -333,9 +333,11 @@ class PedalStroke(AnalysisPlugin):
         summary = [
             tr("{side} · {s} s measured · {n} pedal strokes at {rpm} rpm.", side=side, n=len(strokes),
                s=f"{sum(b - a + 1 for a, b in stretches) / fps:.0f}", rpm=f"{rpm_mid:.0f}"),
-            tr("Bottom and top are the two ends of the stroke: leg most stretched and leg most bent. Angles are "
-               "measured inside the joint, so 180° is a straight limb. The measures marked * are the ones the "
-               "detector places least reliably.")]
+            tr("Bottom and top are the two ends of the stroke while pedalling: leg most stretched and leg most "
+               "bent. They are dynamic values, not those of a goniometer with the crank held at the bottom, and "
+               "recovery and propulsion are split at them, not at the crank's position. Angles are measured "
+               "inside the joint, so 180° is a straight limb. The measures marked * are the ones the detector "
+               "places least reliably.")]
         if p.phases:
             summary.append(tr("Phases were detected automatically. You can adjust them in the Phases tab."))
         return Result(title=self.label, summary="\n".join(summary + advice), tables=tables)

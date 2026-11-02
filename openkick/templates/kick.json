@@ -2,6 +2,7 @@
   "id": "kick", "order": 1,
   "name": {"es": "Patada", "en": "Kick"},
   "description": {"es": "Rodilla, cadera y tobillo · 4 fases", "en": "Knee, hip and ankle · 4 phases"},
+  "cutoff_hz": 15, "min_fps": 60,
   "angles": [["right_hip", "right_knee", "right_ankle"], ["right_shoulder", "right_hip", "right_knee"]],
   "trajectories": ["right_ankle"],
   "phases": [{"es": "Carrera", "en": "Run-up"}, {"es": "Apoyo", "en": "Plant"}, {"es": "Golpeo", "en": "Strike"}, {"es": "Seguimiento", "en": "Follow-through"}],

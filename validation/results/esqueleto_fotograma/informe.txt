@@ -185,7 +185,7 @@
   walking  muslo   lab  41.5 (±0.4) | 1 detección  40.7 (±1.8, dif -0.8) | 2 modelo  43.1 (±0.1, dif +1.6) | 3 medidas  41.3 (±0.1, dif -0.1)
   walking  pierna  lab  42.3 (±0.6) | 1 detección  43.3 (±2.0, dif +1.0) | 2 modelo  44.3 (±0.0, dif +2.0) | 3 medidas  42.3 (±0.0, dif +0.0)
 
-figuras en /tmp/claude-1000/-home-lex-Documentos-OpenKick/29eee832-81e7-452f-a87b-9afc1ada34f1/scratchpad/frames_fig
+figuras en validation/results/esqueleto_fotograma/
 
 [walking] rodilla que muestra OpenKick vs OpenSim del laboratorio: apoyo / balanceo / por flexión (grados)
   marcadores lab. apoyo   +4.9  balanceo   +2.3   0-10:  +8.0 10-20:  +3.1 20-30:  -1.3 30-45:  +0.8 45-75:  +0.2

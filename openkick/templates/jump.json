@@ -2,6 +2,7 @@
   "id": "jump", "order": 4,
   "name": {"es": "Salto vertical", "en": "Vertical jump"},
   "description": {"es": "Impulso, vuelo y aterrizaje", "en": "Push-off, flight and landing"},
+  "cutoff_hz": 12, "min_fps": 60,
   "angles": [["right_hip", "right_knee", "right_ankle"], ["right_shoulder", "right_hip", "right_knee"]],
   "trajectories": ["right_hip"],
   "phases": [{"es": "Contramovimiento", "en": "Countermovement"}, {"es": "Impulso", "en": "Push-off"}, {"es": "Vuelo", "en": "Flight"}, {"es": "Aterrizaje", "en": "Landing"}],

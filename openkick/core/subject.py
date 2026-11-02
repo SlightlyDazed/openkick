@@ -38,6 +38,7 @@ SIDES = ("left", "right")
 # WHO adult classes of the body mass index (kg/m²)
 BMI_CLASSES = [(18.5, "Underweight"), (25.0, "Normal weight"), (30.0, "Overweight"),
                (35.0, "Obesity class I"), (40.0, "Obesity class II"), (float("inf"), "Obesity class III")]
+ADULT_AGE = 18             # the adult classes of the BMI apply from here
 LEG_DIFFERENCE_NOTE = 1.0   # cm: from about here a difference is worth a closer look (a tape is ±1 cm itself)
 
 
@@ -76,8 +77,10 @@ class Subject:
 
     @property
     def bmi_class(self) -> str | None:
+        """The WHO class for adults. None under 18, where it is read on the percentiles for the
+        age and sex instead (WHO growth references), which the program does not hold."""
         b = self.bmi
-        if b is None:
+        if b is None or (self.age is not None and self.age < ADULT_AGE):
             return None
         return next(name for top, name in BMI_CLASSES if b < top)
 
@@ -136,7 +139,8 @@ def describe(s: Subject, tr=lambda t, **k: t.format(**k) if k else t) -> list[tu
     if s.mass_kg:
         rows.append((tr("Weight"), f"{s.mass_kg:.1f} kg"))
     if s.bmi is not None:
-        rows.append((tr("Body mass index"), f"{s.bmi:.1f} kg/m² · {tr(s.bmi_class)}"))
+        rows.append((tr("Body mass index"), f"{s.bmi:.1f} kg/m² · {tr(s.bmi_class)}" if s.bmi_class else
+                     f"{s.bmi:.1f} kg/m² · {tr('under 18: read it on the percentiles for age and sex')}"))
     if s.dominant:
         rows.append((tr("Dominant side"), tr("left" if s.dominant == "left" else "right").capitalize()))
     if s.activity:

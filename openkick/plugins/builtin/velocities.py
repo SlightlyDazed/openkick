@@ -9,20 +9,24 @@ from openkick.plugins import AnalysisPlugin, Result, Table
 class Velocities(AnalysisPlugin):
     id = "velocities"
     name = {"es": "Velocidades y aceleraciones", "en": "Velocities and accelerations"}
-    description = {"es": "Velocidad lineal y angular máxima, por fase, con filtro Butterworth 6 Hz.",
-                   "en": "Peak linear and angular velocity per phase, Butterworth 6 Hz filtered."}
+    description = {"es": "Velocidad lineal y angular máxima, por fase, con filtro Butterworth (6 Hz, o el de la plantilla).",
+                   "en": "Peak linear and angular velocity per phase, Butterworth filtered (6 Hz, or the template's)."}
 
     def run(self, ctx):
         p = ctx.project
         t = ctx.times()
-        ranges = [(tr("Whole clip"), 0, p.frame_count - 1)] + [(ph.name, ph.start, ph.end) for ph in p.phases]
+        whole = (tr("Whole clip"), 0, p.frame_count - 1)
+        if p.template == "gait" and p.phases:
+            # walking into and out of the picture is not walking: only the strides found
+            whole = (tr("All strides"), min(ph.start for ph in p.phases), max(ph.end for ph in p.phases))
+        ranges = [whole] + [(ph.name, ph.start, ph.end) for ph in p.phases]
         tables = []
         tracks = [m for m in p.measurements if m.kind == "trajectory"]
         if tracks:
             rows = []
             for m in tracks:
                 s = ctx.series(m)
-                acc = np.gradient(s.value, t) if len(t) > 1 else s.value * np.nan
+                acc = s.accel if s.accel is not None else s.value * np.nan
                 for label, a, b in ranges:
                     v, i = _peak(s.value[a:b + 1])
                     ac, _ = _peak(np.abs(acc[a:b + 1]))
@@ -48,7 +52,17 @@ class Velocities(AnalysisPlugin):
                                 tr("Angular velocity")))
         if not tables:
             return Result(summary=tr("Add angles or trajectories to compute velocities."))
-        return Result(title=self.label, summary=note, tables=tables)
+        notes = [note] if note else []
+        from openkick.core.analysis import cutoff
+        from openkick.core.templates import find
+        notes.append(tr("Positions and angles are smoothed below {hz} Hz before differentiating.",
+                        hz=f"{cutoff(p):.0f}"))
+        t_ = find(p.template)
+        if t_ is not None and t_.min_fps and p.video.fps < t_.min_fps - 1:
+            notes.append(tr("This movement is too fast for {fps} frames per second: its peak speeds come out "
+                            "low. Record at {need} frames per second or more (120 is better).",
+                            fps=f"{p.video.fps:.0f}", need=f"{t_.min_fps:.0f}"))
+        return Result(title=self.label, summary="\n".join(notes), tables=tables)
 
 
 def _peak(v):

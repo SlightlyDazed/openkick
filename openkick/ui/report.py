@@ -35,7 +35,9 @@ LIMITS = ("The 3D analysis is experimental. Knee, hip and ankle were checked aga
           "Read the numbers as what changes between recordings made the same way, and check in the videos "
           "whatever looks odd.")
 STAR = "* What the detector places least reliably (the foot)."
-DOT = "● The difference is larger than what changes from one cycle to the next. The first analysis is the reference."
+DOT = ("● The difference is larger than what changes from one cycle to the next. The first analysis is the reference. "
+       "Between two recordings it does not include the error of placing the camera again, which alone can move "
+       "an angle a few degrees.")
 # format -> (menu entry, file filter)
 FORMATS = {"pdf": ("PDF report…", "PDF (*.pdf)"), "txt": ("Report as text (.txt)…", "{text} (*.txt)"),
            "json": ("Data for research (.json)…", "JSON (*.json)")}

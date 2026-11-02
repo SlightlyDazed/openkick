@@ -18,6 +18,12 @@ REACH = 180.0              # the heel goes from this far ahead of the pelvis to 
 STANCE = 0.6
 
 
+def seen(share: float, cadence: float) -> float:
+    """Where the plugin puts a toe off at `share` of the stride: later by TOE_OFF_DELAY_2D, the
+    bias measured against force plates (this walker's toes have none)."""
+    return share + G.TOE_OFF_DELAY_2D * cadence / 120
+
+
 def walker(seconds=8.0, fps=30.0, cadence=110.0, near="right", forward=1.0, overground=False,
            noise=0.0, shoulders=0.0) -> Project:
     """A person walking seen from the side. Each foot slides back under the pelvis while on the
@@ -88,7 +94,7 @@ def test_strides_are_found_and_timed(fps, cadence, forward, overground):
     cycle = {row[0]: row for row in table(r, "Gait cycle").rows}
     assert abs(number(cycle["Cadence"][1]) - cadence) < 2.0
     assert abs(number(cycle["Stride time"][1]) - 120 / cadence) < 0.03
-    assert abs(number(cycle["Stance"][1]) - 100 * STANCE) < 4.0
+    assert abs(number(cycle["Stance"][1]) - 100 * seen(STANCE, cadence)) < 4.0
     strides = table(r, "Stride by stride").rows
     assert abs(len(strides) - 8 * cadence / 120) <= 2
     assert "Right side" in r.summary
@@ -111,8 +117,8 @@ def test_phases_and_subphases_are_proposed():
         assert all(a.end + 1 == b.start for a, b in zip(eight, eight[1:]))       # back to back, no gaps
         assert abs((ph.start / fps) % stride) < 2 / fps or abs((ph.start / fps) % stride - stride) < 2 / fps
         share = {s.name: (s.start - ph.start) / (ph.end + 1 - ph.start) for s in eight}
-        assert abs(share["Initial swing"] - STANCE) < 0.06                   # toe off
-        assert abs(share["Mid stance"] - 0.1) < 0.06                         # the other foot leaves (half a stride later)
+        assert abs(share["Initial swing"] - seen(STANCE, 110)) < 0.06        # toe off
+        assert abs(share["Mid stance"] - seen(0.1, 110)) < 0.06              # the other foot leaves (half a stride later)
         assert abs(share["Pre-swing"] - 0.5) < 0.06                          # the other foot lands
     for a, b in zip(p.phases, p.phases[1:]):
         assert a.end < b.start
@@ -137,6 +143,51 @@ def test_both_legs_and_stride_length():
     treadmill.calibration = p.calibration
     rows = {row[0] for row in table(gait.PLUGINS[0].run(PluginContext(treadmill)), "Gait cycle").rows}
     assert "Stride length" not in rows
+
+
+def test_hip_extension_reads_below_zero():
+    """The thigh goes behind the body at the end of the stance: clinical angles show it, where
+    the angle inside the joint folded over at 180°."""
+    p = walker(cadence=110, noise=1.0)
+    r = gait.PLUGINS[0].run(PluginContext(p))
+    cycle = {row[0]: row for row in table(r, "Gait cycle").rows}
+    assert number(cycle["Hip, most extended"][1]) < 0           # this walker's thigh goes about 7° behind
+    assert number(cycle["Knee, swing"][1]) > number(cycle["Knee at contact"][1])     # flexion grows in the swing
+    assert "negative hip is behind the body" in r.summary
+
+
+def checks(result) -> dict:
+    return {row[0]: row for row in table(result, "Recording check").rows}
+
+
+def test_stride_length_that_changes_with_the_distance_to_the_camera():
+    p = walker(cadence=110, overground=True)
+    p.calibration = Calibration(px_per_m=300.0, a=(0, 0), b=(300, 0), length_m=1.0)
+    steady = gait.PLUGINS[0].run(PluginContext(p))
+    assert checks(steady)["Stride length steady"][2] == "OK"
+    # the same walk, the person coming nearer: they grow by half over the clip
+    n = p.frame_count
+    grow = np.linspace(1.0, 1.5, n)[:, None, None]
+    centre = np.array([0.0, 450.0])
+    p.pose.xy[:] = (p.pose.xy - centre) * grow + centre
+    p.pose.raw_xy[:] = p.pose.xy
+    p.touch()
+    nearer = gait.PLUGINS[0].run(PluginContext(p))
+    row = checks(nearer)["Stride length steady"]
+    assert row[2] == "Review"
+    assert "nearer to or go away from the camera" in nearer.summary         # the cause, and what to do
+
+
+def test_peak_speeds_only_inside_the_strides():
+    from openkick.core.project import Measurement, PointRef
+    from openkick.plugins.builtin import velocities
+    p = walker(cadence=110, noise=1.0)
+    templates.apply(p, templates.find("gait"))
+    gait.PLUGINS[0].run(PluginContext(p))
+    p.measurements.append(Measurement("trajectory", "ankle", [PointRef.at(L.INDEX["right_ankle"])]))
+    r = velocities.PLUGINS[0].run(PluginContext(p))
+    labels = {row[1] for t in r.tables for row in t.rows}
+    assert "All strides" in labels and "Whole clip" not in labels
 
 
 def test_user_phases_are_compared():
@@ -231,7 +282,7 @@ def test_the_eight_phases_follow_the_feet():
     assert "could not be seen" in r.summary
     share = {k: number(v[1]) for k, v in rows.items()}
     assert abs(sum(share.values()) - 100) < 1.5
-    assert abs(share["Initial swing"] + share["Mid swing"] + share["Terminal swing"] - 100 * (1 - STANCE)) < 6
+    assert abs(share["Initial swing"] + share["Mid swing"] + share["Terminal swing"] - 100 * (1 - seen(STANCE, 100))) < 6
 
 
 def test_events_out_of_order_take_their_usual_place():

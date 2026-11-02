@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 
 NAMES = ["shoulder", "hip", "knee", "ankle", "heel", "toe"]
+ARMS = ["elbow", "wrist"]          # also kept by "mediapipe-heavy" (for the shoulder angle)
 
 
 def run(engine: str, video: Path):
@@ -31,9 +32,10 @@ def _mediapipe(engine: str, video: Path):
     meta = probe(video)
     res = PoseDetector(ensure_model(kind)).run(meta)
     src = {"shoulder": "shoulder", "hip": "hip", "knee": "knee", "ankle": "ankle", "heel": "heel",
-           "toe": "foot_index"}
+           "toe": "foot_index", "elbow": "elbow", "wrist": "wrist"}
+    names = NAMES + (ARMS if engine == "mediapipe-heavy" else [])
     points = {f"{side}_{n}": res.xy[:, L.INDEX[f"{side}_{src[n]}"], :].astype(float)
-              for side in ("right", "left") for n in NAMES}
+              for side in ("right", "left") for n in names}
     return _times(meta), points
 
 

@@ -2,6 +2,7 @@
   "id": "gait", "order": 2,
   "name": {"es": "Marcha", "en": "Gait"},
   "description": {"es": "Ciclo de paso, apoyo y balanceo", "en": "Stride cycle, stance and swing"},
+  "hip_reference": "vertical",
   "angles": [["right_hip", "right_knee", "right_ankle"], ["left_hip", "left_knee", "left_ankle"], ["right_shoulder", "right_hip", "right_knee"], ["left_shoulder", "left_hip", "left_knee"]],
   "trajectories": ["right_ankle", "left_ankle"],
   "phases": [{"es": "Apoyo", "en": "Stance"}, {"es": "Balanceo", "en": "Swing"}],
