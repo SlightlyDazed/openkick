@@ -16,7 +16,12 @@ with the **X** at the top right.
 - At least two cameras and at most six, recording **at the same time** the same movement. They do not
   need to start recording together: the program synchronises the videos itself. If the phones record
   sound it uses it first (a clap at the start makes it safer); if the sound is not enough, it
-  synchronises by the motion of the body.
+  synchronises by the motion of the body. Without sound, start every camera with the person **standing
+  still** and let them start moving afterwards. A movement that repeats (walking, pedalling) looks the
+  same one whole stride or pedal stroke later, to the cameras' geometry and to the body's rise and fall
+  alike. Only something that does not repeat, such as the start of the movement or a clap, tells the
+  right offset. In the OpenCap gait trials, synchronised by the motion alone, about one camera in eight was
+  more than 50 ms off.
 - Different angles, for example one from the side and one from the front. The more similar the
   viewpoints, the worse the depth.
 - The whole person inside the image in every camera during the whole movement.

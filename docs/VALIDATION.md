@@ -852,3 +852,26 @@ every comparison now says so.
 - leg length with a tape (ASIS to medial malleolus);
 - the cycling trunk angle (shoulder–hip line above the horizontal);
 - the closed hip angle (trunk–thigh), as bike fitting measures it.
+
+### Synchronising a repeated movement by the motion alone (2 November 2026)
+
+A test with a made-up treadmill walker failed: the cameras came out one and three strides apart. The
+reason is not a bug.
+- **The cameras' geometry cannot tell.** The agreement between two cameras was 0.96–1.00 at the
+  right offset and at every whole-stride offset alike. Walking, the body has the same shape one stride
+  later. Overground it is also moved as a block, and that is the same as another camera position.
+- **The body's rise and fall repeats every step.** It cannot tell either.
+
+Several ways of choosing among the offsets that fit equally well were measured against the true offsets
+of 146 camera pairs: the 36 OpenCap trials × 4 pairs, plus the 2 pairs of the made-up walker. The rules
+tried were:
+- the movement's correlation at each candidate;
+- the candidate where the recordings overlap most;
+- both, or the agreement alone;
+- a hybrid that keeps today's rule unless it fails.
+
+None did better on the real trials than the current rule. Pairs more than 0.5 s off stayed at 3, and
+gait pairs more than 50 ms off stayed at 14 of 108. So the synchronisation was left as it was. The test
+walker now stands still for its first second, as people do when the phones are started; then it
+synchronises within 7 ms. The advice to stand still or clap at the start is in
+[MULTIVIEW_3D.md](MULTIVIEW_3D.md).

@@ -142,7 +142,10 @@ def test_spanish():
 
 def walking_session(count=3, noise=0.7):
     """The walker filmed by `count` cameras around it (2D points only, as the detector gives them),
-    each starting to record at its own time."""
+    each starting to record at its own time. The person stands still for the first second, as
+    when the phones are started: with no sound, a walk whose strides are all identical could
+    be matched a whole stride off (the cameras' geometry and the body's rise and fall repeat
+    with it), and only something that does not repeat tells the right offset."""
     from fractions import Fraction
 
     from openkick.core.video import VideoMeta
@@ -150,6 +153,8 @@ def walking_session(count=3, noise=0.7):
     from openkick.multiview.session import Session, View
     from tests.test_multiview import look_at
     X, t = walker3d(seconds=9, yaw=0, pitch=0)
+    X = X.copy()
+    X[:30] = X[30]                                    # standing still, then walking
     world = (X - np.array([0.0, 0.0, 4.0])) * np.array([1.0, -1.0, 1.0])         # y up, feet on the floor
     views = []
     for k, (center, size, start) in enumerate((((3.5, 1.2, 2.0), (848, 478), 0.0), ((-1.0, 1.1, 4.2), (720, 1280), 0.3),
