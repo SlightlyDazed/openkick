@@ -20,6 +20,8 @@ MIN_SCORE = 0.5            # detections below this confidence are not used unles
 MANUAL_WEIGHT = 3.0        # how much more a hand-placed point pulls the 3D point towards its ray
 PROBLEM_CM = 6.0           # the cameras disagree by more than this -> worth a look
 REJECT_CM = 12.0           # three or more cameras: one that puts a point this far from the rest is left out
+OUTVOTE_FAR_CM = None      # under study (not in use): also left out, path or not, when this far from the rest
+BONES_MARGIN = 0.15        # calibrating a pair, steadier bones overrule the best fit only when this much steadier
 OFF_PATH_CM = 4.0          # a 3D point this far from the path its neighbouring frames give it has jumped
 SMOOTH_HZ = 8.0            # 3D smoothing: the tremor faster than this goes (0: none)
 FAST_SMOOTH_HZ = 12.0      # for fast gestures, whose peaks a lower cut-off would flatten
@@ -245,7 +247,8 @@ class Pair:
         camera B turned round the person every 30 degrees. When the body hardly changes shape
         (a rider on a trainer moves the legs in two flat planes and little else) several
         geometries fit the matches almost equally well; only the right one keeps the bones the
-        same length from frame to frame, so among those that fit, that decides."""
+        same length from frame to frame, so among those that fit, that decides when it is clear
+        (BONES_MARGIN); otherwise the best fit stays. If none fits well, the bones decide."""
         o = self.observe(self.offset)
         step = max(1, int(round(len(o["rows"]) / 250)))
         m = o["ok"][::step]
@@ -268,13 +271,21 @@ class Pair:
             raise ValueError("the two videos do not show a consistent movement")
         best_rms = min(f[2] for f in found)
         most = max(f[3] for f in found)
-        fits = [f for f in found if f[2] <= 1.5 * best_rms + 0.5 and f[3] >= 0.5 * most] or found
+        fits = [f for f in found if f[2] <= 1.5 * best_rms + 0.5 and f[3] >= 0.5 * most]
         sample = max(1, int(round(len(o["rows"]) / 150)))
-
-        def spread(f):
-            X = G.triangulate(o["na"][::sample], o["nb"][::sample], I3, Z3, f[0], f[1])
-            return G.bone_spread(X)
-        best = min(fits, key=spread)
+        spread = {id(f): G.bone_spread(G.triangulate(o["na"][::sample], o["nb"][::sample], I3, Z3, f[0], f[1]))
+                  for f in (fits or found)}
+        steady = min(fits or found, key=lambda f: spread[id(f)])
+        if not fits:
+            # none fits well and agrees with most matches (the closest fit may explain 4 % of them):
+            # the bones decide
+            best = steady
+        else:
+            # the bones decide only when they are clearly steadier than with the best fit: in a squat seen
+            # from the front and the side (laboratory data) a guess 94 degrees off kept them 11 % steadier
+            # than the right one, which fitted twice as well; on the cycling sessions this picks the same
+            top = min(fits, key=lambda f: f[2])
+            best = steady if spread[id(steady)] < (1 - BONES_MARGIN) * spread[id(top)] else top
         self.R, self.d, self.rms, self.agreement = best
 
     def solve(self, progress=None):
@@ -616,14 +627,22 @@ class Session:
             better = far & (hit > PROBLEM_CM) & (rest < best)
             wrong[better], best[better] = k, rest[better]
         wrong[~(best < 0.5 * hit)] = -1
+        # under study: a camera wrong for a long stretch (a leg hidden behind the body, which the
+        # detector places somewhere with confidence) moves the path with it, so it never "jumps"
+        forced = np.zeros(len(hit), bool)
+        if OUTVOTE_FAR_CM:
+            for k, (v, _, ev, _, _) in enumerate(tries):
+                forced |= (wrong == k) & (ev[v] > OUTVOTE_FAR_CM)
         # the 3D point: all the cameras, unless it leaves its path (twice: the second path is cleaner)
         for _ in range(2):
             gap = off(X0[idx], path[idx])
             choice, chosen = np.full(len(hit), -1), X0[idx]
             for k, (_, Xv, _, far, _) in enumerate(tries):
                 d = np.linalg.norm(Xv - path[idx], axis=-1)
-                better = far & np.isfinite(d) & (d < gap)
+                better = far & np.isfinite(d) & (d < gap) & ~forced
                 choice[better], gap[better], chosen[better] = k, d[better], Xv[better]
+                m = forced & (wrong == k)
+                choice[m], chosen[m] = k, Xv[m]
             X[...] = X0
             X[idx] = chosen
             path = G.path_of(X, frames)

@@ -409,6 +409,7 @@ person and computes the inverse kinematics. It takes a few seconds.
   another in front (about 140° between them), the hip of the far side comes out worse: the comparison
   flags as doubtful the leg whose thigh or shank changes length by more than 10 %.
 - In the OpenSim model, knee and ankle come out with 3–6° of error against the lab, but hip flexion comes
-  out 9 to 16° too high in squats, sit-to-stand and jumps.
+  out 8 to 12° too high in sit-to-stand and jumps. The program gives half of the trunk's lean to the lower
+  back, which Pose2Sim alone keeps straight.
 - Required components: `rtmlib` and `onnxruntime` for step 1; `pose2sim`, `opensim` and `vtk` for step 2.
   They are not yet included in the Windows installer.

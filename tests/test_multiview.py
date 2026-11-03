@@ -521,6 +521,8 @@ def test_opensim_step_and_model_view(tmp_path, monkeypatch):
         time.sleep(0.05)
     assert w.osim_result and w.osim_result["ok"], w.osim_panel.info.text()
     assert (tmp_path / "osim" / "kinematics").is_dir() and w.osim_view.scene is not None
+    # the second inverse kinematics, with part of the trunk's lean in the lower back, ran
+    assert (tmp_path / "osim" / "kinematics" / "lumbar" / "ik_setup.xml").exists()
     w.ctl.set_row(30)
     app.processEvents()
     img = w.osim_view.grab().toImage()

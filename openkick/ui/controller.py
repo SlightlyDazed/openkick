@@ -219,7 +219,7 @@ class Controller(QObject):
         old = self.project.pose
         n = pose.frame_count
         edit = A.PoseEdit(0, n - 1, old.xy.copy(), old.source.copy(), pose.xy.copy(), pose.source.copy())
-        old.raw_xy, old.visibility, old.z = pose.raw_xy, pose.visibility, pose.z
+        old.raw_xy, old.visibility, old.z, old.detector = pose.raw_xy, pose.visibility, pose.z, pose.detector
         edit.redo(old)
         self.push_pose_edit(edit, text)
 

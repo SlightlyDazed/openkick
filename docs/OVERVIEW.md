@@ -37,7 +37,10 @@ on its own.
 ## How to use the 2D analysis
 
 1. **Open a video.** Drag it into the window or choose it with *Open video*. Skeleton detection starts
-   by itself.
+   by itself. In its window you can change the **detector**: MediaPipe or RTMPose, each in three sizes
+   (from 6 to 596 MB), lighter for slow computers. The choice is kept for the next video. Against the lab,
+   RTMPose balanced is much better in gait (knee about 4° off against 9°) and MediaPipe accurate has the
+   better hip in squats and jumps; RTMPose does not find the hands.
 2. **Review the skeleton.** The timeline marks doubtful frames in orange; the Tab key jumps to the next
    one.
 3. **Correct.** Drag the misplaced point to its place. The correction can apply to that frame only, be
@@ -172,28 +175,34 @@ and cannot be removed.
 
 It was measured against a marker-based motion-capture lab using a public dataset (OpenCap, Stanford
 University): 9 people, phones on tripods at 60 frames per second, doing squats, sit-to-stand, drop
-jumps and walking. Everything measured is the automatic result, without any manual correction.
+jumps and walking. Everything measured is the automatic result, without any manual correction. The
+reference is the angles the lab computes from its markers with its own OpenSim model; OpenKick's are the
+angles the app shows.
 
 Mean error in degrees against the lab:
 
 | Joint | 2D, one camera | 3D, two cameras | OpenSim model |
 |---|---|---|---|
-| Knee | 5 to 10 | 4.3 | 3.7 |
-| Hip | 7 to 10 | 7.6 | 9.4 in flexion |
-| Ankle | 13 to 20 | 5.1 | 6.3 |
-| Shoulder | not measured | 5.3 | not measured |
-| Elbow | not measured | 14.4 | not measured |
+| Knee | 7 to 10 | 4.3 | 3.5 |
+| Hip | 6 to 8 | 5.4 | 6.9 in flexion |
+| Ankle | 12 to 20 | 6.1 | 6.2 |
+| Shoulder | 7 to 21 | 7.8 | not measured |
+| Elbow | 16 to 27 | 18.2 | not measured |
 
 What these numbers say:
 
-- **The knee is the most reliable** in all three cases.
+- **With two cameras the knee is the most reliable**, and the hip and ankle follow closely.
 - **The ankle can only be measured with two cameras.** With one it is not reliable.
-- **The elbow is not valid yet:** it reads about 14° less, almost constantly.
-- **The OpenSim model's hip flexion is too high**, by 9 to 16° in squats, sit-to-stand and jumps.
+- **In 2D the knee reads 4 to 9° less flexion than the lab** in squats, sit-to-stand and jumps. In this
+  dataset the "side" cameras are 30 to 40° off a true side view; with the camera well placed it should be
+  less, but that is not measured. In 2D the hip is as good as the knee.
+- **The elbow is not valid:** it reads 15 to 19° less, almost constantly, in 2D and in 3D.
+- **The OpenSim model's hip flexion is too high** in sit-to-stand and jumps, by 8 to 12° on average, in
+  the deepest part of the movement. The hip the app shows in 3D does not have that error. Pose2Sim holds
+  the lower back straight, which made it worse (9.3°); since November the export gives half of the
+  trunk's lean to the lower back.
 - **For gait it cannot compare two people with each other:** the error is the same size as the
   differences between them.
-- In 2D the program tends to measure less flexion than the real one, and the error grows when the camera
-  is not side-on.
 
 What is not measured:
 
@@ -205,9 +214,10 @@ What is not measured:
   videos. Measuring it needs a reference of its own: stickers on the greater trochanter, the lateral
   femoral condyle and the lateral malleolus, or a goniometer with the pedal stopped.
 
-**About the reference.** In that data, the lab's "knee" and "ankle" are skin markers outside the joint.
-Against the angles the lab computes with its own OpenSim (the gold standard), the OpenKick 3D knee is
-off by 4.0–4.7° and the OpenCap two-camera knee by 3.1–3.4°.
+**About the reference.** In that data, the lab's "knee" and "ankle" are skin markers outside the joint,
+so angles drawn straight from the markers are not the truth: until November 2026 the numbers were
+measured that way and came out different (better for the 2D knee, worse for the hip). For comparison,
+OpenCap's own two-camera result scored against the same reference gives 3.9° at the knee through OpenSim.
 
 **What needs validating and what does not.** MediaPipe, RTMPose, Pose2Sim and OpenSim have their own
 studies and are cited. What has to be measured is what OpenKick adds: calibrating with the body,
@@ -279,8 +289,8 @@ Still to do, in order of importance:
 
 - **Frame:** each of the images of the video.
 - **Skeleton:** the body points the program detects, joined by lines.
-- **Detection engine:** the neural network that finds those points. 2D uses MediaPipe (33 points); 3D
-  uses RTMPose (26 points, with the feet).
+- **Detection engine:** the neural network that finds those points. 2D uses MediaPipe (33 points) or
+  RTMPose, whichever you choose; 3D uses RTMPose (26 points, with the feet).
 - **Phase:** a named stretch of the movement, such as "stance" or "strike".
 - **Range of motion:** the difference between the largest and the smallest angle of a joint.
 - **Calibrate:** in 2D, telling the program how many pixels make a metre. In 3D it is not needed: the

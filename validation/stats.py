@@ -1,4 +1,6 @@
 """Paper-style statistics from the results already computed (no video is processed here).
+The reference is the laboratory's OpenSim inverse kinematics; OpenKick's values are the clinical
+angles the app shows (validation.opencap, validation.multiview).
 
     python -m validation.stats          ->  validation/results/study_summary.txt
 
@@ -108,9 +110,10 @@ def load_study(name: str):
 
 
 def section_2d() -> list[str]:
-    out = ["", "2D, ONE CAMERA (side views Cam0 and Cam4). MAE° [95 % CI over participants]; ICC of the range of motion"]
+    out = ["", "2D, ONE CAMERA (side views Cam0 and Cam4, the leg nearer the camera), against the laboratory's OpenSim angles.",
+           "MAE° [95 % CI over participants]; ICC of the range of motion"]
     engines = ["mediapipe", "rtmpose-lightweight", "rtmpose-balanced", "rtmpose-performance"]
-    for joint in ("knee", "hip", "ankle"):
+    for joint in ("knee", "hip", "ankle", "shoulder", "elbow"):
         out.append(f"\n  {joint}")
         out.append(f"  {'engine':22s}" + "".join(f"{LABEL[k]:>26s}" for k in KINDS))
         for e in engines:
@@ -121,6 +124,9 @@ def section_2d() -> list[str]:
                     line += f"{'—':>26s}"
                     continue
                 rows = [r for r in csv.DictReader(open(f)) if r["joint"] == f"{joint}_aligned"]
+                if not rows:
+                    line += f"{'—':>26s}"
+                    continue
                 per = {}
                 for r in rows:
                     per.setdefault(r["subject"], []).append(float(r["mae"]))
@@ -207,7 +213,8 @@ def main():
     lines = []
     base = load_study("baseline")
     if base:
-        lines += ["3D, TWO CAMERAS (Cam0 + Cam4), OpenKick without calibration, angles from the 3D points, against the laboratory markers.",
+        lines += ["3D, TWO CAMERAS (Cam0 + Cam4), OpenKick without calibration, the angles the app shows, against the laboratory's",
+                  "OpenSim angles (shoulder: the arm's elevation from the trunk).",
                   f"{len(base)} recordings, {len({r['subject'] for r in base})} participants.", ""]
         lines += table_3d(base, ("knee", "hip", "ankle", "elbow", "shoulder"))
     lines += section_opensim() + section_2d() + section_fps() + section_pairs() + section_holdout()

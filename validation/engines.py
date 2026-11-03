@@ -1,5 +1,6 @@
 """Pose engines under test. Each returns frame times and named 2D points in pixels:
-right/left _shoulder, _hip, _knee, _ankle, _heel, _toe (NaN where not detected)."""
+right/left _shoulder, _hip, _knee, _ankle, _heel, _toe (NaN where not detected), and for MediaPipe
+_elbow and _wrist too."""
 
 from __future__ import annotations
 
@@ -8,7 +9,7 @@ from pathlib import Path
 import numpy as np
 
 NAMES = ["shoulder", "hip", "knee", "ankle", "heel", "toe"]
-ARMS = ["elbow", "wrist"]          # also kept by "mediapipe-heavy" (for the shoulder angle)
+ARMS = ["elbow", "wrist"]          # MediaPipe also gives the arms (shoulder and elbow angles)
 
 
 def run(engine: str, video: Path):
@@ -33,7 +34,7 @@ def _mediapipe(engine: str, video: Path):
     res = PoseDetector(ensure_model(kind)).run(meta)
     src = {"shoulder": "shoulder", "hip": "hip", "knee": "knee", "ankle": "ankle", "heel": "heel",
            "toe": "foot_index", "elbow": "elbow", "wrist": "wrist"}
-    names = NAMES + (ARMS if engine == "mediapipe-heavy" else [])
+    names = NAMES + ARMS
     points = {f"{side}_{n}": res.xy[:, L.INDEX[f"{side}_{src[n]}"], :].astype(float)
               for side in ("right", "left") for n in names}
     return _times(meta), points

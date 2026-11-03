@@ -613,7 +613,7 @@ class PhasesTab(QWidget):
 
 
 class PointTab(QWidget):
-    SCOPES = [("frame", "Only this frame", "The rest stays as MediaPipe detected it"),
+    SCOPES = [("frame", "Only this frame", "The rest stays as the detector found it"),
               ("neighbors", "Smooth with neighbors", "Spreads the change over ±3 frames"),
               ("phase", "Until the end of the phase", "Shifts the joint over the whole current phase")]
 
@@ -626,7 +626,7 @@ class PointTab(QWidget):
         box = QVBoxLayout()
         box.setSpacing(12)
         box.addWidget(section(tr("Selected point")))
-        self.empty = QLabel(tr("Click a joint on the video to inspect it. Drag it to correct MediaPipe; "
+        self.empty = QLabel(tr("Click a joint on the video to inspect it. Drag it to correct the detection; "
                                "the angles and trajectories that use it update by themselves."))
         self.empty.setWordWrap(True)
         self.empty.setObjectName("Faint")
@@ -659,7 +659,7 @@ class PointTab(QWidget):
             grid.addWidget(tile, 0, i)
         dl.addLayout(grid)
         crow = QHBoxLayout()
-        cl = QLabel(tr("MediaPipe confidence"))
+        cl = QLabel(tr("Detection confidence"))
         cl.setStyleSheet(f"color: {theme.MUTED}; font-size: 12px;")
         crow.addWidget(cl, 1)
         self.conf_lbl = QLabel()
@@ -674,7 +674,7 @@ class PointTab(QWidget):
         self.src_lbl.setWordWrap(True)
         dl.addWidget(self.src_lbl)
         brow = QHBoxLayout()
-        self.revert_btn = QPushButton(tr("Revert to MediaPipe"))
+        self.revert_btn = QPushButton(tr("Revert to the detection"))
         self.revert_btn.clicked.connect(lambda: revert_joint(self.ctl, self.ctl.selected_landmark))
         brow.addWidget(self.revert_btn)
         dl.addLayout(brow)
@@ -750,7 +750,7 @@ class PointTab(QWidget):
             self.src_lbl.setText(tr("Adjusted by a nearby correction or smoothing"))
             self.src_lbl.setStyleSheet(f"background: {theme.RAISED}; color: {theme.TEXT_2}; border-radius: 8px; padding: 9px 12px;")
         else:
-            self.src_lbl.setText(tr("As detected by MediaPipe"))
+            self.src_lbl.setText(tr("As detected"))
             self.src_lbl.setStyleSheet(f"background: {theme.RAISED}; color: {theme.TEXT_2}; border-radius: 8px; padding: 9px 12px;")
         self.revert_btn.setEnabled(bool(src != 1))
         for m in p.measurements:

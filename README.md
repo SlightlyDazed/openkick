@@ -37,7 +37,8 @@ whole body in every frame, and every measurement is attached to that skeleton.
 <td width="50%" valign="top">
 
 ### 🦴 Automatic skeleton
-MediaPipe, 33 landmarks, in every frame — running in the background while you work.
+MediaPipe or RTMPose (you choose by weight: from 6 MB to 596 MB) in every frame — running in the
+background while you work.
 
 ### 📐 Skeleton-linked measurements
 Angles, trajectories with velocity, distances, segment markers, centre of mass (De Leva, 1996) and
@@ -103,26 +104,33 @@ Measured against a marker-based motion-capture lab using the public
 [OpenCap](https://simtk.org/projects/opencap) dataset (Stanford): 9 participants (of its 10; one did not
 consent to sharing their videos), 72 recordings, phones on tripods at
 60 fps, squats, sit-to-stand, drop jumps and walking. **Automatic output only — no manual correction.**
+The reference is the lab's own OpenSim joint angles; OpenKick's are the clinical angles the app shows.
 
 <div align="center">
 
-| Mean absolute error (°) | 2D · one camera | 3D · two cameras | OpenSim model |
+| Mean absolute error (°) | 2D · one camera | 3D · two cameras [95 % CI] | OpenSim model |
 |:---|:---:|:---:|:---:|
-| **Knee**     | 5–10  | **4.3** | **3.7** |
-| **Hip**      | 7–10  | 7.6     | 9.4 *(flexion)* |
-| **Ankle**    | 13–20 | **5.1** | 6.3 |
-| **Shoulder** | —     | 5.3     | — |
-| **Elbow**    | —     | 14.4 ⚠️ | — |
+| **Knee**     | 7–10  | **4.3** [4.0–4.7] | **3.5** |
+| **Hip**      | 6–8   | **5.4** [4.4–6.5] | 6.9 *(flexion)* |
+| **Ankle**    | 12–20 | **6.1** [5.6–6.6] | 6.2 |
+| **Shoulder** | 7–21  | 7.8 [6.6–9.2]     | — |
+| **Elbow**    | 16–27 ⚠️ | 18.2 ⚠️        | — |
 
 </div>
 
-<sub>2D: range over the four movements (MediaPipe). 3D: all 72 recordings pooled; the 95 % intervals,
-Bland–Altman limits and ICC are in the validation document.</sub>
+<sub>2D: range over the four movements (MediaPipe, the leg nearer the camera). 3D: all 72 recordings
+pooled, interval over participants; the Bland–Altman limits and ICC are in the validation document.
+Before 2 November 2026 these numbers were measured against angles built from the lab's skin markers,
+which sit 3–8 cm outside the joints.</sub>
 
-- ✅ Locating the cameras **from the body matches checkerboard calibration** (within 1°, with 2, 3 and 5 cameras).
-- ✅ The knee is the most reliable joint; the ankle needs two cameras.
-- ⚠️ **The elbow is not valid yet** (≈14° constant under-flexion); OpenSim hip flexion is overestimated by
-  9–16° in squats, sit-to-stand and jumps.
+- ✅ Locating the cameras **from the body matches checkerboard calibration** (within 1°).
+- ✅ In 3D the knee is the most reliable joint, and the ankle needs two cameras.
+- ⚠️ **In 2D the knee reads 4–9° less flexion than the lab** in squats, sit-to-stand and jumps (the side
+  cameras of this dataset are 30–40° off a true side view); the hip is as good as the knee.
+- ⚠️ **The elbow is not valid** (15–19° constant under-flexion, in 2D and 3D). The OpenSim model's hip
+  flexion is still too high in sit-to-stand and jumps (bias +8 to +12°); the app's own 3D hip is not.
+- ⚠️ **Comparing people by their gait is not reliable**: the error is as large as the differences
+  between healthy people.
 - ⚠️ **3D cycling is not validated against a lab**: so far only a consistency test with one rider at two
   saddle heights.
 - ⏳ Not yet measured: gain from manual correction, fast sports movements, hand-held cameras.
@@ -211,7 +219,8 @@ packaging/     PyInstaller spec and Inno Setup installer
 
 Copyright © 2026 Gabriel Alexander Laurente ([@SlightlyDazed](https://github.com/SlightlyDazed)).
 Released under the [GNU GPL v3 or later](LICENSE).
-MediaPipe is Apache 2.0; IBM Plex and Space Grotesk fonts are under the SIL Open Font License.
+MediaPipe and rtmlib are Apache 2.0 (RTMPose's trained models are downloaded from OpenMMLab and are for
+non-commercial use); IBM Plex and Space Grotesk fonts are under the SIL Open Font License.
 
 > [!IMPORTANT]
 > OpenKick is a research tool, **not a medical device**.

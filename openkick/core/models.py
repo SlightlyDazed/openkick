@@ -17,13 +17,13 @@ TITLES = {"2d": "2D analysis: body detection (Google MediaPipe)",
           "3d": "3D analysis: body and feet detection (OpenMMLab RTMPose)"}
 
 
-def _rtm_urls() -> list[str]:
-    """The RTMPose and person-detector downloads of the 3D modes (empty if rtmlib is not installed)."""
+def _rtm_urls(modes=THREE_D_MODES) -> list[str]:
+    """The RTMPose and person-detector downloads of these modes (empty if rtmlib is not installed)."""
     try:
         from rtmlib import BodyWithFeet
     except Exception:  # noqa: BLE001 - without the 3D extras there is nothing to get
         return []
-    return [BodyWithFeet.MODE[m][k] for m in THREE_D_MODES for k in ("det", "pose")]
+    return [BodyWithFeet.MODE[m][k] for m in modes for k in ("det", "pose")]
 
 
 def _rtm_dir() -> Path:
@@ -72,14 +72,15 @@ def _fetch(url: str, dst: Path, progress: Callable[[int, int], None] | None, can
 
 
 def download(key: str, progress: Callable[[int, int, int, int], None] | None = None,
-             cancelled: Callable[[], bool] | None = None) -> bool:
-    """Get one component. `progress(file, files, done bytes, total bytes)`. False if cancelled."""
+             cancelled: Callable[[], bool] | None = None, modes=THREE_D_MODES) -> bool:
+    """Get one component ("3d": the RTMPose `modes`). `progress(file, files, done bytes, total bytes)`.
+    False if cancelled."""
     if key == "2d":
         from openkick.core.pose import ensure_model
         ensure_model("heavy", (lambda d, t: progress(0, 1, d, t)) if progress else None)
         return True
     from rtmlib.tools.file import download_checkpoint
-    urls = [u for u in _rtm_urls() if not _rtm_ready(u)]
+    urls = [u for u in _rtm_urls(modes) if not _rtm_ready(u)]
     folder = _rtm_dir()
     folder.mkdir(parents=True, exist_ok=True)
     for i, url in enumerate(urls):

@@ -11,8 +11,9 @@ from PySide6.QtWidgets import (QComboBox, QDialog, QFrame, QHBoxLayout, QLabel, 
                                QVBoxLayout)
 
 from openkick.core import landmarks as L
-from openkick.core import templates
-from openkick.core.pose import PoseDetector, PoseResult, ensure_model
+from openkick.core import models, templates
+from openkick.core.pose import (ENGINES, RTMPOSE_NOTE, PoseDetector, PoseResult, RTMPoseDetector, ensure_model, is_rtmpose,
+                                rtmpose_available)
 from openkick.core.video import VideoMeta
 from openkick.i18n import tr
 from openkick.ui import icons, theme
@@ -39,10 +40,20 @@ class DetectionWorker(QThread):
     def run(self):
         try:
             self.stage.emit("model")
-            path = ensure_model(self.model, lambda d, t: self.modelProgress.emit(d, t))
+            if is_rtmpose(self.model):
+                mode = self.model.split("-", 1)[1]
+                if not models.download("3d", lambda i, n, d, t: self.modelProgress.emit(d, t), lambda: self._stop,
+                                       modes=(mode,)):
+                    self.done.emit(None)
+                    return
+                det = RTMPoseDetector(mode)
+            else:
+                path = ensure_model(self.model, lambda d, t: self.modelProgress.emit(d, t))
+                det = PoseDetector(path, enhance=self.enhance)
             self.stage.emit("detect")
-            det = PoseDetector(path, enhance=self.enhance)
             res = det.run(self.meta, self._on_frame, lambda: self._stop)
+            if res is not None:
+                res.detector = self.model
             self.done.emit(res)
         except Exception as e:  # noqa: BLE001 - reported to the user
             self.failed.emit(str(e))
@@ -115,13 +126,16 @@ class StepRow(QHBoxLayout):
 
 
 class ProcessingDialog(QDialog):
-    """Runs detection with live preview. Emits `finished_ok(result, template_id)`."""
+    """Runs detection with live preview. Emits `finished_ok(result, template_id)`, and
+    `modelChanged(key)` when the user picks another detector (detection starts again with it)."""
     finished_ok = Signal(object, object)
     progressed = Signal(int)
+    modelChanged = Signal(str)
 
     def __init__(self, meta: VideoMeta, template_id: str | None, model: str, parent=None):
         super().__init__(parent)
         self.meta = meta
+        self.model = model
         self.setWindowTitle(tr("Detecting the pose"))
         self.setModal(True)
         self.setFixedWidth(600)
@@ -155,10 +169,9 @@ class ProcessingDialog(QDialog):
         self.bar.setFixedHeight(8)
         self.bar.setRange(0, 1000)
         lay.addWidget(self.bar)
-        self.steps = [StepRow(tr("Prepare the MediaPipe model")),
+        self.steps = [StepRow(tr("Prepare the detection model")),
                       StepRow(tr("Read the video and the real time of each frame")),
-                      StepRow(tr("Detect the skeleton (MediaPipe, {model} model)",
-                                 model={"heavy": tr("accurate"), "full": tr("balanced"), "lite": tr("fast")}[model])),
+                      StepRow(""),
                       StepRow("")]
         box = QVBoxLayout()
         box.setSpacing(12)
@@ -166,6 +179,26 @@ class ProcessingDialog(QDialog):
             box.addLayout(s)
         lay.addLayout(box)
         self.steps[1].set_state("done", tr("{n} frames", n=meta.frame_count))
+        eng = QHBoxLayout()
+        el = QLabel(tr("Detector"))
+        el.setStyleSheet(f"color: {theme.MUTED};")
+        eng.addWidget(el)
+        self.engine = QComboBox()
+        rtm = rtmpose_available()
+        for key, (label, mb, _) in ENGINES.items():
+            self.engine.addItem(f"{tr(label)} · {mb} MB", key)
+            if is_rtmpose(key) and not rtm:          # without the 3D extras (rtmlib) it cannot run
+                self.engine.model().item(self.engine.count() - 1).setEnabled(False)
+        self.engine.setCurrentIndex(max(0, self.engine.findData(model)))
+        self.engine.currentIndexChanged.connect(self._engine_changed)
+        eng.addWidget(self.engine)
+        eng.addStretch(1)
+        lay.addLayout(eng)
+        self.engine_hint = QLabel()
+        self.engine_hint.setWordWrap(True)
+        self.engine_hint.setStyleSheet(f"color: {theme.FAINT}; font-size: 12px;")
+        lay.addWidget(self.engine_hint)
+        self._engine_text()
         sep = QFrame()
         sep.setObjectName("Separator")
         lay.addWidget(sep)
@@ -191,17 +224,47 @@ class ProcessingDialog(QDialog):
         lay.addLayout(foot)
         self._tpl_text()
         self.t0 = time.monotonic()
-        self.worker = DetectionWorker(meta, model)
-        self.worker.stage.connect(self._stage)
-        self.worker.modelProgress.connect(self._model_progress)
-        self.worker.progress.connect(self._progress)
-        self.worker.done.connect(self._done)
-        self.worker.failed.connect(self._failed)
+        self.worker = self._new_worker()
         self.result_ok = False
+
+    def _new_worker(self) -> DetectionWorker:
+        w = DetectionWorker(self.meta, self.model)
+        w.stage.connect(self._stage)
+        w.modelProgress.connect(self._model_progress)
+        w.progress.connect(self._progress)
+        w.done.connect(self._done)
+        w.failed.connect(self._failed)
+        return w
 
     def start(self):
         self.worker.start()
         self.show()
+
+    def _engine_text(self):
+        label, _, what = ENGINES[self.model]
+        self.steps[2].label.setText(tr("Detect the skeleton ({model})", model=tr(label)))
+        self.engine_hint.setText(tr(what) + (" " + tr(RTMPOSE_NOTE) if is_rtmpose(self.model) else ""))
+
+    def _engine_changed(self, *_):
+        """Another detector: what the first one did so far is dropped and detection starts again."""
+        key = self.engine.currentData()
+        if key == self.model:
+            return
+        old = self.worker
+        for sig in (old.stage, old.modelProgress, old.progress, old.done, old.failed):
+            sig.disconnect()
+        old.stop()
+        old.wait()
+        self.model = key
+        self.modelChanged.emit(key)
+        self._engine_text()
+        self.bar.setValue(0)
+        self.pct.setText("0 %")
+        self.eta.setText("")
+        self.steps[0].set_state("todo")
+        self.steps[2].set_state("todo")
+        self.worker = self._new_worker()
+        self.worker.start()
 
     def _tpl_text(self, *_):
         t = templates.find(self.tpl.currentData())
@@ -256,6 +319,7 @@ class ProcessingDialog(QDialog):
     def _cancel(self):
         self.worker.stop()
         self.cancel_btn.setEnabled(False)
+        self.engine.setEnabled(False)
 
     def closeEvent(self, e):
         if self.worker.isRunning():

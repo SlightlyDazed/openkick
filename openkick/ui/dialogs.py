@@ -541,7 +541,7 @@ class AboutDialog(QDialog):
                         "Reads and writes Kinovea .kva files."),
                      tr("License: GNU GPL v3 or later. Pose detection: Google MediaPipe (Apache 2.0). "
                         "Fonts: IBM Plex and Space Grotesk (SIL OFL)."),
-                     tr("3D: RTMPose and its person detector (OpenMMLab, through rtmlib, Apache 2.0), downloaded "
+                     tr("2D (optional) and 3D: RTMPose and its person detector (OpenMMLab, through rtmlib, Apache 2.0), downloaded "
                         "from their official site. Their training datasets (Halpe, Human-Art and others) are "
                         "for non-commercial use only."),
                      tr("OpenKick is not a medical device. Its measurements help the professional's judgement and "

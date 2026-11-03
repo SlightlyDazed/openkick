@@ -2,7 +2,10 @@
 
     python -m validation.study baseline     per-frame results of the two-camera reconstruction, kept for the statistics
     python -m validation.study fps30        the same from videos at 30 frames per second (every other frame)
+    python -m validation.study ceiling      Cam0 + Cam4 in every movement, against the checkerboard calibration (the
+                                            per-movement table; as validation.multiview --batch, in parallel)
     python -m validation.study pairs        other camera pairs (squats and walking)
+    python -m validation.study cameras      three and five cameras (squats and walking)
     python -m validation.study holdout      settings chosen on some participants, results on the others
     python -m validation.study stats        tables with confidence intervals, agreement and reliability
 
@@ -73,7 +76,7 @@ def evaluate(job: tuple) -> dict:
     lags = [V.known_lag(subject, trial, c) for c in cams]
     lag = lags[0]
     ref = M.reference_3d(subject, trial)
-    est = M.angles_from_keypoints(s.X)
+    est = M.angles_from_keypoints(s.X, s.t, trial)
     cal = [M.load_camera(subject, trial, c) for c in cams]
     R_true, t_true = M.relative_pose(cal[0], cal[1])
     q = s.quality()
@@ -81,7 +84,7 @@ def evaluate(job: tuple) -> dict:
                 "baseline_err_pct": float(abs(s.scale - np.linalg.norm(t_true) / 1000) / (np.linalg.norm(t_true) / 1000) * 100),
                 "offset_err_ms": float((s.offsets[1] - (lags[0] - lags[1])) * 1000), "level": q["level"],
                 "reconstructed": q["reconstructed"], "frames": int(s.frame_count)})
-    series = {"t": s.t - lag}
+    series = {"t": s.t - lag, "X": s.X}
     for j in JOINTS:
         per_side = []
         for side in "rl":
@@ -161,6 +164,18 @@ def fps30():
 PAIRS = (("Cam0", "Cam1"), ("Cam0", "Cam2"), ("Cam1", "Cam3"), ("Cam0", "Cam3"), ("Cam2", "Cam4"), ("Cam0", "Cam4"))
 
 
+def ceiling():
+    save("ceiling", pool_map(_pair, [(s, tr, k, ("Cam0", "Cam4")) for s, tr, k in trials()], label="ceiling"))
+
+
+CAMERA_SETS = (("Cam0", "Cam2", "Cam4"), ("Cam0", "Cam1", "Cam2", "Cam3", "Cam4"))
+
+
+def cameras():
+    jobs = [(s, tr, k, cams) for cams in CAMERA_SETS for s, tr, k in trials(("squats", "walking"))]
+    save("cameras", pool_map(_pair, jobs, label="cameras"))
+
+
 def pairs():
     jobs = [(s, tr, k, cams) for cams in PAIRS for s, tr, k in trials(("squats", "walking"))]
     save("pairs", pool_map(_pair, jobs, label="pairs"))
@@ -205,7 +220,7 @@ def main(argv=None):
             from validation import stats
             stats.main()
         else:
-            {"baseline": baseline, "fps30": fps30, "pairs": pairs, "holdout": holdout}[name]()
+            {"baseline": baseline, "fps30": fps30, "ceiling": ceiling, "pairs": pairs, "cameras": cameras, "holdout": holdout}[name]()
 
 
 if __name__ == "__main__":

@@ -385,7 +385,7 @@ class WelcomePage(QWidget):
         h1 = QLabel(tr("Analyze the movement,\nnot the software."))
         h1.setFont(theme.display(44))
         hero.addWidget(h1)
-        sub = QLabel(tr("Load a video: OpenKick detects the skeleton with MediaPipe, measures angles and "
+        sub = QLabel(tr("Load a video: OpenKick detects the skeleton with MediaPipe or RTMPose, measures angles and "
                         "trajectories frame by frame, and you only fix what needs fixing."))
         sub.setWordWrap(True)
         sub.setMaximumWidth(640)
@@ -441,7 +441,7 @@ class WelcomePage(QWidget):
         fl.addStretch(1)
         fl.addWidget(QLabel(tr("Developed by {name}", name=AUTHOR)))
         fl.addWidget(QLabel("·"))
-        fl.addWidget(QLabel(tr("Pose detection: MediaPipe")))
+        fl.addWidget(QLabel(tr("Pose detection: MediaPipe and RTMPose")))
         outer.addWidget(foot)
         self.reload_templates()
 

@@ -295,7 +295,7 @@ class VideoCanvas(QWidget):
             self._pill(p, right, top, tr("No person detected in this frame"), theme.WARN, right=True)
         else:
             color = theme.OK if conf >= 0.75 else theme.WARN
-            self._pill(p, right, top, tr("MediaPipe · confidence {v}%", v=round(conf * 100)), color, right=True)
+            self._pill(p, right, top, tr("Detection · confidence {v}%", v=round(conf * 100)), color, right=True)
 
     # ── interaction ────────────────────────────────────────
     def _tool_changed(self, tool: str):
@@ -609,7 +609,7 @@ class VideoCanvas(QWidget):
         elif j is not None:
             self.ctl.select_landmark(j)
             theme.menu_title(menu, tr(L.DISPLAY[L.NAMES[j]]))
-            menu.addAction(tr("Revert to MediaPipe"), lambda: revert_joint(self.ctl, j))
+            menu.addAction(tr("Revert to the detection"), lambda: revert_joint(self.ctl, j))
             if j in L.ANGLE_PRESETS:
                 menu.addAction(tr("Measure this angle"), lambda: self._add_preset_angle(j))
             menu.addAction(tr("Follow its trajectory"), lambda: self._add_trajectory(PointRef.at(j), j))

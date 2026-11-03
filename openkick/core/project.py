@@ -235,7 +235,9 @@ class Calibration:
 
 
 class Pose:
-    """Per-frame landmarks. `raw_xy` keeps MediaPipe's output to allow reverting edits."""
+    """Per-frame landmarks. `raw_xy` keeps the detector's output to allow reverting edits;
+    `detector` is which one found them (core/pose.py ENGINES; "" in projects older than the choice,
+    which were all MediaPipe)."""
 
     def __init__(self, n: int):
         self.xy = np.full((n, L.COUNT, 2), np.nan, np.float32)
@@ -243,6 +245,7 @@ class Pose:
         self.visibility = np.zeros((n, L.COUNT), np.float32)
         self.z = np.full((n, L.COUNT), np.nan, np.float32)
         self.source = np.zeros((n, L.COUNT), np.uint8)
+        self.detector = ""
 
     @property
     def frame_count(self) -> int:
@@ -263,7 +266,7 @@ class Pose:
             a = np.round(a.astype(np.float64), nd)
             return np.where(np.isnan(a), None, a).tolist()
         return {"xy": arr(self.xy), "raw_xy": arr(self.raw_xy), "visibility": arr(self.visibility, 3),
-                "z": arr(self.z, 4), "source": self.source.tolist()}
+                "z": arr(self.z, 4), "source": self.source.tolist(), "detector": self.detector}
 
     @classmethod
     def from_dict(cls, d: dict) -> "Pose":
@@ -276,6 +279,7 @@ class Pose:
         p.visibility = arr(d["visibility"])
         p.z = arr(d["z"])
         p.source = np.array(d["source"], np.uint8)
+        p.detector = d.get("detector", "")
         return p
 
 

@@ -15,7 +15,7 @@ import numpy as np
 OUT = Path(__file__).resolve().parent / "results"
 ENGINES = ["mediapipe", "rtmpose-lightweight", "rtmpose-balanced", "rtmpose-performance"]
 MOVES = ["squats", "STS", "DJ", "walking"]
-JOINTS = ["knee", "hip", "ankle"]
+JOINTS = ["knee", "hip", "ankle", "shoulder", "elbow"]
 
 
 def load() -> list[dict]:

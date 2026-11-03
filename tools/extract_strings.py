@@ -40,7 +40,7 @@ for _, a, b in PointTab.SCOPES:
     add(b)
 for _, d in SHORTCUTS:
     add(d)
-for s in ("Accurate (heavy)", "Balanced (full)", "Fast (lite)", "segment"):
+for s in ("segment",):
     add(s)
 from openkick.core.bodymodel import DERIVED, SEGMENTS  # noqa: E402
 
@@ -104,6 +104,11 @@ from openkick.multiview.session import STROKE_PARTS as _parts  # noqa: E402
 from openkick.core.models import TITLES as _titles  # noqa: E402
 for _n in _titles.values():
     add(_n)
+from openkick.core import pose as _pose  # noqa: E402
+for _label, _, _what in _pose.ENGINES.values():
+    add(_label)
+    add(_what)
+add(_pose.RTMPOSE_NOTE)
 for _n in _parts + ("{bone} {cm} cm · tape {usual} · {pct} %", "{bone} {cm} cm · usual {usual} · {pct} %"):
     add(_n)
 for _n in _rev.WHY.values():

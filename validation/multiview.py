@@ -4,8 +4,9 @@
 "body"     what OpenKick does (openkick.multiview): no calibration at all; time offset, camera
            pose and scale are solved from the two skeletons and the person's height.
 
-Both are scored with 3D joint angles against the marker-based mocap, and the recovered cameras
-and time offset are compared with the true ones.
+Both are scored with the angles the app shows in 3D (openkick.core.joints.clinical_3d, smoothed
+as the movement's template does) against the laboratory's OpenSim angles, and the recovered
+cameras and time offset are compared with the true ones.
 
     python -m validation.multiview --subject subject2 --trial squats1 --cams Cam0 Cam4
     python -m validation.multiview --batch squats DJ walking STS
@@ -94,44 +95,39 @@ def pose_difference(R_est, t_est, R_true, t_true) -> dict:
 # ── 3D angles ──────────────────────────────────────────────────────────
 
 
-def angle3(a, o, b):
-    v1, v2 = a - o, b - o
-    c = (v1 * v2).sum(-1) / (np.linalg.norm(v1, axis=-1) * np.linalg.norm(v2, axis=-1))
-    return np.degrees(np.arccos(np.clip(c, -1, 1)))
+def angles_from_keypoints(X: np.ndarray, t: np.ndarray, trial: str) -> dict:
+    """The app's 3D angles from triangulated HALPE-26 points (N, 26, 3), as the template of the
+    trial's movement shows them (openkick.multiview.template3d.angles): the room's vertical from
+    the body, the template's hip reference, low-pass at its cutoff."""
+    import warnings
 
-
-def between3(v1, v2):
-    c = (v1 * v2).sum(-1) / (np.linalg.norm(v1, axis=-1) * np.linalg.norm(v2, axis=-1))
-    return np.degrees(np.arccos(np.clip(c, -1, 1)))
-
-
-def angles_from_keypoints(X: np.ndarray) -> dict:
-    """3D joint angles from triangulated HALPE-26 points (N, 26, 3)."""
-    g = lambda n: X[:, IDX[n]]  # noqa: E731
+    from openkick.core.analysis import CUTOFF_HZ, lowpass
+    from openkick.core.joints import clinical_3d
+    from openkick.multiview.export import to_world
+    tpl = V.template_of(trial)
+    fps = 1.0 / float(np.median(np.diff(t)))
+    cut = min((tpl.cutoff_hz if tpl else None) or CUTOFF_HZ, 0.45 * fps)
     out = {}
-    for side, S in (("r", "right"), ("l", "left")):
-        out[f"knee_{side}"] = 180 - angle3(g(f"{S}_hip"), g(f"{S}_knee"), g(f"{S}_ankle"))
-        out[f"hip_{side}"] = 180 - angle3(g(f"{S}_shoulder"), g(f"{S}_hip"), g(f"{S}_knee"))
-        out[f"ankle_{side}"] = between3(g(f"{S}_knee") - g(f"{S}_ankle"), g(f"{S}_toe") - g(f"{S}_heel"))
-        out[f"elbow_{side}"] = 180 - angle3(g(f"{S}_shoulder"), g(f"{S}_elbow"), g(f"{S}_wrist"))
-        out[f"shoulder_{side}"] = angle3(g(f"{S}_hip"), g(f"{S}_shoulder"), g(f"{S}_elbow"))     # arm away from the trunk
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        up = to_world(X)[1]["R"][1]
+        for side, S in (("r", "right"), ("l", "left")):
+            for j in V.JOINTS:
+                out[f"{j}_{side}"] = lowpass(clinical_3d(X, IDX, j, S, up, V.hip_reference(trial)), fps, cut)
     return out
 
 
 def reference_3d(subject: str, trial: str) -> dict:
-    """The same 3D angles from the laboratory markers (no projection)."""
-    t, m = V.read_trc(V.ROOT / subject / "MarkerData" / "Mocap" / f"{trial}.trc")
-    out = {"t": t}
-    for side, S, s in (("r", "R", "r"), ("l", "L", "L")):
-        out[f"knee_{side}"] = 180 - angle3(m[f"{S}_HJC"], m[f"{s}_knee"], m[f"{s}_ankle"])
-        out[f"hip_{side}"] = 180 - angle3(m[f"{S}_Shoulder"], m[f"{S}_HJC"], m[f"{s}_knee"])
-        out[f"ankle_{side}"] = between3(m[f"{s}_knee"] - m[f"{s}_ankle"], m[f"{s}_toe"] - m[f"{s}_calc"])
-        if f"{S}_elbow_lat" in m and f"{S}_wrist_radius" in m:
-            elbow = (m[f"{S}_elbow_lat"] + m[f"{S}_elbow_med"]) / 2
-            wrist = (m[f"{S}_wrist_radius"] + m[f"{S}_wrist_ulna"]) / 2
-            out[f"elbow_{side}"] = 180 - angle3(m[f"{S}_Shoulder"], elbow, wrist)
-            out[f"shoulder_{side}"] = angle3(m[f"{S}_HJC"], m[f"{S}_Shoulder"], elbow)
-    return out
+    """The laboratory's OpenSim angles. The shoulder in 3D is the arm's elevation from the trunk
+    (no sign), so it is compared with the elevation the lab's arm_flex and arm_add make together
+    (the long axis of the arm turned by both: cos = cos flex · cos add)."""
+    ref = V.reference(subject, trial)
+    _, c = V.read_mot(V.ROOT / subject / "OpenSimData" / "Mocap" / "IK" / f"{trial}.mot")
+    for s in "rl":
+        if f"arm_add_{s}" in c:
+            flex, add = np.radians(c[f"arm_flex_{s}"]), np.radians(c[f"arm_add_{s}"])
+            ref[f"shoulder_{s}"] = np.degrees(np.arccos(np.clip(np.cos(flex) * np.cos(add), -1, 1)))
+    return ref
 
 
 # ── time alignment with the laboratory ─────────────────────────────────
@@ -177,8 +173,9 @@ def mocap_lag(t: np.ndarray, X_mm: np.ndarray, subject: str, trial: str, max_s: 
 def score_angles(t: np.ndarray, est: dict, ref: dict, lag: float) -> dict:
     """Errors per joint (both legs pooled) at the given video/mocap time offset."""
     out = {"lag_s": lag}
-    for j in ("knee", "hip", "ankle"):
-        ms = [V.metrics(est[f"{j}_{s}"], np.interp(t - lag, ref["t"], ref[f"{j}_{s}"], left=np.nan, right=np.nan)) for s in "rl"]
+    for j in V.JOINTS:
+        ms = [V.metrics(est[f"{j}_{s}"], np.interp(t - lag, ref["t"], ref[f"{j}_{s}"], left=np.nan, right=np.nan))
+              for s in "rl" if f"{j}_{s}" in ref]
         ms = [m for m in ms if "mae" in m]
         out[j] = {k: float(np.mean([m[k] for m in ms])) if ms else float("nan") for k in ("mae", "bias", "sd", "r")}
     return out
@@ -250,13 +247,13 @@ def run(subject: str, trial: str, cams=("Cam0", "Cam4"), verbose=True) -> dict:
     res = {"height_m": height, "true_offsets_s": offsets, "true_offset_s": offsets[1], "mocap_lag_s": lag,
            "baseline_true_m": float(np.linalg.norm(rel[1][1]) / 1000),
            "angle_between_cameras_deg": float(np.degrees(np.arccos(np.clip((np.trace(rel[1][0]) - 1) / 2, -1, 1))))}
-    res["ceiling"] = score_angles(t, angles_from_keypoints(X), ref, lag)
+    res["ceiling"] = score_angles(t, angles_from_keypoints(X, t, trial), ref, lag)
     res["ceiling"].update({"reprojection_px": reproj, "fit_mm": fit})
 
     s.solve()
     q = s.quality()
     _, fit2 = mocap_lag(s.t, s.X * 1000, subject, trial)
-    out = score_angles(s.t, angles_from_keypoints(s.X), ref, lag)
+    out = score_angles(s.t, angles_from_keypoints(s.X, s.t, trial), ref, lag)
     diffs = [pose_difference(*s.cams[i], *rel[i]) for i in range(1, len(cams))]
     true_base = float(np.linalg.norm(rel[s.base][1]) / 1000)
     out.update({"rotation_deg": float(np.mean([x["rotation_deg"] for x in diffs])),

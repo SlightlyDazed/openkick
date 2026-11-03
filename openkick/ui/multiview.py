@@ -2603,9 +2603,8 @@ class OpensimPanel(QWidget):
         self.video_btn = self.video_btns[0]
         lay.addWidget(card)
 
-        note = QLabel(tr("Checked against a laboratory: knee and ankle come out within about 3–6°. Hip flexion comes out "
-                         "9–16° too high in squats, sit-to-stand and jumps, because the tilt of the pelvis cannot be "
-                         "seen from two hip points."))
+        note = QLabel(tr("Checked against a laboratory: knee and ankle come out within about 3–6°. Hip flexion still comes out "
+                         "8–12° too high in sit-to-stand and jumps, in the deepest part of the movement."))
         note.setWordWrap(True)
         note.setStyleSheet(f"color: {theme.FAINT}; font-size: 12px;")
         lay.addWidget(note)

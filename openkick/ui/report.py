@@ -31,7 +31,8 @@ MORE_CSS = """
 .small { color: #5B6474; font-size: 8.5pt; }
 """
 LIMITS = ("The 3D analysis is experimental. Knee, hip and ankle were checked against a motion capture laboratory "
-          "in squats and walking (3 to 9 degrees of mean error); cycling has not been checked against one. "
+          "in squats, sit-to-stand, drop jumps and walking (4 to 8 degrees of mean error); cycling has not been "
+          "checked against one. "
           "Read the numbers as what changes between recordings made the same way, and check in the videos "
           "whatever looks odd.")
 STAR = "* What the detector places least reliably (the foot)."

@@ -124,4 +124,71 @@ def run_opensim(project: Path, trc: Path, height_m: float, mass_kg: float = 70.0
     finally:
         os.chdir(cwd)
     kin = project / "kinematics"
-    return {"osim": sorted(kin.glob("*.osim")), "mot": sorted(kin.glob("*.mot")), "dir": kin}
+    osims, mots = sorted(kin.glob("*.osim")), sorted(kin.glob("*.mot"))
+    if not augment and osims and mots:     # measured only without the augmenter
+        bend_lumbar(osims[0], project / "pose-3d" / trc.name, mots[0], kin)
+    return {"osim": osims, "mot": mots, "dir": kin}
+
+
+# Part of the trunk's forward lean given to the lower back. Pose2Sim holds the lumbar joint at 0°,
+# so the whole lean ends up in the pelvis and the hip comes out too flexed. In the OpenCap lab
+# the lower back makes 47–66 % of the lean; 50 % brought the hip error from 9.3° to 6.9° (from
+# 10.6° to 8.5° on the participants that were not used to choose it). docs/VALIDATION.md
+LUMBAR_SHARE = 0.5
+LUMBAR = "L5_S1_Flex_Ext"
+
+
+def _read_mot(path: Path) -> tuple[list[str], np.ndarray]:
+    lines = Path(path).read_text().splitlines()
+    i = next(k for k, ln in enumerate(lines) if ln.strip().lower() == "endheader")
+    cols = lines[i + 1].split("\t")
+    return cols, np.array([ln.split("\t") for ln in lines[i + 2:] if ln.strip()], float)
+
+
+def bend_lumbar(osim: Path, trc: Path, mot: Path, kin: Path, share: float = LUMBAR_SHARE) -> bool:
+    """Solve the inverse kinematics again, now asking the lower back to take `share` of the
+    trunk's lean (pelvis tilt + lumbar, measured from the most upright frames). Replaces `mot`
+    and the marker-error file. Returns False (and leaves Pose2Sim's result) if it cannot."""
+    import Pose2Sim
+    from lxml import etree
+    cols, a = _read_mot(mot)
+    if not share or LUMBAR not in cols or "pelvis_tilt" not in cols or len(a) < 2:
+        return False
+    col = {c: a[:, k] for k, c in enumerate(cols)}
+    trunk = col["pelvis_tilt"] + col[LUMBAR]
+    hip = (col["hip_flexion_r"] + col["hip_flexion_l"]) / 2
+    upright = hip <= np.nanpercentile(hip, 10)
+    target = share * (trunk - np.nanmedian(trunk[upright]))
+    work = kin / "lumbar"
+    shutil.rmtree(work, ignore_errors=True)
+    work.mkdir()
+    coords = work / "lumbar_target.mot"
+    with open(coords, "w") as f:
+        f.write(f"lumbar target\nversion=1\nnRows={len(a)}\nnColumns=2\ninDegrees=yes\nendheader\ntime\t{LUMBAR}\n")
+        for t, v in zip(col["time"], target):
+            f.write(f"{t:.6f}\t{v:.6f}\n")
+    setup = Path(Pose2Sim.__file__).parent / "OpenSim_Setup" / "IK_Setup_Pose2Sim_Halpe26.xml"
+    tree = etree.parse(str(setup))
+    root = tree.getroot()
+    task = root.find(f".//IKCoordinateTask[@name='{LUMBAR}']")
+    if task is None:
+        return False
+    task.find("weight").text = "1"
+    task.find("value_type").text = "from_file"
+    out_mot = work / Path(mot).name
+    for tag, text in (("model_file", osim), ("marker_file", trc), ("output_motion_file", out_mot),
+                      ("results_directory", work), ("coordinate_file", coords)):
+        root.find(f".//{tag}").text = str(Path(text).resolve())
+    root.find(".//time_range").text = f"{col['time'][0]} {col['time'][-1]}"
+    tree.write(str(work / "ik_setup.xml"))
+    import opensim
+    opensim.Logger.setLevelString("error")
+    opensim.InverseKinematicsTool(str(work / "ik_setup.xml")).run()
+    if not out_mot.exists():
+        return False
+    shutil.copy(out_mot, mot)
+    for err in work.glob("*_ik_marker_errors.sto"):
+        for old in kin.glob("*_ik_marker_errors.sto"):
+            old.unlink()
+        shutil.copy(err, kin / err.name)
+    return True

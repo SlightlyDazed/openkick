@@ -43,8 +43,9 @@ PLUGINS = [KneeFlexion()]
 |---|---|
 | `ctx.project` | The project: `video`, `pose`, `measurements`, `phases`, `notes`, `calibration` |
 | `ctx.project.pose.xy` | Array `(frames, 33, 2)` in pixels (`NaN` = not detected) |
-| `ctx.project.pose.visibility` | MediaPipe confidence `(frames, 33)` |
-| `ctx.project.pose.source` | Origin of each point: 1 = MediaPipe, 2 = corrected by hand, 3 = smoothed |
+| `ctx.project.pose.visibility` | The detector's confidence `(frames, 33)` |
+| `ctx.project.pose.source` | Origin of each point: 1 = detected, 2 = corrected by hand, 3 = smoothed |
+| `ctx.project.pose.detector` | Which detector found it (`heavy`, `rtmpose-balanced`, …; empty in older projects, MediaPipe) |
 | `ctx.times()` | Real time of each frame, in seconds |
 | `ctx.series(m)` | Series of a measurement: `.value` (° / m/s / m), `.rate` (°/s for angles), `.xy` (trajectories) |
 | `ctx.stats(m, phase=None)` | `minimum`, `maximum`, `range`, `mean`, `t_min`, `t_max` |

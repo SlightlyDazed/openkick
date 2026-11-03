@@ -81,7 +81,7 @@ for kind in ("squats", "walking"):
                         d[f"{mode}_deviation"] = dev
                     s.update(recalibrate=False)
                     d[f"{mode}_X"] = s.X.copy()
-                    for k, v in M.angles_from_keypoints(s.X).items():
+                    for k, v in M.angles_from_keypoints(s.X, s.t, tr).items():
                         d[f"{mode}_{k}"] = v
                 np.savez_compressed(OUT / f"{kind}_{subj}_{tr}.npz", **d)
                 print(kind, subj, tr, "ok", flush=True)

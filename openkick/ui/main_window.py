@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (QApplication, QButtonGroup, QFileDialog, QFrame, 
 from openkick import APP_NAME, AUTHOR, __version__
 from openkick.core import analysis as A
 from openkick.core import templates
+from openkick.core.pose import ENGINES, is_rtmpose, rtmpose_available
 from openkick.core.project import SRC_AUTO, SRC_MANUAL, Pose, Project
 from openkick.core.video import probe
 from openkick.formats import csvexport, kva
@@ -435,7 +436,7 @@ class MainWindow(QMainWindow):
         self.addAction(self.a_undo)
         self.addAction(self.a_redo)
         self.a_delete = self._act("Delete selected measurement", self.delete_selected, "Delete", "trash")
-        self.a_revert = self._act("Revert selected joint to MediaPipe", self.revert_selected)
+        self.a_revert = self._act("Revert selected joint to the detection", self.revert_selected)
         self.a_fit = self._act("Fit to window", lambda: self.canvas.fit(), "0", "fit")
         self.a_zin = self._act("Zoom in", lambda: self.canvas.zoom_at(1.25), "+")
         self.a_zout = self._act("Zoom out", lambda: self.canvas.zoom_at(0.8), "-")
@@ -505,13 +506,19 @@ class MainWindow(QMainWindow):
         m.addAction(self.a_detect)
         self.model_menu = m.addMenu(tr("Detection model"))
         grp = QActionGroup(self)
-        cur = self.settings.value("model", "heavy")
-        for key, label in (("heavy", "Accurate (heavy)"), ("full", "Balanced (full)"), ("lite", "Fast (lite)")):
-            a = self.model_menu.addAction(tr(label))
+        cur = self._model()
+        self.model_actions = {}
+        rtm = rtmpose_available()
+        for key, (label, size, what) in ENGINES.items():
+            a = self.model_menu.addAction(f"{tr(label)} · {size} MB")
+            a.setToolTip(tr(what))
             a.setCheckable(True)
             a.setChecked(key == cur)
-            a.triggered.connect(lambda _=False, k=key: self.settings.setValue("model", k))
+            a.setEnabled(rtm or not is_rtmpose(key))
+            a.triggered.connect(lambda _=False, k=key: self._set_model(k))
             grp.addAction(a)
+            self.model_actions[key] = a
+        self.model_menu.setToolTipsVisible(True)
         m.addAction(self.a_smooth)
         m.addAction(self.a_next_low)
         m.addSeparator()
@@ -763,7 +770,7 @@ class MainWindow(QMainWindow):
         self.show_workspace()
         self._kva_summary(notes)
         if not project.pose.has_data:
-            if QMessageBox.question(self, APP_NAME, tr("This KVA has no skeleton. Detect the pose with MediaPipe now?")) \
+            if QMessageBox.question(self, APP_NAME, tr("This KVA has no skeleton. Detect the pose now?")) \
                     == QMessageBox.Yes:
                 self.start_detection(None)
 
@@ -787,13 +794,25 @@ class MainWindow(QMainWindow):
                 self.processing.show()
                 return
             self.stop_detection()               # it was for a video that is no longer open
-        model = self.settings.value("model", "heavy")
-        dlg = ProcessingDialog(p.video, template_id, model, self)
+        dlg = ProcessingDialog(p.video, template_id, self._model(), self)
         dlg.finished_ok.connect(lambda res, tid, path=p.video.path: self._detected(res, tid, path))
+        dlg.modelChanged.connect(self._set_model)
         dlg.progressed.connect(self._bg_progress)
         dlg.finished.connect(lambda _: self._update_status())
         self.processing = dlg
         dlg.start()
+
+    def _model(self) -> str:
+        """The detector the user picked last (MediaPipe accurate at first, or if RTMPose cannot run here)."""
+        key = self.settings.value("model", "heavy")
+        if key not in ENGINES or (is_rtmpose(key) and not rtmpose_available()):
+            return "heavy"
+        return key
+
+    def _set_model(self, key: str):
+        self.settings.setValue("model", key)
+        if key in self.model_actions:
+            self.model_actions[key].setChecked(True)
 
     def _bg_progress(self, pct):
         if self.processing and self.processing.isHidden():
@@ -816,6 +835,7 @@ class MainWindow(QMainWindow):
         pose.visibility[:] = res.visibility
         pose.z[:] = res.z
         pose.source[:] = np.where(np.isfinite(res.xy[..., 0]), SRC_AUTO, 0)
+        pose.detector = res.detector
         first = not p.pose.has_data
         if first:
             p.pose = pose
@@ -849,7 +869,7 @@ class MainWindow(QMainWindow):
         if not self.ctl.project:
             return
         if self.ctl.project.pose.has_data:
-            if QMessageBox.question(self, APP_NAME, tr("Run MediaPipe again on the whole video? "
+            if QMessageBox.question(self, APP_NAME, tr("Detect the pose again on the whole video? "
                                                       "Your hand corrections are kept.")) != QMessageBox.Yes:
                 return
         self.start_detection(self.ctl.project.template)

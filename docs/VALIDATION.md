@@ -7,33 +7,39 @@ and with lab markers. **9 of them are used**, because one did not consent to pub
 ## Summary
 
 Mean absolute error in degrees against the lab, automatic output only (no manual correction), 9
-participants, 72 recordings (squat, sit-to-stand, drop jump, gait):
+participants, 72 recordings (squat, sit-to-stand, drop jump, gait). **The reference is the lab's own
+OpenSim inverse kinematics**, and OpenKick's values are the clinical angles the app shows (0 = neutral,
+flexion positive). Measured on 2 November 2026 with the code of that day:
 
 | Joint | 2D · one side camera (MediaPipe) | 3D · two cameras [95 % CI] | OpenSim model, two cameras |
 |---|---|---|---|
-| Knee | 5.3–10.2 | 4.3 [3.5 to 5.3] | 3.7 |
-| Hip | 6.7–9.9 (trunk–thigh) | 7.6 [6.6 to 8.6] (trunk–thigh) | 9.4 (flexion) |
-| Ankle | 12.8–19.5 | 5.1 [4.5 to 5.8] | 6.3 |
-| Shoulder | — | 5.3 [4.7 to 5.8] | — |
-| Elbow | — | 14.4 [12.4 to 16.6], **not valid** | — |
+| Knee | 7.1–9.7 | 4.3 [4.0 to 4.7] | 3.5 |
+| Hip (flexion) | 5.7–8.4 | 5.4 [4.4 to 6.5] | 6.9 |
+| Ankle | 11.9–20.4 | 6.1 [5.6 to 6.6] | 6.2 |
+| Shoulder | 6.9–20.7 | 7.8 [6.6 to 9.2] (elevation) | — |
+| Elbow | 15.5–26.9, **not valid** | 18.2 [16.7 to 19.7], **not valid** | — |
 
-- **Sources.** 2D: the range over the four movements in *Results (1 October 2026)*. 3D: all 72 recordings
-  pooled, from *Statistics: intervals, agreement and reliability*, which also gives the bias, Bland–Altman
-  limits of agreement, correlation and ICC. The per-movement 3D tables further down give 3.8–4.8° for the
-  knee and 4.4–6.7° for the ankle; weighted by number of recordings they give the pooled value. OpenSim: *OpenSim angles
-  against the lab*.
-- **Dates.** The pooled 3D figures were computed on 2 October 2026. The reconstruction changes of 25 October
-  moved the per-movement results by less than 1° (see that section).
-- **Clinical angles since 1 November 2026.** The app now reports the joints with a sign from 0°, and the
-  error is measured against the lab's OpenSim angles: 2D hip in gait 5.5° (it was 16.5° inside the joint),
-  2D ankle 9–20° (it was 27–43°), 3D hip 4.2–7.3°, 3D ankle 4.3–7.5°. See *Clinical angles, gait events
-  and speeds*.
+- **Sources.** 2D: the range over the four movements in *Results*, the leg nearer the camera. 3D: all 72
+  recordings pooled, from *Statistics: intervals, agreement and reliability*, which also gives the bias,
+  Bland–Altman limits of agreement, correlation and ICC. OpenSim: *OpenSim angles against the lab*.
+- **The reference changed on 2 November 2026.** Before, every table compared against angles built from the
+  lab's markers the way OpenKick built its own (thigh–shank, trunk–thigh, shank–foot). The knee and ankle
+  markers sit on the skin, 3–8 cm outside the joint, so that reference was itself 4.5–5.5° off the lab's
+  OpenSim knee and compressed its range. Against the lab's OpenSim the 2D knee comes out worse than it
+  seemed (7–10° instead of 5–10°), the hip better (3D 5.4° instead of 7.6°), and the reliability of the
+  ranges of motion lower (see *Statistics*). The sections dated before November keep their old numbers as
+  a record; the other camera pairs and three and five cameras were repeated the same day.
+- **A calibration fix on 2 November.** Repeating the camera pairs showed one squat whose cameras came out
+  72° off (*A pair placed wrong*). The rule that picks the camera placement was corrected and every 3D
+  number in this document was measured again with the corrected code; the means moved by 0.1° or less.
 - **Cycling is not validated.** It has only a consistency test: one rider, two saddle heights, phone videos
   compressed by a messaging app, no lab reference.
 - **Tuning on the same data.** Three settings were checked on held-out participants (*Tuning on some
-  participants and measuring on others*): no sign of inflated numbers. The later thresholds (12 cm to drop a
-  camera, 4 cm off the trajectory, 8 Hz smoothing) were chosen on the cycling sessions and then checked on
-  all OpenCap participants, not re-run on a held-out split.
+  participants and measuring on others*): the held-out participants come out within about 1° of the
+  others. The later choices were made on all participants and are not re-run on a held-out split: the
+  thresholds of 25 October (12 cm to drop a camera, 4 cm off the trajectory, 8 Hz smoothing, chosen on the
+  cycling sessions) and those of 1 November (the hip's 0.75 share of the trunk lean; the 23 ms toe-off
+  shift, which was checked leaving one participant out).
 
 The rest of this document is the detailed record, section by section and dated, of each measurement and
 of what changed between them.
@@ -47,81 +53,106 @@ of what changed between them.
 2. From the repository root:
 
 ```bash
-python -m validation.opencap --engine mediapipe --trials squats1 --plots
-python -m validation.opencap --engine rtmpose-balanced --trials squats1
+python -m validation.opencap --engine mediapipe --types squats STS DJ walking   # 2D, one engine
+python -m validation.report                                                     # 2D tables
+python -m validation.study baseline ceiling fps30 holdout                       # 3D, two cameras
+python -m validation.opensim_ik --types squats STS DJ walking                   # 3D -> OpenSim
+python -m validation.stats                                                      # intervals, agreement, ICC
 ```
 
 Available engines: `mediapipe` (the one in the app), `rtmpose-lightweight`, `rtmpose-balanced` and
-`rtmpose-performance` (these need `pip install rtmlib`). Results go to `validation/results/` and the
-detections are cached, so repeating a run is immediate.
+`rtmpose-performance` (these need `pip install rtmlib`). Results go to `validation/results/`
+(`summary.txt` for 2D, `study_summary.txt` for the rest) and the detections are cached, so repeating a run
+is fast. The whole set took under two hours on a 12-thread CPU with the detections already cached.
 
 ## What is compared
 
-- **Reference.** The same angles OpenKick measures, computed from the lab's 3D markers projected onto the
-  subject's sagittal plane. Knee: thigh–shank. Hip: trunk–thigh. Ankle: shank–foot.
-- **OpenKick.** The angles obtained from the video of the two cameras that see the subject from the side
-  (Cam0 and Cam4), using the leg closest to each camera.
+- **Reference.** The lab's OpenSim inverse kinematics, shipped with the dataset (`OpenSimData/Mocap/IK`):
+  `knee_angle`, `hip_flexion`, `ankle_angle`, `arm_flex` and `elbow_flex`. In 3D the app measures the
+  shoulder as the arm's elevation from the trunk, without a sign, so it is compared with the elevation that
+  `arm_flex` and `arm_add` make together.
+- **OpenKick.** The angles the app shows (`openkick/core/joints.py`), with the hip reference of the
+  template a user would pick: Gait for gait (thigh against the vertical), Squat for squat and sit-to-stand
+  and Vertical jump for the drop jump (vertical tipped by three quarters of the trunk's lean). In 2D, the
+  video of the two cameras that see the subject from the side (Cam0 and Cam4), the leg closest to each
+  camera, without smoothing. In 3D, both legs, smoothed as the template does (6 Hz; 12 Hz for the jump).
 - **Timing.** Video and lab are only roughly synchronised: an offset of up to 0.18 s remains in squat,
   sit-to-stand and jump, and of up to 0.56 s in gait. It is measured in 3D, by fitting the body
   reconstructed with two cameras to the lab markers (`python -m validation.multiview --batch ...` saves it
   to `validation/results/mocap_lag.json`), and corrected before computing the error.
 
-## Results (1 October 2026)
+## Results (2 November 2026)
 
 9 participants (one did not consent to publishing their videos), 2 side cameras each, 4 movements:
 squats (1 recording per person), sit-to-stand (1), drop jump (3) and gait (3). In total 144 videos per
-engine. The full table is regenerated with `python -m validation.report` and is written to
-`validation/results/summary.txt`.
+engine, the leg nearer each camera. The full table is regenerated with `python -m validation.report` and
+is written to `validation/results/summary.txt`.
 
-Mean error in degrees against the lab, after correcting the time offset.
+Mean error in degrees against the lab's OpenSim angles, after correcting the time offset; bias in
+brackets (− = less flexion than the lab).
 
 **Knee**
 
 | Engine | Squat | Sit-to-stand | Jump | Gait |
 |---|---|---|---|---|
-| MediaPipe (current) | 6.7 | 7.9 | 5.3 | 10.2 |
-| RTMPose lightweight | 6.9 | 8.5 | 5.2 | 7.9 |
-| RTMPose balanced | 5.8 | 8.1 | 4.7 | 6.6 |
-| RTMPose performance | 6.3 | 8.8 | 5.3 | 6.4 |
+| MediaPipe (the app's) | 9.4 (−7.7) | 9.7 (−8.7) | 7.1 (−3.7) | 9.3 (−3.8) |
+| RTMPose lightweight | 9.9 (−9.3) | 10.1 (−9.7) | 8.7 (−6.0) | 6.1 (−2.3) |
+| RTMPose balanced | 8.8 (−8.1) | 9.9 (−9.4) | 7.8 (−5.3) | 4.4 (−1.0) |
+| RTMPose performance | 8.9 (−8.2) | 10.6 (−10.1) | 7.9 (−6.0) | 4.6 (−0.4) |
 
-**Hip** (trunk–thigh angle)
-
-| Engine | Squat | Sit-to-stand | Jump | Gait |
-|---|---|---|---|---|
-| MediaPipe (current) | 6.7 | 9.7 | 7.2 | 9.9 |
-| RTMPose lightweight | 9.1 | 12.3 | 8.3 | 5.0 |
-| RTMPose balanced | 7.9 | 11.0 | 7.8 | 5.1 |
-| RTMPose performance | 7.9 | 11.9 | 8.3 | 5.0 |
-
-**Ankle**
+**Hip** (flexion of the thigh, the reference of the template)
 
 | Engine | Squat | Sit-to-stand | Jump | Gait |
 |---|---|---|---|---|
-| MediaPipe (current) | 19.5 | 19.0 | 16.8 | 12.8 |
-| RTMPose lightweight | 15.8 | 15.8 | 12.1 | 11.8 |
-| RTMPose balanced | 18.5 | 17.8 | 12.9 | 10.6 |
-| RTMPose performance | 13.9 | 11.8 | 10.8 | 8.9 |
+| MediaPipe (the app's) | 8.4 (−7.8) | 6.0 (−1.4) | 5.7 (−1.5) | 6.1 (+1.0) |
+| RTMPose lightweight | 11.6 (−11.3) | 7.0 (−4.7) | 7.8 (−6.0) | 4.6 (+0.3) |
+| RTMPose balanced | 10.3 (−10.0) | 6.5 (−3.9) | 6.9 (−4.7) | 4.6 (+0.6) |
+| RTMPose performance | 10.4 (−10.2) | 6.9 (−4.8) | 6.7 (−4.9) | 4.9 (+1.0) |
 
-**Speed and size** (CPU only, 12-thread machine; RTMPose looking for the person every 10 frames):
-MediaPipe 25 fps and 30 MB; RTMPose lightweight 48 fps and 43 MB; balanced 26 fps and 157 MB;
-performance 8 fps and 596 MB.
+**Ankle** (dorsiflexion, the sole from heel to toes)
+
+| Engine | Squat | Sit-to-stand | Jump | Gait |
+|---|---|---|---|---|
+| MediaPipe (the app's) | 20.4 (−20.3) | 19.1 (−18.9) | 13.1 (−10.1) | 11.9 (−7.2) |
+| RTMPose lightweight | 16.7 (−16.6) | 15.8 (−15.7) | 11.6 (−6.2) | 10.9 (−7.7) |
+| RTMPose balanced | 19.4 (−19.4) | 17.8 (−17.8) | 12.1 (−9.4) | 9.3 (−7.4) |
+| RTMPose performance | 14.8 (−14.8) | 11.8 (−11.8) | 9.2 (−7.5) | 7.3 (−5.2) |
+
+**Shoulder and elbow** (MediaPipe only; the RTMPose model used here has no arms in the test bench)
+
+| Joint | Squat | Sit-to-stand | Jump | Gait |
+|---|---|---|---|---|
+| Shoulder (flexion) | 10.2 (−9.8) | 14.1 (−14.1) | 20.7 (−19.0) | 6.9 (−3.1) |
+| Elbow (flexion) | 15.5 (−15.5) | 15.8 (−15.8) | 26.9 (−24.5) | 20.9 (−19.2) |
+
+**Speed and size** (CPU only, 12-thread machine; RTMPose looking for the person every 10 frames, measured
+on 1 October): MediaPipe 25 fps and 30 MB; RTMPose lightweight 48 fps and 43 MB; balanced 26 fps and 157
+MB; performance 8 fps and 596 MB.
 
 What these numbers say:
 
-- **For the knee in squat, sit-to-stand and jump, the four engines tie:** they differ by 1° or less. The
-  largest model does not measure better.
-- **In gait RTMPose wins:** knee 6.4–7.9° against MediaPipe's 10.2°, and hip 5° against 9.9°. The median
-  correlation with the lab is 0.97 for the two larger RTMPose models and 0.83 for MediaPipe.
+- **In squat, sit-to-stand and jump the four engines are close at the knee** (7 to 11°), and all measure
+  less flexion than the lab: 4 to 10° of bias and a range of motion 6 to 14 % smaller. Most of the error is
+  that offset.
+- **In gait RTMPose wins clearly:** knee 4.4–4.6° with the two larger models against MediaPipe's 9.3°, hip
+  4.6° against 6.1°. With MediaPipe 9 of the 54 gait videos have more than 10° of knee error (frames in
+  which one leg hides the other); with RTMPose performance, none. The median correlation with the lab is
+  0.99 for the two larger RTMPose models and 0.89 for MediaPipe.
 - **For the hip MediaPipe wins** in squat, sit-to-stand and jump (1 to 3° less error).
-- **Gait is still the movement with the most failures:** between 17 % and 28 % of the recordings have more
-  than 10° of knee error, because of the frames in which one leg hides the other.
-- **There is an error common to all of them:** they measure less flexion than the lab (2–8° at the knee)
-  and, in squat, sit-to-stand and jump, a range of motion 5 % to 12 % smaller.
-- **That error grows the further the camera is from a true side view** with MediaPipe: with the camera
-  less than 30° from the side view the knee error is 5.1°; between 40 and 50°, 7.6°. The camera angle is
-  our own estimate from the apparent separation of the hips; it is not checked against the real
-  calibration.
-- **The ankle is not reliable with any of them:** 9 to 20° of error, largely a constant offset.
+- **The error grows the further the camera is from a true side view.** With MediaPipe, squat,
+  sit-to-stand and jump: 6.6° of knee error with the camera less than 30° from the side view, 8.3° between
+  30 and 40°, 9.7° between 40 and 50°. The camera angle is our own estimate from the apparent separation of
+  the hips; it is not checked against the real calibration. Most of these recordings are 30–50° off.
+- **The ankle is not reliable with one camera:** 7 to 20° of error, almost all of it a constant offset.
+- **The shoulder works in gait** (6.9°) and less well where the arms move in front of the body. **The
+  elbow is not valid** (16–27°, nearly all of it a constant under-flexion), as in 3D.
+- **Reliability of the range of motion** (ICC against the lab, recording by recording; MediaPipe, knee):
+  0.40 squat, 0.49 sit-to-stand, 0.57 jump, 0.04 gait. One camera does not tell one person's range from
+  another's.
+
+**Before 2 November.** These tables compared against angles built from the markers, with the angle
+inside the joint. They gave a better knee (MediaPipe 5.3–10.2°) and a worse hip (6.7–9.9° as trunk–thigh,
+16.5° in gait as the clinical hip, see *Clinical angles*); the old values are in the history of this file.
 
 **Correction of 1 October 2026.** The first version of this table gave 12–14° of knee error in gait for
 every engine. It was a bug in the test bench, not in the engines: it aligned the video with the lab by
@@ -143,9 +174,10 @@ which does not have that ambiguity. Squat, sit-to-stand and jump change by 0.2°
   on held-out participants (see *Tuning on some participants and measuring on others*); the ones added on
   25 October were not.
 
-## 3D reconstruction with two cameras (1 October 2026)
+## 3D reconstruction with two cameras (1 October 2026, repeated 2 November)
 
-`python -m validation.multiview --batch squats STS DJ walking`
+`python -m validation.study ceiling` (the same as `python -m validation.multiview --batch squats STS DJ walking`,
+in parallel)
 
 This measures OpenKick's *3D from several videos* tool (`openkick/multiview/`), here with two cameras, the
 way a person uses it: it receives only the videos and the height. It is compared with a ceiling:
@@ -155,34 +187,42 @@ way a person uses it: it receives only the videos and the height. It is compared
   from the two skeletons and the height. The lens is assumed to be a phone's main lens (26 mm
   equivalent). No manual correction at all.
 
-The 3D points are scored with 3D joint angles against the lab markers. 9 participants, cameras Cam0 and
-Cam4 (about 130° between them, 6 m apart). Mean error in degrees (knee / hip / ankle):
+The 3D points are turned into the angles the app shows and scored against the lab's OpenSim angles. 9
+participants, cameras Cam0 and Cam4 (about 130° between them, 6 m apart). Mean error in degrees (knee /
+hip / ankle), both legs:
 
 | Movement | Recordings | Ceiling | OpenKick | Camera orientation error | Synchronisation error (median) |
 |---|---|---|---|---|---|
-| Squat | 9 | 3.7 / 8.4 / 4.8 | 3.9 / 8.6 / 5.3 | 5.0° | 4 ms |
-| Sit-to-stand | 9 | 3.4 / 7.9 / 5.9 | 3.8 / 8.3 / 6.7 | 5.4° | 2 ms |
-| Drop jump | 27 | 4.4 / 8.0 / 5.8 | 4.1 / 7.5 / 5.4 | 6.3° | 3 ms |
-| Gait | 27 | 4.8 / 7.1 / 4.7 | 4.8 / 7.1 / 4.4 | 8.6° | 4 ms |
+| Squat | 9 | 4.8 / 6.2 / 6.2 | 4.6 / 6.0 / 6.1 | 6.0° | 4 ms |
+| Sit-to-stand | 9 | 4.4 / 7.6 / 6.6 | 4.9 / 7.3 / 7.4 | 5.5° | 2 ms |
+| Drop jump | 27 | 4.5 / 4.9 / 7.2 | 4.3 / 5.4 / 7.4 | 6.3° | 3 ms |
+| Gait | 27 | 4.5 / 4.1 / 3.9 | 4.1 / 4.6 / 4.4 | 8.6° | 4 ms |
 
-For comparison, a single camera in 2D with the same engine (RTMPose balanced), in the same order of
-movements: knee 5.8 / 8.1 / 4.7 / 6.6°, hip 7.9 / 11.0 / 7.8 / 5.1°, ankle 18.5 / 17.8 / 12.9 / 10.6°.
+For comparison, a single camera in 2D, in the same order of movements: knee 9.4 / 9.7 / 7.1 / 9.3° with
+MediaPipe (8.8 / 9.9 / 7.8 / 4.4° with RTMPose balanced), hip 8.4 / 6.0 / 5.7 / 6.1°, ankle 20.4 / 19.1 /
+13.1 / 11.9°.
 
 - **Calibrating with the body matches checkerboard calibration** in all four movements: the difference
   in the angles is 1° or less.
-- **At the knee, two cameras measure better than one:** 3.8–4.8° against 4.7–8.1°.
-- **With two cameras the ankle becomes measurable** (4–7° against 11–18° with one).
-- **The hip stays at 7–9°**, with no clear improvement over one camera (better in sit-to-stand, worse in
-  gait).
-- The camera orientation is recovered with 5 to 9° of mean error (maximum 17°) and the distance between
-  cameras within 1 to 4 %, and the joint angles still come out the same.
-- The offset between the two videos is recovered with a maximum error of 18 ms (one frame lasts 17 ms).
+- **At the knee, two cameras measure clearly better than one:** 4.1–4.9° against 7.1–9.7° with MediaPipe.
+  The 2D knee's under-flexion mostly disappears (bias −1.9° pooled).
+- **With two cameras the ankle becomes measurable** (4–7.5° against 12–20° with one).
+- **The hip improves in squat and gait** (6.0 and 4.6° against 8.4 and 6.1°), but not in sit-to-stand
+  (7.3 against 6.0°) or the jump (5.4 against 5.7°).
+- The camera orientation is recovered with 5.5 to 9° of mean error (maximum 17°) and the distance between
+  cameras within 1.5 to 3.5 %, and the joint angles still come out the same.
+- The offset between the two videos is recovered with a median error of 2–4 ms; the maximum was 18 ms,
+  in one gait recording (one frame lasts 17 ms). Before the calibration fix it was 37 ms, in one
+  sit-to-stand.
 - The tool's quality indicator said "good" in 69 of the 72 recordings and "acceptable" in 3, all of them
   gait.
 - The 3D points end up about 6 cm from the lab markers after aligning position and orientation (this
   includes the difference between a marker on the skin and the joint centre).
 - Letting the program fit the focal length makes things worse (tested earlier: 14° of knee error). It is
   kept fixed.
+
+**Before 2 November** this table compared against angles from the markers: the knee came out 0.5° better
+(3.8–4.8°), the hip 2–3° worse (7.1–8.6°) and the ankle about 1° better.
 
 **What failed before and why.** The first gait test gave 16.5° of knee error and 51° of camera
 orientation error. There were two causes, and neither was pose detection:
@@ -200,32 +240,32 @@ is not measured.
 
 ### With three and with five cameras
 
-`python -m validation.multiview --batch squats walking --cams Cam0 Cam2 Cam4`
-`python -m validation.multiview --batch squats walking --cams Cam0 Cam1 Cam2 Cam3 Cam4`
+*Repeated on 2 November against the lab's OpenSim angles* (`python -m validation.study cameras`; on 1
+October it was `python -m validation.multiview --batch squats walking --cams ...` against the markers).
 
 Squat (9 recordings) and gait (27). Mean error in degrees (knee / hip / ankle), with the ceiling
 (checkerboard calibration) and with uncalibrated OpenKick:
 
 | Cameras | Squat, ceiling | Squat, OpenKick | Gait, ceiling | Gait, OpenKick |
 |---|---|---|---|---|
-| 2 (Cam0, Cam4) | 3.7 / 8.4 / 4.8 | 3.9 / 8.6 / 5.3 | 4.8 / 7.1 / 4.7 | 4.8 / 7.1 / 4.4 |
-| 3 (Cam0, Cam2, Cam4) | 4.5 / 6.5 / 3.8 | 4.6 / 6.5 / 3.9 | 6.3 / 7.9 / 5.3 | 6.3 / 7.9 / 4.9 |
-| 5 (all) | 4.4 / 6.5 / 4.0 | 4.3 / 6.3 / 3.8 | 6.3 / 7.7 / 5.1 | 6.1 / 7.4 / 4.5 |
+| 2 (Cam0, Cam4) | 4.8 / 6.2 / 6.2 | 4.6 / 6.0 / 6.1 | 4.5 / 4.1 / 3.9 | 4.1 / 4.6 / 4.4 |
+| 3 (Cam0, Cam2, Cam4) | 3.9 / 6.1 / 5.5 | 4.1 / 6.1 / 5.5 | 4.1 / 4.0 / 4.7 | 3.9 / 4.3 / 4.7 |
+| 5 (all) | 3.6 / 6.3 / 5.6 | 3.5 / 6.2 / 5.4 | 4.0 / 3.7 / 4.5 | 3.8 / 3.9 / 4.5 |
 
 - **Uncalibrated OpenKick matches the ceiling** with any number of cameras (0.5° or less difference). The
-  more cameras, the better they are placed: 5.0° of orientation error with two cameras in squat, 2.7°
-  with five.
-- **More cameras is not better for everything.** In squat the hip (from 8.6 to 6.3°) and the ankle (from
-  5.3 to 3.8°) improve, but the knee gets slightly worse (from 3.9 to 4.3–4.6°). In gait the knee gets
-  worse by more (from 4.8 to 6.1–6.3°).
-- That degradation **appears equally with checkerboard calibration**, so it does not come from
-  calibrating with the body. The frontal cameras add it, since they see knee flexion poorly. It is left
-  as is: it is the real error of the method with these cameras.
-- **Synchronisation in gait:** in 12 of the 27 recordings, the offset OpenKick computes for some camera
-  differs by more than 50 ms from the reference one (in 3, by more than half a second). With two cameras
-  this did not happen (maximum 18 ms). It is not established which of the two is wrong: gait repeats, and
-  the reference is also obtained by looking for the best fit. The angles come out the same as the ceiling
-  in those recordings.
+  more cameras, the better they are placed: 6.0° of orientation error with two cameras in squat, 2.6° with
+  three and 2.3° with five.
+- **More cameras measure better**, knee included: in squat 4.6 → 4.1 → 3.5°, in gait 4.1 → 3.9 → 3.8°;
+  the hip in gait 4.6 → 3.9°, the ankle in squat 6.1 → 5.4°.
+- **This corrects the 1 October conclusion**, which said that more cameras made the knee worse (3.9 to
+  4.3–4.6° in squat, 4.8 to 6.1–6.3° in gait) because of the frontal cameras. That was the reference: the
+  angles built from the skin markers. Against the lab's OpenSim the frontal cameras help.
+- **Synchronisation in gait:** in 13 of the 27 recordings, the offset OpenKick computes for some camera
+  differs by more than 50 ms from the reference one (in 3, by more than half a second; at most 0.78 s).
+  With two cameras this did not happen (maximum 18 ms). It is not established which of the two is wrong:
+  gait repeats, and the reference is also obtained by looking for the best fit (see *Synchronising a
+  repeated movement by the motion alone*). The angles come out the same as the ceiling in those
+  recordings.
 - **Dropping the camera that disagrees:** with three or more cameras, leaving out the one that deviates
   by a few centimetres made the angles worse (knee 5.3° against 4.7° in a test with 7 recordings). That is
   why a camera is only dropped if it places the point more than 12 cm from where the others put it. With
@@ -446,7 +486,7 @@ measurement (before the afternoon fix for jumps, which changes them by less than
 - With the rear and the front cameras about 140° apart, the hip on the far side is triangulated poorly. The
   front camera records at 30 fps.
 
-## OpenSim angles against the lab (1 October 2026)
+## OpenSim angles against the lab (1 October 2026, repeated 2 and 3 November)
 
 `python -m validation.opensim_ik --types squats STS DJ walking`
 
@@ -455,29 +495,74 @@ scaling and inverse kinematics with Pose2Sim (simple model, no marker augmentati
 compared with the angles OpenSim gives from the lab markers (`OpenSimData/Mocap/IK`). 72 recordings, 9
 participants, cameras Cam0 and Cam4. Mean error in degrees; bias in brackets.
 
+Since 3 November the export gives part of the trunk's lean to the lower back (*The lower back*, below).
+With that step, the default:
+
 | Movement | Knee | Hip, flexion | Hip, adduction | Hip, rotation | Ankle |
 |---|---|---|---|---|---|
-| Squat (9) | 2.9 (+0.9) | 9.7 (+8.7) | 3.6 (+3.0) | 7.2 (+5.1) | 3.4 (+0.9) |
-| Sit-to-stand (9) | 2.9 (+1.4) | 16.2 (+15.8) | 3.5 (+2.7) | 5.9 (+4.3) | 4.1 (−0.6) |
-| Drop jump (27) | 3.4 (+1.9) | 12.8 (+12.5) | 3.0 (+1.9) | 5.9 (+4.2) | 8.6 (+8.3) |
-| Gait (27) | 4.6 (−2.7) | 3.7 (+0.7) | 6.3 (−3.3) | 11.1 (+0.4) | 5.8 (+4.1) |
-| **All (72)** | **3.7** | **9.4** | **4.4** | **8.0** | **6.3** |
+| Squat (9) | 2.5 (−0.0) | 5.9 (+3.0) | 3.7 (+3.3) | 6.8 (+5.1) | 3.3 (+1.1) |
+| Sit-to-stand (9) | 2.6 (+1.0) | 12.3 (+11.8) | 3.5 (+2.7) | 5.7 (+4.3) | 4.1 (−0.7) |
+| Drop jump (27) | 3.2 (+1.5) | 9.2 (+7.7) | 2.9 (+2.0) | 5.5 (+4.2) | 8.5 (+8.1) |
+| Gait (27) | 4.6 (−2.8) | 3.3 (−0.4) | 6.4 (−3.3) | 11.0 (+0.3) | 5.6 (+3.9) |
+| **All (72)** | **3.5** | **6.9** | **4.4** | **7.7** | **6.2** |
+
+Before that step (Pose2Sim as it comes, 2 November):
+
+| Movement | Knee | Hip, flexion | Hip, adduction | Hip, rotation | Ankle |
+|---|---|---|---|---|---|
+| Squat (9) | 2.8 (+0.5) | 9.4 (+8.3) | 3.7 (+3.3) | 7.1 (+5.2) | 3.3 (+1.3) |
+| Sit-to-stand (9) | 2.9 (+1.4) | 16.2 (+15.8) | 3.5 (+2.7) | 5.9 (+4.4) | 4.1 (−0.6) |
+| Drop jump (27) | 3.3 (+1.9) | 12.7 (+12.4) | 3.0 (+2.0) | 5.7 (+4.3) | 8.7 (+8.3) |
+| Gait (27) | 4.6 (−2.7) | 3.6 (+0.7) | 6.4 (−3.3) | 11.0 (+0.4) | 5.6 (+3.9) |
+| **All (72)** | **3.7** | **9.3** | **4.4** | **7.9** | **6.3** |
+
+(On 2 November that table was repeated with the reconstruction of that day, the changes of 25 October and
+the calibration fix: each recording moved by up to 2.5°, the means by 0.2° or less. This chain was always
+scored against the lab's OpenSim.)
 
 As a yardstick, the result OpenCap publishes for these same recordings with two cameras (HRNet,
 checkerboard-calibrated cameras, with its marker augmentation), scored with the same code: knee 3.9; hip
 flexion 6.6; adduction 2.3; rotation 3.9; ankle 5.8. It is not the same camera pair, so the comparison is
 indicative.
 
-- **Knee and ankle are on a par with OpenCap** (3.7 against 3.9 and 6.3 against 5.8).
-- **Hip flexion comes out too high** in squat, sit-to-stand and jump: 9 to 16° of bias, with a range of
-  motion about 23° larger than the lab's. It does not happen in gait (0.7°).
-- **The cause is the pelvis, not the legs.** The model flexes the lumbar spine 15 to 24° less than the lab
-  and loads that flexion onto the hip. If the full trunk–thigh angle (hip plus lumbar) is measured, the
-  error drops to 6.5 / 7.8 / 9.1° in squat, sit-to-stand and jump. With only two hip points, pelvic tilt
-  cannot be seen; OpenCap infers it with a network that adds anatomical markers.
-- **Hip adduction and rotation** come out worse than OpenCap's (4.4 and 8.0 against 2.3 and 3.9), for the
-  same reason.
+- **Knee and ankle are on a par with OpenCap** (3.5 against 3.9 and 6.2 against 5.8), and so is hip
+  flexion as a mean (6.9 against 6.6), though not movement by movement.
+- **The app's own 3D hip is still better** (5.4° pooled, see *Statistics*): what the model adds is in the
+  pelvis and the lower back, not in the 3D points.
+- **Hip flexion still comes out too high in sit-to-stand and jump** (bias +11.8 and +7.7°), in the deepest
+  part of the movement. Standing, the excess is 1–4°; at deep flexion, 20–25° before the lumbar step. The
+  pelvis tilt is roughly right there, so it is the thigh that is over-flexed. Not solved; one suspect is
+  where the model's hip joint sits with respect to the detected hip point.
+- **Hip adduction and rotation** come out worse than OpenCap's (4.4 and 7.7 against 2.3 and 3.9): with only
+  two hip points the pelvis is poorly defined.
 - The model markers end up 3.5–4.1 cm from the 3D points after inverse kinematics.
+
+### The lower back (3 November 2026)
+
+Scripts: `openkick/multiview/export.py` (`bend_lumbar`); the study scripts were not kept in the repository.
+
+Pose2Sim's inverse kinematics holds the lumbar joint (`L5_S1_Flex_Ext`) at 0° (a coordinate task with weight
+0.1). With the HALPE-26 points there is nothing that tells the pelvis from the lower back, so the whole lean
+of the trunk is taken by the pelvis, and the hip, measured from the pelvis, comes out too flexed. In the lab
+the model's lumbar range is 24° on average (35–39° in squat, sit-to-stand and jump); Pose2Sim's, 0.2°.
+
+The fix: after Pose2Sim, inverse kinematics is solved again with a target for the lumbar joint, a share of
+the trunk's lean (pelvis tilt plus lumbar, measured from the most upright frames, those with the 10 % lowest
+hip flexion), with weight 1. The marker error barely changes (3.65 to 3.61 cm).
+
+| Share given to the lower back | Knee | Hip, flexion (bias) | Ankle | Lumbar range, model / lab |
+|---|---|---|---|---|
+| None (Pose2Sim) | 3.7 | 9.3 (+7.9) | 6.3 | 0.2 / 24.4 |
+| 25 % | 3.6 | 8.0 (+6.3) | 6.2 | 7.8 / 24.4 |
+| **50 % (default)** | **3.5** | **6.9 (+4.6)** | **6.2** | 15.7 / 24.4 |
+| Lumbar left free (no task) | 4.5 | 17.0 (−12.6) | 5.5 | 55 / 24.4 |
+
+- In the lab, the lower back makes 51 % of the lean in squat, 47 % in sit-to-stand and 66 % in jump.
+- Weight 10 instead of 1 gives the same within 0.1°.
+- **Chosen on some participants, measured on others** (as in *Tuning on some participants*): the share
+  was picked with participants 2–5 (hip 7.7 → 5.0°, 50 % the best of those tried); on participants 7–11,
+  not used to choose it, the hip goes from 10.6 to 8.5° and knee and ankle do not change.
+- The augmented chain (*With Pose2Sim's marker network*) does not get this step: it was not measured there.
 
 ### With Pose2Sim's marker network
 
@@ -488,7 +573,8 @@ Turned on as it comes, with the Pose2Sim model, **it does not fix the hip and ma
 
 | | Knee | Hip, flexion | Hip, adduction | Hip, rotation | Ankle |
 |---|---|---|---|---|---|
-| Detected points only (default) | 3.7 | 9.4 | 4.4 | 8.0 | 6.3 |
+| Detected points only, with the lumbar step (default) | 3.5 | 6.9 | 4.4 | 7.7 | 6.2 |
+| Detected points only, Pose2Sim as it comes | 3.7 | 9.3 | 4.4 | 7.9 | 6.3 |
 | With the marker network | 5.0 | 15.0 | 3.4 | 7.2 | 7.0 |
 | OpenCap, two cameras | 3.9 | 6.6 | 2.3 | 3.9 | 5.8 |
 
@@ -503,10 +589,11 @@ A constant excess points to how the pelvis is defined in the Pose2Sim model and 
 3D points. OpenCap uses its own model and scales it with a standing recording of the person; that is not
 tested here. For now the export stays without the network.
 
-## Additional studies (2 October 2026)
+## Additional studies (2 October 2026, repeated 2 November)
 
 `python -m validation.study baseline fps30 holdout pairs` and then `python -m validation.stats`. All the
-tables, with their intervals, are in `validation/results/study_summary.txt`.
+tables, with their intervals, are in `validation/results/study_summary.txt`. On 2 November all of them
+were repeated against the lab's OpenSim angles, with the calibration fix of that day.
 
 ### Tuning on some participants and measuring on others
 
@@ -519,60 +606,73 @@ method, not before; the right thing would have been to make it from the start.
 
 | | Knee | Hip | Ankle |
 |---|---|---|---|
-| Tuning participants, default settings | 4.5 | 7.8 | 5.5 |
-| Test participants, default settings | 4.2 | 7.5 | 4.8 |
-| Test participants, settings chosen on the tuning ones | 4.3 | 7.1 | 4.6 |
+| Tuning participants, default settings | 4.1 | 4.8 | 6.3 |
+| Test participants, default settings | 4.5 | 5.9 | 5.9 |
+| Test participants, settings chosen on the tuning ones | 4.5 | 5.1 | 5.8 |
 
-- On the participants who took part in no tuning, the error is the same or lower. There is no sign that the
-  numbers in this document are inflated by tuning on the same data.
-- Of the three settings tried, two change nothing: the minimum confidence of a point (0.3, 0.5 or 0.7) and
-  the threshold for accepting a match (2, 3 or 5 px) move the error by 0.1° or less.
-- **The assumed lens does matter.** Assuming 22, 26 or 30 mm equivalent gives 5.5 / 5.9 / 6.5° of mean
-  error on the tuning participants. 22 mm does slightly better here, but on the test participants the
-  improvement is not clear (better in squat and sit-to-stand, worse for the knee in gait). 26 mm is kept,
-  which is usual for a phone. If the real lens is known, it is better to use it.
+- On the participants who took part in no tuning, knee and ankle come out the same and the hip 1.1° worse
+  (5.9 against 4.8°). Part of that is who the people are: the two groups differ that much with the same
+  settings. There is no sign of a large inflation, but the hip's number may be about 1° optimistic.
+- **The threshold for accepting a match** (2, 3 or 5 px) changes little (5.3 / 5.1 / 5.2°); 3 px stays.
+- **The assumed lens matters:** 22, 26 or 30 mm equivalent give 5.5 / 5.1 / 5.3° of mean error on the
+  tuning participants, and 26 mm, usual for a phone, is the best. If the real lens is known, it is better
+  to use it.
+- **The minimum confidence of a point now chooses 0.7** instead of the 0.5 in use (5.0 against 5.1° on the
+  tuning participants). On the test participants it lowers the hip from 5.9 to 5.1° and leaves knee and
+  ankle the same. Against the markers, on 2 October, it made no difference. It is not changed yet: it
+  drops more points, and that has to be checked on the cycling sessions and with hand corrections first.
+- (On 2 October, against the markers, the three rows were 4.5 / 7.8 / 5.5, 4.2 / 7.5 / 4.8 and 4.3 / 7.1 /
+  4.6.)
 
 ### Statistics: intervals, agreement and reliability
 
-3D with two cameras, 72 recordings, 9 participants. The 95 % interval is obtained by resampling
-participants, not recordings. The limits of agreement (Bland–Altman) are over all frames.
+3D with two cameras, 72 recordings, 9 participants, against the lab's OpenSim angles. The 95 % interval is
+obtained by resampling participants, not recordings. The limits of agreement (Bland–Altman) are over all
+frames.
 
 | Joint | Mean error [95 % CI] | Bias | Limits of agreement | Correlation |
 |---|---|---|---|---|
-| Knee | 4.3° [3.5 to 5.3] | −3.1° | −10.6 to +4.4° | 0.99 |
-| Hip (trunk–thigh) | 7.6° [6.6 to 8.6] | −8.0° | −18.2 to +2.2° | 0.91 |
-| Ankle | 5.1° [4.5 to 5.8] | +4.4° | −6.0 to +14.8° | 0.92 |
-| Shoulder (arm–trunk) | 5.3° [4.7 to 5.8] | +0.3° | −15.6 to +16.1° | 0.86 |
-| Elbow | 14.4° [12.4 to 16.6] | −14.0° | −30.9 to +2.9° | 0.80 |
+| Knee (flexion) | 4.3° [4.0 to 4.7] | −1.9° | −11.9 to +8.2° | 0.99 |
+| Hip (flexion) | 5.4° [4.4 to 6.5] | 0.0° | −15.4 to +15.4° | 0.99 |
+| Ankle (dorsiflexion) | 6.1° [5.6 to 6.6] | −4.7° | −17.2 to +7.8° | 0.92 |
+| Shoulder (elevation) | 7.8° [6.6 to 9.2] | −1.4° | −19.5 to +16.7° | 0.88 |
+| Elbow (flexion) | 18.2° [16.7 to 19.7] | −17.3° | −30.2 to −4.3° | 0.77 |
 
-- **What is new here is the shoulder and the elbow.** The shoulder is on a par with the knee and the ankle.
-  **The elbow is not valid:** it measures 14° less flexion almost constantly, which suggests that the point
-  the network detects does not coincide with the elbow centre defined by the markers.
+- **The elbow is not valid:** it measures 15 to 19° less flexion almost constantly, against the markers
+  and against the lab's OpenSim alike. The point the network detects does not coincide with the elbow
+  centre of the lab's model.
+- **The limits of agreement are wide** (±10° at the knee, ±15° at the hip) even where the mean error is 4–5°:
+  single frames can be off by much more than the average.
 - **Reliability within one movement.** To know whether the method tells one person from another, the range
   of motion and the maximum value were compared recording by recording with the lab's (intraclass
-  correlation, ICC; 1 is perfect agreement):
+  correlation ICC(A,1); 1 is perfect agreement):
 
 | Movement | Knee, range | Knee, maximum | Hip, range | Hip, maximum | Ankle, range |
 |---|---|---|---|---|---|
-| Squat | 0.84 | 0.95 | 0.40 | 0.97 | 0.84 |
-| Sit-to-stand | 0.70 | 0.89 | 0.30 | 0.93 | 0.90 |
-| Drop jump | 0.82 | 0.99 | 0.87 | 0.94 | 0.68 |
-| Gait | 0.32 | 0.45 | 0.24 | 0.13 | 0.41 |
+| Squat | 0.63 | 0.84 | 0.35 | 0.63 | 0.35 |
+| Sit-to-stand | 0.55 | 0.64 | 0.50 | 0.54 | 0.45 |
+| Drop jump | 0.66 | 0.92 | 0.56 | 0.65 | 0.29 |
+| Gait | 0.35 | 0.38 | 0.67 | 0.10 | 0.28 |
 
-- In squat, sit-to-stand and jump, the **knee and hip maximum** is reliable (0.89 to 0.99). The **hip range**
-  is not, in squat and sit-to-stand (0.30 to 0.40): it comes out 13 to 17° larger than the lab's.
-- **In gait reliability is low for everything** (0.13 to 0.45). People are very alike when walking, and an
-  error of 4 to 7° is the same size as the differences between them. This method cannot compare people by
+- **Only the knee's maximum in squat and jump is reliable** (0.84 and 0.92). The ranges of motion are
+  moderate at best (0.3 to 0.67): the knee's range comes out 6 to 11° smaller than the lab's, the hip's 10
+  to 13° larger in squat, sit-to-stand and jump.
+- **In gait reliability is low for everything** (0.10 to 0.67). People are very alike when walking, and an
+  error of 4–5° is the same size as the differences between them. This method cannot compare people by
   their gait.
-- If all four movements are pooled, the ICC rises to 0.95–0.99, but that number is misleading: it only says
+- If all four movements are pooled, the ICC rises to 0.88–0.97, but that number is misleading: it only says
   that a squat can be told apart from a step.
-- The same statistics for 2D and for the OpenSim angles are in `study_summary.txt`. In 2D with one camera,
-  the knee range has an ICC of 0.43 to 0.81 in squat, sit-to-stand and jump, and of 0.09 to 0.22 in gait.
+- **Against the markers (2 October) these ICCs were higher** (knee maximum 0.89–0.99 in squat, sit-to-stand
+  and jump). Part of that agreement was shared error: the detected knee and the skin markers compress the
+  range in the same way (see *Skeleton: detection or OpenSim model*).
+- The same statistics for 2D and for the OpenSim angles are in `study_summary.txt`. In 2D with one camera
+  (MediaPipe), the knee range has an ICC of 0.40 to 0.57 in squat, sit-to-stand and jump, and of 0.04 in
+  gait.
 
 ### At 30 frames per second
 
-The same 72 recordings using one frame out of two. Mean error (knee / hip / ankle): 4.3 / 7.6 / 5.1° at
-60 fps and 4.3 / 7.6 / 5.1° at 30 fps. Synchronisation does not get worse either (3 ms against 4 ms median
+The same 72 recordings using one frame out of two. Mean error (knee / hip / ankle): 4.3 / 5.4 / 6.1° at
+60 fps and 4.5 / 5.4 / 6.2° at 30 fps. Synchronisation does not get worse either (3 ms against 4 ms median
 error).
 
 Two limits of this test: these movements are not fast, and dropping frames from a 60 fps video is not the
@@ -581,29 +681,62 @@ kick at 30 fps.
 
 ### Other camera pairs
 
+*Repeated on 2 November against the lab's OpenSim angles* (`python -m validation.study pairs`).
+
 Squat (9 recordings) and gait (27), with six camera pairs. Mean error in degrees (knee / hip / ankle), with
 checkerboard calibration and with uncalibrated OpenKick:
 
 | Pair | Angle between cameras | Squat, checkerboard | Squat, OpenKick | Gait, checkerboard | Gait, OpenKick |
 |---|---|---|---|---|---|
-| Cam0 + Cam1 | 30° | 4.9 / 6.1 / 6.8 | 5.1 / 6.5 / 9.5 | 6.2 / 6.3 / 6.4 | 6.3 / 6.3 / 6.2 |
-| Cam2 + Cam4 | 65° | 5.8 / 7.0 / 3.9 | 5.9 / 7.0 / 4.9 | 7.3 / 8.1 / 7.2 | 9.8 / 7.8 / 7.4 |
-| Cam0 + Cam2 | 65° | 5.2 / 6.5 / 3.6 | 5.4 / 6.7 / 4.7 | 6.7 / 6.7 / 6.5 | 6.7 / 6.8 / 5.8 |
-| Cam1 + Cam3 | 80° | 4.7 / 6.8 / 4.1 | 4.9 / 6.8 / 4.0 | 6.4 / 6.6 / 6.1 | 6.4 / 6.3 / 7.1 |
-| Cam0 + Cam3 | 105° | 4.6 / 7.3 / 4.4 | 4.8 / 7.4 / 5.4 | 5.8 / 7.3 / 5.2 | 5.8 / 7.1 / 4.9 |
-| Cam0 + Cam4 | 130° | 3.7 / 8.4 / 4.8 | 3.9 / 8.6 / 5.3 | 4.8 / 7.1 / 4.7 | 4.8 / 7.1 / 4.4 |
+| Cam0 + Cam1 | 25–30° | 4.9 / 9.7 / 8.3 | 5.3 / 12.1 / 10.8 | 5.1 / 6.0 / 4.9 | 5.3 / 6.0 / 5.0 |
+| Cam2 + Cam4 | 65° | 5.0 / 8.9 / 5.5 | 5.3 / 8.9 / 6.5 | 5.6 / 4.8 / 6.6 | 8.6 / 7.0 / 7.3 |
+| Cam0 + Cam2 | 65° | 4.8 / 8.4 / 5.2 | 5.0 / 8.9 / 6.3 | 4.9 / 5.0 / 5.9 | 4.7 / 5.4 / 5.6 |
+| Cam1 + Cam3 | 75–85° | 3.4 / 7.0 / 5.4 | 3.2 / 7.1 / 5.5 | 4.0 / 3.6 / 5.2 | 4.2 / 4.6 / 7.0 |
+| Cam0 + Cam3 | 105–110° | 4.4 / 6.9 / 6.0 | 4.6 / 7.1 / 6.8 | 4.2 / 4.1 / 4.4 | 4.1 / 4.5 / 4.7 |
+| Cam0 + Cam4 | 130–135° | 4.8 / 6.2 / 6.2 | 4.6 / 6.0 / 6.1 | 4.5 / 4.1 / 3.9 | 4.1 / 4.6 / 4.4 |
 
-- **It works with any pair, including cameras only 30° apart.** In 11 of the 12 cases OpenKick stays within
-  1° of checkerboard calibration for knee and hip.
-- **Two worse cases:** the knee in gait with Cam2 + Cam4 (9.8 against 7.3°) and the ankle in squat with
-  Cam0 + Cam1 (9.5 against 6.8°).
-- **The pair used in the rest of this document (Cam0 + Cam4) is the one that measures the knee best.** With
-  the other pairs, the knee comes out 1 to 2.5° worse even with checkerboard calibration. The knee numbers
-  in the main tables are therefore the favourable case.
+- **It works with most pairs, including cameras only 30° apart:** in 10 of the 12 cases OpenKick stays
+  within 1° of checkerboard calibration for knee and hip.
+- **Two worse cases:** the hip and ankle in squat with Cam0 + Cam1 (12.1 against 9.7°, 10.8 against
+  8.3°), and Cam2 + Cam4 in gait, because of synchronisation: 4 recordings between 0.17 and 0.83 s off,
+  since the frontal camera sees little of a repeated step.
+- **Cam0 + Cam4, the pair of the main tables, is one of the best but not the best:** Cam1 + Cam3 gives a
+  better knee in squat (3.2°) and Cam0 + Cam3 the same in gait. The main tables are not the most
+  favourable case, as was thought on 2 October.
 - Synchronisation is less precise when one of the cameras is the frontal one (Cam2): 7 to 37 ms median
   error, against 2 to 6 ms for the other pairs.
-- The quality indicator said "good" in all 54 squats and in 131 of the 162 gait trials. With the cameras
-  30° apart, only in 13 of 27 gait trials.
+- The quality indicator said "good" in all 54 squats and in 134 of the 162 gait trials. With the cameras
+  25–30° apart, only in 13 of 27 gait trials.
+
+#### A pair placed wrong (2 November 2026)
+
+Repeating these pairs, one squat (subject 5, Cam2 + Cam4) came out with the cameras 72° off, the distance
+between them 0.08 m instead of 3.4 m, a knee error of 48° and the quality indicator at "poor". On
+2 October the same recording had been placed within 3°.
+
+- **The cause was a rule added on 25 October.** To place a pair, the tool tries 12 starting guesses and
+  keeps those that fit the two skeletons almost as well as the best. Among those it took the one whose
+  bones change length least over the recording. That rule fixed the cycling sessions, but here a guess
+  94° off had bones 11 % steadier than the right one, which fitted twice as well. (The recording's own
+  scale, also changed that month, was ruled out: without it the result was the same.)
+- **The fix** (`BONES_MARGIN` in `openkick/multiview/session.py`): the guess that fits best is kept, and
+  the steadier bones only overrule it when they are more than 15 % steadier.
+- **A second case, found by the hold-out study.** With that fix, trying a 5 px threshold (the default is
+  3 px) placed one squat (subject 3, Cam0 + Cam4) 155° off. There no guess fitted well: the one with the
+  smallest error explained only 4 % of the matches, the rule took it as the best fit, and the bones (which
+  pointed to the right guess) were not 15 % steadier. Now, when no guess both fits well and agrees with
+  most matches, the bones decide, as they did before the fix. That squat is placed within 7°.
+- **How it was chosen.** Eleven rules were compared, offline, on the starting guesses of 252 pairs of
+  this dataset (every movement, the six pairs) and of the 6 camera pairs of the two cycling sessions.
+  Against the rule of 25 October, the one chosen changes the guess in 18 of the 252 pairs: 14 better and
+  1 worse (by 9°, before refining). No guess is more than 45° off any more (there was one), and the mean
+  error of the starting guess goes from 7.5 to 6.9°. In cycling it picks the same as before in all 6
+  pairs. Margins of 10, 20 and 30 % give almost the same. Two other rules were rejected because they
+  change the cycling sessions: weighing fit and bones together, and discarding first the guesses that
+  agree with few matches.
+- **Result.** The squat of subject 5 is now placed within 3° and the indicator says "good". Every 3D
+  table in this document was measured again with the final rule: the means moved by 0.1° or less,
+  because the other recordings already found the right placement after refining.
 
 ### Other public datasets (search of 2 October 2026)
 

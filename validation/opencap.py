@@ -1,20 +1,22 @@
 """Validation of OpenKick's 2D joint angles against the OpenCap "LabValidation" dataset
 (marker-based motion capture synchronized with 5 smartphone cameras).
 
-Reference ("gold standard")
-    The same clinical 2D angles OpenKick measures, computed from the laboratory's 3D markers
-    projected on the subject's sagittal plane (mocap X = forward, Y = up, Z = right):
-      knee  = angle between thigh (hip joint centre -> knee) and shank (knee -> ankle)
-      hip   = angle between trunk (hip joint centre -> shoulder) and thigh
-      ankle = angle between shank (ankle -> knee) and foot (heel -> toe)
-    expressed as flexion: 0 deg = straight (knee, hip); ankle is the shank-foot angle (about 90 deg
-    standing, smaller in dorsiflexion).
+Reference
+    The laboratory's own OpenSim inverse kinematics, shipped with the data: knee_angle,
+    hip_flexion, ankle_angle, arm_flex (shoulder) and elbow_flex, the clinical convention
+    (0 = neutral, flexion and dorsiflexion positive). Until November 2026 the reference was built
+    from the markers the way OpenKick built its own angles; the skin markers sit 3-8 cm outside
+    the joints, so that reference was itself 4.5-5.5 deg off the lab's OpenSim knee.
+
+OpenKick
+    The angles the app shows, automatic output (no smoothing, no manual correction):
+    openkick.core.joints.clinical, with the hip's reference of the template a user would pick
+    for the movement (TEMPLATE).
 
 Timing
-    Video and mocap are synchronized in the dataset, but a residual offset of a few frames
-    remains in some cameras. It is estimated by cross-correlation of the knee angle and
-    reported; errors are given both as-is and after removing that offset ("aligned").
-    The knee is also compared with the OpenSim inverse-kinematics result shipped with the data.
+    Video and mocap are only roughly synchronized. The offset is measured in 3D
+    (mocap_lag.json, see validation.multiview) and refined by cross-correlation of the knee;
+    errors are given both as-is and after removing that offset ("aligned").
 
 Usage
     python -m validation.opencap --engine mediapipe --trials squats1 STS1
@@ -45,7 +47,11 @@ OUT = Path(__file__).resolve().parent / "results"
 # Cameras that see the subject in profile (checked on the videos). Which side of the body each
 # one sees depends on where the subject faces, so it is deduced from the detection itself.
 PROFILE_CAMS = ("Cam0", "Cam4")
-JOINTS = ("knee", "hip", "ankle")
+JOINTS = ("knee", "hip", "ankle", "shoulder", "elbow")
+LAB = {"knee": "knee_angle", "hip": "hip_flexion", "ankle": "ankle_angle", "shoulder": "arm_flex", "elbow": "elbow_flex"}
+# The template a user would pick for each movement: it sets the hip's reference and, in 3D, the
+# smoothing of the angles
+TEMPLATE = {"squats": "squat", "STS": "squat", "DJ": "jump", "walking": "gait"}
 
 
 # ── dataset readers ────────────────────────────────────────────────────
@@ -98,51 +104,35 @@ def trials_of_type(subject: str, kind: str) -> list[str]:
     return [t for t in trials_of(subject) if re.fullmatch(TYPES[kind], t) and session_of(subject, t)]
 
 
+def template_of(trial: str):
+    """The app's template for this trial's movement (None for movements not in TEMPLATE)."""
+    import re
+
+    from openkick.core.templates import find
+    kind = next((k for k, pat in TYPES.items() if re.fullmatch(pat, trial)), None)
+    return find(TEMPLATE.get(kind, ""))
+
+
+def hip_reference(trial: str) -> str:
+    t = template_of(trial)
+    return (t.hip_reference if t else None) or "pelvis"
+
+
 # ── angles ─────────────────────────────────────────────────────────────
 
 
-def between(v1: np.ndarray, v2: np.ndarray) -> np.ndarray:
-    """Angle between two direction vectors (degrees) for arrays (N, 2)."""
-    n1, n2 = np.linalg.norm(v1, axis=1), np.linalg.norm(v2, axis=1)
-    with np.errstate(invalid="ignore", divide="ignore"):
-        c = np.clip((v1 * v2).sum(axis=1) / (n1 * n2), -1, 1)
-    return np.degrees(np.arccos(c))
-
-
-def interior(a: np.ndarray, o: np.ndarray, b: np.ndarray) -> np.ndarray:
-    """Angle at vertex o (degrees) for arrays (N, 2)."""
-    v1, v2 = a - o, b - o
-    n1, n2 = np.linalg.norm(v1, axis=1), np.linalg.norm(v2, axis=1)
-    with np.errstate(invalid="ignore", divide="ignore"):
-        c = np.clip((v1 * v2).sum(axis=1) / (n1 * n2), -1, 1)
-    return np.degrees(np.arccos(c))
-
-
 def reference(subject: str, trial: str) -> dict:
-    """Marker-based sagittal-plane angles (+ OpenSim IK knee) at the mocap rate."""
-    t, m = read_trc(ROOT / subject / "MarkerData" / "Mocap" / f"{trial}.trc")
-    # Subject's sagittal plane: vertical (lab Y) x forward, where forward is horizontal and
-    # perpendicular to the mean pelvis left-right axis over the trial.
-    lat = np.nanmean(m["r.ASIS"] - m["L.ASIS"], axis=0)
-    lat[1] = 0
-    lat /= np.linalg.norm(lat)
-    fwd = np.array([lat[2], 0.0, -lat[0]])          # lateral rotated 90 deg about the vertical
-    xy = lambda name: np.stack([m[name] @ fwd, m[name][:, 1]], axis=1)  # noqa: E731
+    """The laboratory's OpenSim angles (LAB) at the mocap rate, as {joint_side: series}."""
+    t, c = read_mot(ROOT / subject / "OpenSimData" / "Mocap" / "IK" / f"{trial}.mot")
     out = {"t": t}
-    for side, S, s in (("r", "R", "r"), ("l", "L", "L")):
-        hjc, sho = xy(f"{S}_HJC"), xy(f"{S}_Shoulder")
-        knee, ank, toe, heel = xy(f"{s}_knee"), xy(f"{s}_ankle"), xy(f"{s}_toe"), xy(f"{s}_calc")
-        out[f"knee_{side}"] = 180 - interior(hjc, knee, ank)
-        out[f"hip_{side}"] = 180 - interior(sho, hjc, knee)
-        out[f"ankle_{side}"] = between(knee - ank, toe - heel)
+    for j, col in LAB.items():
+        for side in "rl":
+            if f"{col}_{side}" in c:
+                out[f"{j}_{side}"] = c[f"{col}_{side}"]
     # body proportions used to estimate how far a camera is from a true profile view
+    _, m = read_trc(ROOT / subject / "MarkerData" / "Mocap" / f"{trial}.trc")
     out["hip_width_over_thigh"] = float(np.nanmedian(
         np.linalg.norm(m["R_HJC"] - m["L_HJC"], axis=1) / np.linalg.norm(m["R_HJC"] - m["r_knee"], axis=1)))
-    ik = ROOT / subject / "OpenSimData" / "Mocap" / "IK" / f"{trial}.mot"
-    if ik.exists():
-        ti, c = read_mot(ik)
-        for side in "rl":
-            out[f"knee_ik_{side}"] = np.interp(t, ti, c[f"knee_angle_{side}"])
     return out
 
 
@@ -153,14 +143,30 @@ class Detection:
     seconds: float           # processing time
 
 
-def angles_2d(d: Detection, side: str) -> dict:
-    p = d.points
+def landmarks_of(d: Detection) -> np.ndarray:
+    """The detection in the app's landmark layout (N, 33, 2), NaN where the engine has no point."""
+    from openkick.core import landmarks as L
+    xy = np.full((len(d.t), L.COUNT, 2), np.nan)
+    for name, v in d.points.items():
+        side, part = name.split("_", 1)
+        xy[:, L.INDEX[f"{side}_{'foot_index' if part == 'toe' else part}"]] = v
+    return xy
+
+
+def angles_2d(d: Detection, side: str, hip: str = "pelvis") -> dict:
+    """The app's clinical angles of one side (openkick.core.joints), the joints the engine sees."""
+    from openkick.core import joints
+    xy = landmarks_of(d)
+    fps = 1 / np.median(np.diff(d.t))
+    forward = joints.facing(xy, fps)
     S = "right" if side == "r" else "left"
-    return {
-        "knee": 180 - interior(p[f"{S}_hip"], p[f"{S}_knee"], p[f"{S}_ankle"]),
-        "hip": 180 - interior(p[f"{S}_shoulder"], p[f"{S}_hip"], p[f"{S}_knee"]),
-        "ankle": between(p[f"{S}_knee"] - p[f"{S}_ankle"], p[f"{S}_toe"] - p[f"{S}_heel"]),
-    }
+    out = {}
+    with np.errstate(invalid="ignore"):
+        for j in JOINTS:
+            if j in ("shoulder", "elbow") and f"{S}_elbow" not in d.points:
+                continue
+            out[j] = joints.clinical(xy, j, S, forward, hip)
+    return out
 
 
 # ── engines ────────────────────────────────────────────────────────────
@@ -257,7 +263,7 @@ def compare(engine: str, subject: str, trial: str, cam: str, side: str | None = 
     ref = reference(subject, trial)
     det = detect(engine, video)
     side = side or near_side(det)
-    est = angles_2d(det, side)
+    est = angles_2d(det, side, hip_reference(trial))
     fps = 1 / np.median(np.diff(det.t))
     known = known_lag(subject, trial, cam)
     if known is None:
@@ -268,14 +274,14 @@ def compare(engine: str, subject: str, trial: str, cam: str, side: str | None = 
            "view_deg": view_angle(det, side, ref["hip_width_over_thigh"]), "frames": len(det.t),
            "lag_s": lag, "fps_proc": len(det.t) / det.seconds if det.seconds else float("nan"), "series": {}}
     for j in JOINTS:
-        r = np.interp(det.t, ref["t"], ref[f"{j}_{side}"])
+        if j not in est or f"{j}_{side}" not in ref:
+            continue
+        r = np.interp(det.t, ref["t"], ref[f"{j}_{side}"], left=np.nan, right=np.nan)
         out[j] = metrics(est[j], r)
         # same comparison after removing the residual video/mocap time offset
-        ra = np.interp(det.t - lag, ref["t"], ref[f"{j}_{side}"])
+        ra = np.interp(det.t - lag, ref["t"], ref[f"{j}_{side}"], left=np.nan, right=np.nan)
         out[j + "_aligned"] = metrics(est[j], ra)
         out["series"][j] = (det.t, est[j], ra)
-    if f"knee_ik_{side}" in ref:
-        out["knee_vs_ik"] = metrics(est["knee"], np.interp(det.t, ref["t"], ref[f"knee_ik_{side}"]))
     return out
 
 
@@ -284,7 +290,7 @@ def compare(engine: str, subject: str, trial: str, cam: str, side: str | None = 
 
 def summarize(rows: list[dict]) -> str:
     lines = [f"{'joint':14s} {'trials':>6s} {'MAE':>7s} {'RMSE':>7s} {'bias':>7s} {'SD':>6s} {'r':>6s}  (degrees; mean over trials)"]
-    for j in [x for jj in JOINTS for x in (jj, jj + "_aligned")] + ["knee_vs_ik"]:
+    for j in [x for jj in JOINTS for x in (jj, jj + "_aligned")]:
         vals = [r[j] for r in rows if j in r and "mae" in r[j]]
         if not vals:
             continue
@@ -300,7 +306,7 @@ def save_csv(rows: list[dict], path: Path):
         w = csv.writer(f)
         w.writerow(["engine", "subject", "trial", "side", "cam", "joint", "lag_s", "fps_proc", "view_deg", "frames"] + keys)
         for r in rows:
-            for j in [x for jj in JOINTS for x in (jj, jj + "_aligned")] + ["knee_vs_ik"]:
+            for j in [x for jj in JOINTS for x in (jj, jj + "_aligned")]:
                 if j in r:
                     w.writerow([r["engine"], r["subject"], r["trial"], r["side"], r["cam"], j,
                                 f"{r['lag_s']:.3f}", f"{r['fps_proc']:.1f}", f"{r['view_deg']:.1f}", r["frames"]] +
@@ -311,10 +317,11 @@ def plot(row: dict, path: Path):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4), dpi=110)
-    for ax, j in zip(axes, JOINTS):
+    joints = [j for j in JOINTS if j in row["series"]]
+    fig, axes = plt.subplots(1, len(joints), figsize=(5 * len(joints), 4), dpi=110)
+    for ax, j in zip(axes, joints):
         t, est, ref = row["series"][j]
-        ax.plot(t, ref, color="#111", lw=2, label="laboratorio (marcadores)")
+        ax.plot(t, ref, color="#111", lw=2, label="laboratorio (OpenSim)")
         ax.plot(t, est, color="#E4572E", lw=1.5, label=f"OpenKick · {row['engine']}")
         m = row[j + "_aligned"]
         ax.set_title(f"{j} {row['side']} · MAE {m.get('mae', float('nan')):.1f}° · sesgo {m.get('bias', float('nan')):+.1f}°")
