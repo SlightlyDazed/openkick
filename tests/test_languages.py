@@ -1,5 +1,6 @@
 """Every language: complete, with the same placeholders as English, and the windows open in it."""
 import json
+import os
 import re
 import subprocess
 import sys
@@ -15,8 +16,10 @@ CODES = [c for c in i18n.LANGUAGES if c != "en"]
 
 @pytest.fixture(scope="module")
 def strings():
+    env = {"PYTHONPATH": str(ROOT), "QT_QPA_PLATFORM": "offscreen", "PATH": "", "PYTHONIOENCODING": "utf-8"}
+    env.update({k: os.environ[k] for k in ("SYSTEMROOT", "WINDIR") if k in os.environ})    # Windows cannot start Python without them
     out = subprocess.run([sys.executable, str(ROOT / "tools" / "extract_strings.py")], capture_output=True, text=True,
-                         cwd=ROOT, env={"PYTHONPATH": str(ROOT), "QT_QPA_PLATFORM": "offscreen", "PATH": ""})
+                         encoding="utf-8", cwd=ROOT, env=env)
     return json.loads(out.stdout)
 
 
