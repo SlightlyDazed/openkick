@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenKick Plugins</title>
+<meta name="description" content="Plugins and templates for OpenKick, the open-source video movement analysis software.">
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F6F6F4; --card: #FFFFFF; --text: #1E1F22; --muted: #5F605C; --faint: #85867F;
+  --line: #E2E2DE; --accent: #5E7A1F; --accent-bg: #EEF3E2; --chip: #EFEFEC;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17181B; --card: #1F2023; --text: #E7E7E4; --muted: #A5A5A0; --faint: #90908B;
+    --line: #2C2D32; --accent: #A3C25A; --accent-bg: #262A1E; --chip: #2A2B30;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17181B; --card: #1F2023; --text: #E7E7E4; --muted: #A5A5A0; --faint: #90908B;
+  --line: #2C2D32; --accent: #A3C25A; --accent-bg: #262A1E; --chip: #2A2B30;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+       font: 15px/1.55 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+header { border-bottom: 1px solid var(--line); background: var(--card); }
+header .wrap { display: flex; align-items: center; gap: 12px; height: 60px; }
+header img { width: 28px; height: 28px; border-radius: 5px; }
+header .brand { font-weight: 600; font-size: 16px; }
+header .brand span { color: var(--faint); font-weight: 400; }
+header nav { margin-left: auto; display: flex; gap: 16px; align-items: center; font-size: 14px; }
+.lang button { background: none; border: 1px solid var(--line); color: var(--muted); font: inherit; font-size: 13px;
+               padding: 2px 8px; cursor: pointer; }
+.lang button:first-child { border-radius: 4px 0 0 4px; }
+.lang button:last-child { border-radius: 0 4px 4px 0; border-left: 0; }
+.lang button[aria-pressed="true"] { background: var(--chip); color: var(--text); }
+h1 { font-size: 26px; font-weight: 600; margin: 36px 0 6px; }
+.lead { color: var(--muted); margin: 0 0 24px; max-width: 680px; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 18px; }
+.tools input { flex: 1 1 240px; min-width: 0; padding: 8px 12px; border: 1px solid var(--line); border-radius: 5px;
+               background: var(--card); color: var(--text); font: inherit; }
+.chip { border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 4px; padding: 6px 10px;
+        font: inherit; font-size: 13px; cursor: pointer; }
+.chip[aria-pressed="true"] { border-color: var(--accent); color: var(--text); background: var(--accent-bg); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: flex;
+        flex-direction: column; gap: 6px; }
+.card h3 { margin: 0; font-size: 16px; font-weight: 600; }
+.meta { color: var(--faint); font-size: 12.5px; }
+.desc { color: var(--muted); font-size: 14px; flex: 1; margin: 4px 0 8px; }
+.badge { display: inline-block; font-size: 11.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 3px;
+         padding: 0 5px; margin-left: 6px; vertical-align: 1px; }
+.actions { display: flex; gap: 14px; font-size: 14px; }
+.empty { color: var(--faint); padding: 24px 0; }
+section.how { margin: 48px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+section.how h2 { font-size: 18px; font-weight: 600; margin: 0 0 10px; }
+section.how ol { margin: 0; padding-left: 20px; color: var(--muted); }
+section.how li { margin-bottom: 8px; }
+code { background: var(--chip); padding: 1px 5px; border-radius: 3px; font-size: 13px; }
+footer { color: var(--faint); font-size: 13px; border-top: 1px solid var(--line); margin-top: 56px; padding: 18px 0 32px; }
+@media (max-width: 700px) { section.how { grid-template-columns: 1fr; } header nav a.hide-sm { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <img src="logo.png" alt="">
+    <div class="brand">OpenKick <span>· Plugins</span></div>
+    <nav>
+      <a class="hide-sm" href="https://github.com/SlightlyDazed/openkick" data-i18n="program">El programa</a>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="es">ES</button><button type="button" data-lang="en">EN</button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1 data-i18n="title">Plugins y plantillas</h1>
+  <p class="lead" data-i18n="lead">Análisis que se suman a OpenKick. Cada plugin vive en el repositorio de su autor:
+    entra, descarga el ZIP y cárgalo en OpenKick.</p>
+
+  <div class="tools">
+    <input id="q" type="search" data-i18n-placeholder="search" placeholder="Buscar">
+    <div id="cats" class="tools" style="margin:0"></div>
+  </div>
+  <div id="grid" class="grid"></div>
+  <p id="empty" class="empty" hidden data-i18n="none">Ningún plugin coincide con la búsqueda.</p>
+
+  <section class="how">
+    <div>
+      <h2 data-i18n="install">Instalar un plugin</h2>
+      <ol>
+        <li data-i18n="i1">Abre el repositorio del plugin.</li>
+        <li data-i18n-html="i2">Pulsa <code>Code › Download ZIP</code>.</li>
+        <li data-i18n-html="i3">En OpenKick: <code>Plugins › Instalar plugin (.zip)…</code> y elige ese archivo.</li>
+      </ol>
+    </div>
+    <div>
+      <h2 data-i18n="publish">Publicar el tuyo</h2>
+      <ol>
+        <li data-i18n-html="p1">Crea tu repositorio a partir de la
+          <a href="https://github.com/SlightlyDazed/openkick-plugin-template">plantilla de plugins</a>.</li>
+        <li data-i18n-html="p2">Escribe tu análisis en <code>plugin.py</code>, completa <code>plugin.json</code> y haz pasar sus tests.</li>
+        <li data-i18n-html="p3">Propón añadirlo con un <em>pull request</em> que sume tu plugin a
+          <a href="https://github.com/SlightlyDazed/openkick/blob/main/site/plugins.json">plugins.json</a>.
+          Se revisa antes de aparecer aquí.</li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap" data-i18n-html="footer">OpenKick es software libre (GPLv3). Los plugins de la comunidad son de sus autores:
+    revisa su código antes de usarlos con datos de pacientes.</div>
+</footer>
+
+<script>
+const TEXT = {
+  es: {
+    program: "El programa", title: "Plugins y plantillas", search: "Buscar",
+    lead: "Análisis que se suman a OpenKick. Cada plugin vive en el repositorio de su autor: entra, descarga el ZIP y cárgalo en OpenKick.",
+    none: "Ningún plugin coincide con la búsqueda.", all: "Todos", included: "incluido en OpenKick",
+    plugin: "plugin", template: "plantilla", repo: "Repositorio", source: "Código", zip: "Descargar ZIP",
+    by: "por", needs: "desde OpenKick {v}",
+    install: "Instalar un plugin", i1: "Abre el repositorio del plugin.",
+    i2: "Pulsa <code>Code › Download ZIP</code>.",
+    i3: "En OpenKick: <code>Plugins › Instalar plugin (.zip)…</code> y elige ese archivo.",
+    publish: "Publicar el tuyo",
+    p1: 'Crea tu repositorio a partir de la <a href="https://github.com/SlightlyDazed/openkick-plugin-template">plantilla de plugins</a>.',
+    p2: "Escribe tu análisis en <code>plugin.py</code>, completa <code>plugin.json</code> y haz pasar sus tests.",
+    p3: 'Propón añadirlo con un <em>pull request</em> que sume tu plugin a <a href="https://github.com/SlightlyDazed/openkick/blob/main/site/plugins.json">plugins.json</a>. Se revisa antes de aparecer aquí.',
+    footer: "OpenKick es software libre (GPLv3). Los plugins de la comunidad son de sus autores: revisa su código antes de usarlos con datos de pacientes.",
+    cat: { Sport: "Deporte", Clinical: "Clínica", Strength: "Fuerza", Analysis: "Análisis", Export: "Exportar" },
+  },
+  en: {
+    program: "The program", title: "Plugins and templates", search: "Search",
+    lead: "Analyses that add to OpenKick. Each plugin lives in its author's repository: open it, download the ZIP and load it into OpenKick.",
+    none: "No plugin matches the search.", all: "All", included: "included in OpenKick",
+    plugin: "plugin", template: "template", repo: "Repository", source: "Source", zip: "Download ZIP",
+    by: "by", needs: "OpenKick {v} or later",
+    install: "Install a plugin", i1: "Open the plugin's repository.",
+    i2: "Press <code>Code › Download ZIP</code>.",
+    i3: "In OpenKick: <code>Plugins › Install plugin (.zip)…</code> and pick that file.",
+    publish: "Publish yours",
+    p1: 'Create your repository from the <a href="https://github.com/SlightlyDazed/openkick-plugin-template">plugin template</a>.',
+    p2: "Write your analysis in <code>plugin.py</code>, fill in <code>plugin.json</code> and make its tests pass.",
+    p3: 'Propose it with a <em>pull request</em> that adds your plugin to <a href="https://github.com/SlightlyDazed/openkick/blob/main/site/plugins.json">plugins.json</a>. It is reviewed before it shows here.',
+    footer: "OpenKick is free software (GPLv3). Community plugins belong to their authors: read their code before using them with patient data.",
+    cat: { Sport: "Sport", Clinical: "Clinical", Strength: "Strength", Analysis: "Analysis", Export: "Export" },
+  },
+};
+let lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
+try { lang = localStorage.getItem("lang") || lang; } catch (e) {}
+let plugins = [], category = "";
+
+const pick = (v) => (typeof v === "string" ? v : v[lang] || v.en || Object.values(v)[0] || "");
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const safeUrl = (u) => (/^https:\/\/github\.com\//.test(u) ? u : "#");
+
+function zipUrl(p) {
+  const m = /^https:\/\/github\.com\/([^/]+)\/([^/#?]+)/.exec(p.repository || "");
+  return m ? `https://github.com/${m[1]}/${m[2]}/archive/refs/heads/${encodeURIComponent(p.branch || "main")}.zip` : "#";
+}
+
+function render() {
+  const t = TEXT[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach((el) => (el.textContent = t[el.dataset.i18n]));
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => (el.innerHTML = t[el.dataset.i18nHtml]));
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => (el.placeholder = t[el.dataset.i18nPlaceholder]));
+  document.querySelectorAll(".lang button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === lang));
+
+  const cats = [...new Set(plugins.map((p) => p.category))];
+  document.getElementById("cats").innerHTML = ["", ...cats].map((c) =>
+    `<button class="chip" type="button" data-cat="${esc(c)}" aria-pressed="${c === category}">${esc(c ? t.cat[c] || c : t.all)}</button>`).join("");
+
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const shown = plugins.filter((p) => (!category || p.category === category) &&
+    (!q || [pick(p.name), pick(p.description), p.author, p.category].join(" ").toLowerCase().includes(q)));
+  document.getElementById("grid").innerHTML = shown.map((p) => `
+    <article class="card">
+      <h3>${esc(pick(p.name))}${p.builtin ? `<span class="badge">${t.included}</span>` : ""}</h3>
+      <div class="meta">${esc(t.cat[p.category] || p.category)} · ${esc(t[p.kind] || p.kind)} · v${esc(p.version)} ·
+        ${esc(t.by)} ${esc(p.author)} · ${esc(t.needs.replace("{v}", String(p.openkick).replace(/^>=\s*/, "")))}</div>
+      <p class="desc">${esc(pick(p.description))}</p>
+      <div class="actions">
+        <a href="${esc(safeUrl(p.repository))}">${p.builtin ? t.source : t.repo}</a>
+        ${p.builtin ? "" : `<a href="${esc(zipUrl(p))}">${t.zip}</a>`}
+      </div>
+    </article>`).join("");
+  document.getElementById("empty").hidden = shown.length > 0;
+}
+
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-lang]");
+  if (b) { lang = b.dataset.lang; try { localStorage.setItem("lang", lang); } catch (err) {} render(); }
+  const c = e.target.closest("[data-cat]");
+  if (c) { category = c.dataset.cat; render(); }
+});
+document.getElementById("q").addEventListener("input", render);
+
+fetch("plugins.json").then((r) => r.json()).then((d) => {
+  // community plugins first, in the order they were added; then what ships with OpenKick
+  plugins = [...d.plugins.filter((p) => !p.builtin), ...d.plugins.filter((p) => p.builtin)];
+  render();
+}).catch(() => { render(); });
+render();
+</script>
+</body>
+</html>

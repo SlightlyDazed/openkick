@@ -1212,5 +1212,12 @@
     "Show fewer": "表示を減らす",
     "Typical phase ± how much it changes from one phase to the next ({n} phases).": "典型的なフェーズ ± フェーズごとの変動（{n}フェーズ）。",
     "far from the camera": "カメラから遠い側",
-    "Elbow": "肘"
+    "Elbow": "肘",
+    "Install plugin (.zip)…": "プラグインをインストール (.zip)…",
+    "Plugin (*.zip)": "プラグイン (*.zip)",
+    "{name} is already installed (version {old}). Replace it with version {new}?": "{name} はすでにインストールされています（バージョン {old}）。バージョン {new} に置き換えますか？",
+    "This ZIP cannot be installed: {why}": "この ZIP はインストールできません: {why}",
+    "{name} {version} is installed. It is in the Plugins menu. A plugin runs its own code: use only those you trust.": "{name} {version} をインストールしました。プラグインメニューにあります。プラグインは独自のコードを実行します。信頼できるものだけを使ってください。",
+    "Community plugins": "コミュニティのプラグイン",
+    "Each package brings one kind of analysis: its tables, its template and, where there is one, its 3D. These come with OpenKick: removing one hides it and installing it brings it back. Plugins made by others are on the community page: download their ZIP and install it here.": "各パッケージは1種類の分析（表、テンプレート、あれば3D）を提供します。これらは OpenKick に付属しており、削除すると非表示になり、インストールすると戻ります。他の人が作ったプラグインはコミュニティページにあります。ZIP をダウンロードしてここでインストールしてください。"
 }

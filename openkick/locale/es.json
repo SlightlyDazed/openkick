@@ -1215,5 +1215,12 @@
     "Show fewer": "Ver menos",
     "Typical phase ± how much it changes from one phase to the next ({n} phases).": "Fase típica ± cuánto cambia de una fase a otra ({n} fases).",
     "far from the camera": "lejos de la cámara",
-    "Elbow": "Codo"
+    "Elbow": "Codo",
+    "Install plugin (.zip)…": "Instalar plugin (.zip)…",
+    "Plugin (*.zip)": "Plugin (*.zip)",
+    "{name} is already installed (version {old}). Replace it with version {new}?": "{name} ya está instalado (versión {old}). ¿Reemplazarlo por la versión {new}?",
+    "This ZIP cannot be installed: {why}": "Este ZIP no se puede instalar: {why}",
+    "{name} {version} is installed. It is in the Plugins menu. A plugin runs its own code: use only those you trust.": "{name} {version} está instalado. Está en el menú Plugins. Un plugin ejecuta su propio código: usa solo los que sean de confianza.",
+    "Community plugins": "Plugins de la comunidad",
+    "Each package brings one kind of analysis: its tables, its template and, where there is one, its 3D. These come with OpenKick: removing one hides it and installing it brings it back. Plugins made by others are on the community page: download their ZIP and install it here.": "Cada paquete trae un tipo de análisis: sus tablas, su plantilla y, si lo tiene, su 3D. Estos vienen con OpenKick: quitar uno lo oculta e instalarlo lo devuelve. Los plugins hechos por otros están en la página de la comunidad: descarga su ZIP e instálalo aquí."
 }

@@ -1212,5 +1212,12 @@
     "Show fewer": "Показать меньше",
     "Typical phase ± how much it changes from one phase to the next ({n} phases).": "Типичная фаза ± насколько она меняется от фазы к фазе ({n} фаз).",
     "far from the camera": "дальняя от камеры",
-    "Elbow": "Локоть"
+    "Elbow": "Локоть",
+    "Install plugin (.zip)…": "Установить плагин (.zip)…",
+    "Plugin (*.zip)": "Плагин (*.zip)",
+    "{name} is already installed (version {old}). Replace it with version {new}?": "{name} уже установлен (версия {old}). Заменить версией {new}?",
+    "This ZIP cannot be installed: {why}": "Этот ZIP нельзя установить: {why}",
+    "{name} {version} is installed. It is in the Plugins menu. A plugin runs its own code: use only those you trust.": "{name} {version} установлен. Он в меню «Плагины». Плагин выполняет собственный код: используйте только те, которым доверяете.",
+    "Community plugins": "Плагины сообщества",
+    "Each package brings one kind of analysis: its tables, its template and, where there is one, its 3D. These come with OpenKick: removing one hides it and installing it brings it back. Plugins made by others are on the community page: download their ZIP and install it here.": "Каждый пакет добавляет один вид анализа: свои таблицы, шаблон и, если есть, 3D. Эти поставляются с OpenKick: удаление скрывает пакет, установка возвращает его. Плагины других авторов — на странице сообщества: скачайте их ZIP и установите здесь."
 }

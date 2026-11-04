@@ -1,0 +1,48 @@
+# Publishes the plugin index (the site/ folder) on GitHub Pages whenever it changes on main.
+name: Plugin index
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["site/**"]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every entry has what the page needs
+        run: |
+          python3 - <<'PY'
+          import json, re, sys
+          d = json.load(open("site/plugins.json", encoding="utf-8"))
+          need = ("id", "name", "description", "category", "author", "version", "openkick", "license", "kind", "repository")
+          seen, bad = set(), []
+          for p in d["plugins"]:
+              miss = [k for k in need if not p.get(k)]
+              if miss: bad.append(f"{p.get('id')}: missing {miss}")
+              if p.get("id") in seen: bad.append(f"{p['id']}: repeated id")
+              seen.add(p.get("id"))
+              if not re.match(r"^https://github\.com/", p.get("repository", "")): bad.append(f"{p.get('id')}: repository is not on GitHub")
+          print("\n".join(bad) or f"{len(seen)} entries OK"); sys.exit(1 if bad else 0)
+          PY
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -6,9 +6,10 @@ repository."""
 
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (QDialog, QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton,
-                               QScrollArea, QVBoxLayout, QWidget)
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtWidgets import (QDialog, QFileDialog, QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QMessageBox,
+                               QPushButton, QScrollArea, QVBoxLayout, QWidget)
 
 from openkick.core import store as ST
 from openkick.i18n import pick, tr
@@ -68,6 +69,37 @@ class PackageCard(QFrame):
         lay.addLayout(row)
 
 
+COMMUNITY_URL = "https://slightlydazed.github.io/openkick/"     # the index of the community's plugins
+
+
+def install_plugin_zip(parent, path: str | None = None) -> bool:
+    """Ask for a plugin's ZIP (the one GitHub gives with Code › Download ZIP) and install it.
+    True when something was installed."""
+    from openkick.plugins import install as INS
+    if path is None:
+        path, _ = QFileDialog.getOpenFileName(parent, tr("Install plugin (.zip)…"), "", tr("Plugin (*.zip)"))
+        if not path:
+            return False
+    try:
+        try:
+            man = INS.install_zip(path)
+        except INS.AlreadyInstalled as e:
+            old = e.installed.get("version", "?")
+            ask = QMessageBox.question(parent, tr("Install plugin (.zip)…"),
+                                       tr("{name} is already installed (version {old}). Replace it with version {new}?",
+                                          name=pick(e.manifest["name"]), old=old, new=e.manifest["version"]))
+            if ask != QMessageBox.Yes:
+                return False
+            man = INS.install_zip(path, replace=True)
+    except INS.InstallError as e:
+        QMessageBox.warning(parent, tr("Install plugin (.zip)…"), tr("This ZIP cannot be installed: {why}", why=e))
+        return False
+    QMessageBox.information(parent, tr("Install plugin (.zip)…"),
+                            tr("{name} {version} is installed. It is in the Plugins menu. A plugin runs its own code: "
+                               "use only those you trust.", name=pick(man["name"]), version=man["version"]))
+    return True
+
+
 class StoreDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -87,10 +119,16 @@ class StoreDialog(QDialog):
         self.search.setFixedWidth(240)
         self.search.textChanged.connect(self.refresh)
         head.addWidget(self.search)
+        web = QPushButton(icons.icon("globe", theme.TEXT, 16), " " + tr("Community plugins"))
+        web.clicked.connect(lambda: QDesktopServices.openUrl(QUrl(COMMUNITY_URL)))
+        head.addWidget(web)
+        self.zip_btn = QPushButton(icons.icon("plus", theme.TEXT, 16), " " + tr("Install plugin (.zip)…"))
+        self.zip_btn.clicked.connect(self._install_zip)
+        head.addWidget(self.zip_btn)
         lay.addLayout(head)
         note = QLabel(tr("Each package brings one kind of analysis: its tables, its template and, where there is "
-                         "one, its 3D. For now they all come with OpenKick: removing one hides it and installing "
-                         "it brings it back. Later they will be downloaded from an online store."))
+                         "one, its 3D. These come with OpenKick: removing one hides it and installing it brings it "
+                         "back. Plugins made by others are on the community page: download their ZIP and install it here."))
         note.setWordWrap(True)
         note.setStyleSheet(f"color: {theme.MUTED};")
         lay.addWidget(note)
@@ -129,6 +167,10 @@ class StoreDialog(QDialog):
         for k, b in self.chip_buttons.items():
             b.setChecked(k == key)
         self.refresh()
+
+    def _install_zip(self):
+        if install_plugin_zip(self):
+            self.changed_any = True
 
     def _toggle(self, pid: str, on: bool):
         ST.set_installed(pid, on)

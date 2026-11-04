@@ -155,7 +155,7 @@ def discover() -> tuple[list[Plugin], list[str]]:
                 plugins.append(p)
     for entry in sorted(user_dir().iterdir()):
         path = entry / "plugin.py" if entry.is_dir() else entry
-        if path.suffix != ".py" or not path.exists() or path.name.startswith("_"):
+        if path.suffix != ".py" or not path.exists() or entry.name.startswith(("_", ".")):
             continue
         try:
             mod = _load_module(path, f"openkick_user_plugin_{entry.stem}")

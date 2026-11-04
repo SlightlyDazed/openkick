@@ -82,3 +82,39 @@ The built-in plugins (`openkick/plugins/builtin/`) are complete examples.
 
 **Security:** a plugin runs code with the user's permissions. Only install plugins from sources you
 trust.
+
+## Share it: a repository, a ZIP and the plugin index
+
+To share a plugin, start from the
+[plugin template](https://github.com/SlightlyDazed/openkick-plugin-template) (**Use this template**
+or fork it). It holds a working example, tests on a made-up rider and a `plugin.json`, the file
+OpenKick reads to install it:
+
+```json
+{
+  "id": "my-plugin",
+  "name": {"en": "My analysis", "es": "Mi análisis"},
+  "description": {"en": "What it measures."},
+  "version": "1.0.0",
+  "author": "Your name",
+  "license": "GPL-3.0-or-later",
+  "openkick": ">=0.1.0",
+  "category": "Analysis",
+  "kind": "plugin",
+  "repository": "https://github.com/you/my-plugin",
+  "templates": []
+}
+```
+
+`id`, `name`, `version`, `author` and `openkick` are required. Next to `plugin.json` there must be
+the `plugin.py` with the `PLUGINS` list.
+
+**Installing.** On the repository's page, *Code › Download ZIP*; in OpenKick, *Plugins › Install
+plugin (.zip)…*. OpenKick finds `plugin.json` (at the top of the ZIP or in the one folder GitHub
+puts everything in), checks the fields and the OpenKick version it needs, and copies the plugin to
+the plugins folder without its `tests/` and `.github/`. The templates listed in `templates` go to
+the templates folder. Installing a plugin that is already there asks before replacing it.
+
+**The index.** The community's plugins are listed at <https://slightlydazed.github.io/openkick/>
+(the page is `site/` in this repository). To add one, open a pull request that adds its entry to
+`site/plugins.json`; it is reviewed before it is merged.

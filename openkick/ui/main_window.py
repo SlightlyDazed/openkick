@@ -464,6 +464,7 @@ class MainWindow(QMainWindow):
         self.a_compare = self._act("Compare analyses…", self.open_compare, None, "compare", False)
         self.a_patients = self._act("Patients…", self.open_patients, None, "user", False)
         self.a_plugins = self._act("Manage plugins…", self.manage_plugins, None, "plugin", False)
+        self.a_plugin_zip = self._act("Install plugin (.zip)…", self.install_plugin_zip, None, "plus", False)
         self.a_plugin_dir = self._act("Open plugins folder", lambda: QDesktopServices.openUrl(
             QUrl.fromLocalFile(str(user_dir()))), None, "folder", False)
         self.a_shortcuts = self._act("Keyboard shortcuts", lambda: ShortcutsDialog(self).exec(), "F1", "keyboard", False)
@@ -1161,6 +1162,7 @@ class MainWindow(QMainWindow):
                 a.setEnabled(self.ctl.has_project)
         m.addSeparator()
         m.addAction(self.a_plugins)
+        m.addAction(self.a_plugin_zip)
         m.addAction(self.a_plugin_dir)
         if self._plugin_errors:
             a = m.addAction(icons.icon("info", theme.WARN, 16), tr("{n} plugins failed to load", n=len(self._plugin_errors)))
@@ -1244,6 +1246,13 @@ class MainWindow(QMainWindow):
         self.multiview_window.show()
         self.multiview_window.raise_()
         self.multiview_window.activateWindow()
+
+    def install_plugin_zip(self):
+        from openkick.ui.store import install_plugin_zip
+        if install_plugin_zip(self):
+            self._fill_plugins_menu()
+            if hasattr(self, "welcome"):
+                self.welcome.reload_templates()
 
     def manage_plugins(self):
         from openkick.ui.store import StoreDialog

@@ -1212,5 +1212,12 @@
     "Show fewer": "收起",
     "Typical phase ± how much it changes from one phase to the next ({n} phases).": "典型阶段 ± 各阶段之间的变化（{n} 个阶段）。",
     "far from the camera": "远离摄像头",
-    "Elbow": "肘"
+    "Elbow": "肘",
+    "Install plugin (.zip)…": "安装插件 (.zip)…",
+    "Plugin (*.zip)": "插件 (*.zip)",
+    "{name} is already installed (version {old}). Replace it with version {new}?": "{name} 已安装（版本 {old}）。要替换为版本 {new} 吗？",
+    "This ZIP cannot be installed: {why}": "无法安装此 ZIP：{why}",
+    "{name} {version} is installed. It is in the Plugins menu. A plugin runs its own code: use only those you trust.": "{name} {version} 已安装，位于“插件”菜单中。插件会运行自己的代码：只使用你信任的插件。",
+    "Community plugins": "社区插件",
+    "Each package brings one kind of analysis: its tables, its template and, where there is one, its 3D. These come with OpenKick: removing one hides it and installing it brings it back. Plugins made by others are on the community page: download their ZIP and install it here.": "每个包提供一种分析：表格、模板，以及（如有）3D。这些随 OpenKick 提供：移除会隐藏，安装会恢复。其他人制作的插件在社区页面上：下载其 ZIP 并在此安装。"
 }

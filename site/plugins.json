@@ -1,0 +1,157 @@
+{
+  "format": 1,
+  "plugins": [
+    {
+      "id": "base-rom",
+      "name": {
+        "es": "Informe de rango de movimiento",
+        "en": "Range of motion report"
+      },
+      "description": {
+        "es": "Tabla de ROM por articulación y fase.",
+        "en": "ROM table per joint and phase."
+      },
+      "category": "Analysis",
+      "author": "OpenKick",
+      "version": "0.1.0",
+      "openkick": ">=0.1.0",
+      "license": "GPL-3.0-or-later",
+      "kind": "plugin",
+      "builtin": true,
+      "repository": "https://github.com/SlightlyDazed/openkick/blob/main/openkick/plugins/builtin/rom_report.py"
+    },
+    {
+      "id": "base-speed",
+      "name": {
+        "es": "Velocidades y aceleraciones",
+        "en": "Velocities and accelerations"
+      },
+      "description": {
+        "es": "Velocidad lineal y angular máxima por fase.",
+        "en": "Peak linear and angular velocity per phase."
+      },
+      "category": "Analysis",
+      "author": "OpenKick",
+      "version": "0.1.0",
+      "openkick": ">=0.1.0",
+      "license": "GPL-3.0-or-later",
+      "kind": "plugin",
+      "builtin": true,
+      "repository": "https://github.com/SlightlyDazed/openkick/blob/main/openkick/plugins/builtin/velocities.py"
+    },
+    {
+      "id": "base-opensim",
+      "name": {
+        "es": "Exportar a OpenSim",
+        "en": "Export to OpenSim"
+      },
+      "description": {
+        "es": "Archivo .trc con los puntos para OpenSim.",
+        "en": ".trc file with the points, for OpenSim."
+      },
+      "category": "Export",
+      "author": "OpenKick",
+      "version": "0.1.0",
+      "openkick": ">=0.1.0",
+      "license": "GPL-3.0-or-later",
+      "kind": "plugin",
+      "builtin": true,
+      "repository": "https://github.com/SlightlyDazed/openkick/blob/main/openkick/plugins/builtin/opensim_trc.py"
+    },
+    {
+      "id": "cycling",
+      "name": {
+        "es": "Ciclismo",
+        "en": "Cycling"
+      },
+      "description": {
+        "es": "Cada pedalada en 2D y 3D: rodilla, cadera, tobillo y postura, cuánto varían, ambas piernas en 3D, y la comparación entre ajustes de la bici.",
+        "en": "Every pedal stroke in 2D and 3D: knee, hip, ankle and posture, how much they vary, both legs in 3D, and the comparison between bike settings."
+      },
+      "category": "Sport",
+      "author": "OpenKick",
+      "version": "0.1.0",
+      "openkick": ">=0.1.0",
+      "license": "GPL-3.0-or-later",
+      "kind": "plugin",
+      "builtin": true,
+      "repository": "https://github.com/SlightlyDazed/openkick/blob/main/openkick/plugins/builtin/cycling.py"
+    },
+    {
+      "id": "gait",
+      "name": {
+        "es": "Marcha",
+        "en": "Gait"
+      },
+      "description": {
+        "es": "Zancadas con sus ocho fases (Perry), ritmo, longitudes de paso y la comparación izquierda/derecha, en 2D y 3D.",
+        "en": "Strides with their eight phases (Perry), pace, step lengths and left against right, in 2D and 3D."
+      },
+      "category": "Clinical",
+      "author": "OpenKick",
+      "version": "0.1.0",
+      "openkick": ">=0.1.0",
+      "license": "GPL-3.0-or-later",
+      "kind": "plugin",
+      "builtin": true,
+      "repository": "https://github.com/SlightlyDazed/openkick/blob/main/openkick/plugins/builtin/gait.py"
+    },
+    {
+      "id": "kick",
+      "name": {
+        "es": "Patada",
+        "en": "Kick"
+      },
+      "description": {
+        "es": "Plantilla de patada: rodilla y cadera de la pierna de golpeo, cuatro fases.",
+        "en": "Kick template: knee and hip of the kicking leg, four phases."
+      },
+      "category": "Sport",
+      "author": "OpenKick",
+      "version": "0.1.0",
+      "openkick": ">=0.1.0",
+      "license": "GPL-3.0-or-later",
+      "kind": "template",
+      "builtin": true,
+      "repository": "https://github.com/SlightlyDazed/openkick/blob/main/openkick/templates/kick.json"
+    },
+    {
+      "id": "squat",
+      "name": {
+        "es": "Sentadilla",
+        "en": "Squat"
+      },
+      "description": {
+        "es": "Plantilla de sentadilla: rodilla, cadera y tobillo, descenso y ascenso.",
+        "en": "Squat template: knee, hip and ankle, descent and ascent."
+      },
+      "category": "Strength",
+      "author": "OpenKick",
+      "version": "0.1.0",
+      "openkick": ">=0.1.0",
+      "license": "GPL-3.0-or-later",
+      "kind": "template",
+      "builtin": true,
+      "repository": "https://github.com/SlightlyDazed/openkick/blob/main/openkick/templates/squat.json"
+    },
+    {
+      "id": "jump",
+      "name": {
+        "es": "Salto vertical",
+        "en": "Vertical jump"
+      },
+      "description": {
+        "es": "Plantilla de salto: contramovimiento, impulso, vuelo y aterrizaje.",
+        "en": "Jump template: countermovement, push-off, flight and landing."
+      },
+      "category": "Sport",
+      "author": "OpenKick",
+      "version": "0.1.0",
+      "openkick": ">=0.1.0",
+      "license": "GPL-3.0-or-later",
+      "kind": "template",
+      "builtin": true,
+      "repository": "https://github.com/SlightlyDazed/openkick/blob/main/openkick/templates/jump.json"
+    }
+  ]
+}

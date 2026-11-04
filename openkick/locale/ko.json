@@ -1212,5 +1212,12 @@
     "Show fewer": "간단히 보기",
     "Typical phase ± how much it changes from one phase to the next ({n} phases).": "대표 단계 ± 단계마다 달라지는 정도 ({n}개 단계).",
     "far from the camera": "카메라에서 먼 쪽",
-    "Elbow": "팔꿈치"
+    "Elbow": "팔꿈치",
+    "Install plugin (.zip)…": "플러그인 설치 (.zip)…",
+    "Plugin (*.zip)": "플러그인 (*.zip)",
+    "{name} is already installed (version {old}). Replace it with version {new}?": "{name}이(가) 이미 설치되어 있습니다(버전 {old}). 버전 {new}(으)로 바꿀까요?",
+    "This ZIP cannot be installed: {why}": "이 ZIP은 설치할 수 없습니다: {why}",
+    "{name} {version} is installed. It is in the Plugins menu. A plugin runs its own code: use only those you trust.": "{name} {version}이(가) 설치되었습니다. 플러그인 메뉴에 있습니다. 플러그인은 자체 코드를 실행하므로 신뢰할 수 있는 것만 사용하세요.",
+    "Community plugins": "커뮤니티 플러그인",
+    "Each package brings one kind of analysis: its tables, its template and, where there is one, its 3D. These come with OpenKick: removing one hides it and installing it brings it back. Plugins made by others are on the community page: download their ZIP and install it here.": "각 패키지는 한 가지 분석(표, 템플릿, 있다면 3D)을 제공합니다. 이 패키지들은 OpenKick에 포함되어 있어 제거하면 숨겨지고 설치하면 다시 나타납니다. 다른 사람이 만든 플러그인은 커뮤니티 페이지에 있습니다. ZIP을 내려받아 여기서 설치하세요."
 }
