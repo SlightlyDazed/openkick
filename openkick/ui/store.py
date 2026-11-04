@@ -20,7 +20,7 @@ class PackageCard(QFrame):
         super().__init__(parent)
         self.pkg = pkg
         self.setObjectName("Card")
-        self.setStyleSheet(f"QFrame#Card {{ background: {theme.CARD}; border: 1px solid {theme.BORDER}; border-radius: 12px; }}"
+        self.setStyleSheet(f"QFrame#Card {{ background: {theme.CARD}; border: 1px solid {theme.BORDER}; border-radius: 6px; }}"
                            " QLabel { border: 0; }")
         self.setFixedHeight(184)
         lay = QVBoxLayout(self)
@@ -30,7 +30,7 @@ class PackageCard(QFrame):
         ic = QLabel()
         ic.setFixedSize(38, 38)
         ic.setAlignment(Qt.AlignCenter)
-        ic.setStyleSheet(f"background: {theme.ACTIVE}; border-radius: 10px;")
+        ic.setStyleSheet(f"background: {theme.ACTIVE}; border-radius: 6px;")
         ic.setPixmap(icons.pixmap(pkg["icon"], theme.ACCENT, 20))
         top.addWidget(ic)
         names = QVBoxLayout()
@@ -103,7 +103,7 @@ class StoreDialog(QDialog):
             b.setChecked(key is None)
             b.setCursor(Qt.PointingHandCursor)
             b.setStyleSheet(f"QPushButton {{ background: transparent; border: 1px solid {theme.BORDER}; min-height: 30px; padding: 0 14px; }}"
-                            f"QPushButton:checked {{ background: #171D12; border-color: {theme.ACCENT}; color: {theme.ACCENT}; font-weight: 600; }}")
+                            f"QPushButton:checked {{ background: {theme.SELECT}; border-color: {theme.ACCENT}; color: {theme.ACCENT}; font-weight: 600; }}")
             b.clicked.connect(lambda _=False, k=key: self._pick(k))
             self.chip_buttons[key] = b
             chips.addWidget(b)

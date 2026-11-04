@@ -194,7 +194,7 @@ class PluginsDialog(QDialog):
         scroll.setWidget(body)
         lay.addWidget(scroll, 1)
         box = QFrame()
-        box.setStyleSheet(f"QFrame {{ border: 1px dashed {theme.BORDER}; border-radius: 12px; }} QLabel {{ border: 0; }}")
+        box.setStyleSheet(f"QFrame {{ border: 1px dashed {theme.BORDER}; border-radius: 6px; }} QLabel {{ border: 0; }}")
         bx = QHBoxLayout(box)
         bx.setContentsMargins(14, 10, 10, 10)
         t = QLabel(tr("Do you code in Python? A plugin can add metrics, charts, exporters or other pose models."))
@@ -250,7 +250,7 @@ class BodyPicker(QWidget):
     def paintEvent(self, _):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        p.setPen(QPen(QColor("#3A4352"), 3, Qt.SolidLine, Qt.RoundCap))
+        p.setPen(QPen(QColor(theme.BORDER_HOVER), 3, Qt.SolidLine, Qt.RoundCap))
         for a, b in FIG_BONES:
             p.drawLine(QPointF(*FIGURE[a]), QPointF(*FIGURE[b]))
         p.drawLine(QPointF(90, 46), QPointF(90, 64))
@@ -341,7 +341,7 @@ class TemplateEditor(QDialog):
         self.phases = QListWidget()
         self.phases.setDragDropMode(QAbstractItemView.InternalMove)
         self.phases.setStyleSheet(f"QListWidget {{ background: transparent; border: 0; }}"
-                                  f"QListWidget::item {{ background: {theme.CARD}; border: 1px solid #222834; border-radius: 8px;"
+                                  f"QListWidget::item {{ background: {theme.CARD}; border: 1px solid {theme.CARD_LINE}; border-radius: 5px;"
                                   f" padding: 8px 10px; margin-bottom: 6px; }}")
         for ph in self.t.phase_names():
             self._add_phase(ph)
@@ -393,7 +393,7 @@ class TemplateEditor(QDialog):
     def _card(self, num: str, title: str) -> QFrame:
         f = QFrame()
         f.setObjectName("Card")
-        f.setStyleSheet(f"QFrame#Card {{ background: {theme.PANEL}; border: 1px solid #1E232C; border-radius: 14px; }}")
+        f.setStyleSheet(f"QFrame#Card {{ background: {theme.PANEL}; border: 1px solid {theme.CARD_LINE}; border-radius: 6px; }}")
         lay = QVBoxLayout(f)
         lay.setContentsMargins(18, 16, 18, 16)
         lay.setSpacing(10)
@@ -401,7 +401,7 @@ class TemplateEditor(QDialog):
         n = QLabel(num)
         n.setFixedSize(24, 24)
         n.setAlignment(Qt.AlignCenter)
-        n.setStyleSheet(f"background: {theme.ACTIVE}; color: {theme.ACCENT}; border-radius: 12px; font-size: 12px; border: 0;")
+        n.setStyleSheet(f"background: {theme.ACTIVE}; color: {theme.ACCENT}; border-radius: 6px; font-size: 12px; border: 0;")
         h.addWidget(n)
         t = QLabel(title)
         t.setStyleSheet("font-size: 15px; font-weight: 600; border: 0;")
@@ -621,7 +621,7 @@ class NoteDialog(QDialog):
             b = QPushButton()
             b.setCheckable(True)
             b.setFixedSize(26, 26)
-            b.setStyleSheet(f"QPushButton {{ background: {c}; border-radius: 13px; border: 2px solid {theme.CARD_2}; min-height: 0; padding: 0; }}"
+            b.setStyleSheet(f"QPushButton {{ background: {c}; border-radius: 5px; border: 2px solid {theme.CARD_2}; min-height: 0; padding: 0; }}"
                             f"QPushButton:checked {{ border: 2px solid {theme.TEXT}; }}")
             b.setChecked(c.upper() == note.color.upper())
             self.colors.addButton(b, i)

@@ -20,7 +20,7 @@ from openkick.ui.controller import Controller
 
 
 def section(text: str) -> QLabel:
-    lbl = QLabel(text.upper())
+    lbl = QLabel(text)
     lbl.setObjectName("SectionTitle")
     return lbl
 
@@ -260,7 +260,7 @@ class MeasurementsTab(QWidget):
 
         self.lay.addStretch(1)
         pill = QFrame()
-        pill.setStyleSheet(f"QFrame {{ border: 1px dashed {theme.BORDER}; border-radius: 10px; }}"
+        pill.setStyleSheet(f"QFrame {{ border: 1px dashed {theme.BORDER}; border-radius: 6px; }}"
                            "QLabel { border: 0; }")
         pl = QHBoxLayout(pill)
         pl.setContentsMargins(12, 6, 6, 6)
@@ -338,9 +338,9 @@ class MeasurementsTab(QWidget):
                 b = QPushButton(ph_i.name)
                 is_cur = ph and ph.id == ph_i.id
                 b.setStyleSheet(
-                    f"QPushButton {{ background: {ph_i.color if is_cur else theme.CARD}; "
-                    f"color: {theme.text_on(ph_i.color) if is_cur else theme.TEXT_2}; "
-                    f"border: 1px solid {ph_i.color}; border-radius: 9px; padding: 2px 8px; font-size: 11px; font-weight: 500; }}"
+                    f"QPushButton {{ background: {theme.calm(ph_i.color) if is_cur else theme.CARD}; "
+                    f"color: {theme.text_on(theme.calm(ph_i.color)) if is_cur else theme.TEXT_2}; "
+                    f"border: 1px solid {theme.calm(ph_i.color, 0.3)}; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 500; }}"
                     f"QPushButton:hover {{ border-color: {theme.ACCENT}; }}"
                 )
                 b.setToolTip(f"{p.video.time_of(ph_i.start):.2f} – {p.video.time_of(ph_i.end):.2f} s · {tr('Click to jump')}")
@@ -361,7 +361,7 @@ class MeasurementsTab(QWidget):
 
             title_lbl = QLabel(f"{ph.name if ph else tr('Outside phases')} ({cur_idx + 1 if cur_idx >= 0 else '—'}/{len(p.phases)})")
             title_lbl.setFont(theme.font(12, 600))
-            title_lbl.setStyleSheet(f"color: {ph.color if ph else theme.MUTED};")
+            title_lbl.setStyleSheet(f"color: {theme.TEXT if ph else theme.MUTED};")
             nav_row.addWidget(title_lbl, 1, Qt.AlignCenter)
 
             next_btn = QToolButton()
@@ -388,9 +388,9 @@ class MeasurementsTab(QWidget):
                     sb.setToolTip(f"{s.name} · {span}")
                     is_sub_cur = sph and sph.id == s.id
                     sb.setStyleSheet(
-                        f"QPushButton {{ background: {s.color if is_sub_cur else theme.CARD}; "
-                        f"color: {theme.text_on(s.color) if is_sub_cur else theme.TEXT_2}; "
-                        f"border: 1px solid {s.color}; border-radius: 6px; padding: {'2px 1px' if many else '2px 8px'}; "
+                        f"QPushButton {{ background: {theme.calm(s.color) if is_sub_cur else theme.CARD}; "
+                        f"color: {theme.text_on(theme.calm(s.color)) if is_sub_cur else theme.TEXT_2}; "
+                        f"border: 1px solid {theme.calm(s.color, 0.3)}; border-radius: 4px; padding: {'2px 1px' if many else '2px 8px'}; "
                         f"font-size: 11px; font-weight: 500; }}"
                         f"QPushButton:hover {{ border-color: {theme.ACCENT}; }}"
                     )
@@ -410,7 +410,7 @@ class MeasurementsTab(QWidget):
         else:
             head = QHBoxLayout()
             chip = QLabel(ph.name)
-            chip.setStyleSheet(f"background: {ph.color}; color: {theme.text_on(ph.color)}; border-radius: 11px;"
+            chip.setStyleSheet(f"background: {theme.calm(ph.color)}; color: {theme.text_on(theme.calm(ph.color))}; border-radius: 4px;"
                                "padding: 3px 10px; font-size: 12px; font-weight: 600;")
             head.addWidget(chip)
             head.addStretch(1)
@@ -445,11 +445,11 @@ class MeasurementsTab(QWidget):
                 lbl.setObjectName("Faint")
                 self.phase_lay.addWidget(lbl)
 
-        for pid, emoji in (("cycling", "🚲"), ("gait", "🚶")):
+        for pid in ("cycling", "gait"):
             c_res = self.ctl.plugin_results.get(pid)
             if c_res and c_res.summary:
                 first_line = c_res.summary.split("\n")[0]
-                badge = QLabel(f"<span style='color:{theme.ACCENT}'>{emoji}</span> {first_line}")
+                badge = QLabel(first_line)
                 badge.setStyleSheet(f"color: {theme.TEXT_2}; font-size: 11px; padding: 4px 6px; background: {theme.STAGE}; border-radius: 6px;")
                 badge.setWordWrap(True)
                 self.phase_lay.addWidget(badge)
@@ -745,13 +745,13 @@ class PointTab(QWidget):
         src = p.pose.source[f, j]
         if src == SRC_MANUAL:
             self.src_lbl.setText(tr("Corrected by hand · protected"))
-            self.src_lbl.setStyleSheet("background: #1A2410; color: #D9F99D; border-radius: 8px; padding: 9px 12px;")
+            self.src_lbl.setStyleSheet(f"background: {theme.SELECT}; color: {theme.ACCENT_HOVER}; border-radius: 5px; padding: 9px 12px;")
         elif src == SRC_SMOOTHED:
             self.src_lbl.setText(tr("Adjusted by a nearby correction or smoothing"))
-            self.src_lbl.setStyleSheet(f"background: {theme.RAISED}; color: {theme.TEXT_2}; border-radius: 8px; padding: 9px 12px;")
+            self.src_lbl.setStyleSheet(f"background: {theme.RAISED}; color: {theme.TEXT_2}; border-radius: 5px; padding: 9px 12px;")
         else:
             self.src_lbl.setText(tr("As detected"))
-            self.src_lbl.setStyleSheet(f"background: {theme.RAISED}; color: {theme.TEXT_2}; border-radius: 8px; padding: 9px 12px;")
+            self.src_lbl.setStyleSheet(f"background: {theme.RAISED}; color: {theme.TEXT_2}; border-radius: 5px; padding: 9px 12px;")
         self.revert_btn.setEnabled(bool(src != 1))
         for m in p.measurements:
             if any(r.landmark == j for r in m.points):

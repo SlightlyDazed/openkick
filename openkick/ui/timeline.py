@@ -387,7 +387,7 @@ class Timeline(QWidget):
         t = int(t0 / step) * step
         while t <= t1 + 1e-9:
             x = self.x_of_time(t)
-            p.setPen(QPen(QColor("#2A303A"), 1))
+            p.setPen(QPen(QColor(theme.BORDER), 1))
             p.drawLine(QPointF(x, r.top() + 4), QPointF(x, r.bottom()))
             p.setPen(QColor(theme.DIM))
             label = f"{t:.1f} s" if t == 0 else (f"{t:.2f}" if step < 0.1 else f"{t:.1f}" if step < 1 else f"{t:.0f}")
@@ -404,13 +404,13 @@ class Timeline(QWidget):
             x1 = self.x_of(ph.end + 1) if ph.end + 1 < project.frame_count else r.right()
             rect = QRectF(x0 + 1, r.top() + 4, max(2, x1 - x0 - 2), r.height() - 8)
             p.setPen(Qt.NoPen)
-            p.setBrush(QColor(ph.color))
-            p.drawRoundedRect(rect, 6, 6)
+            p.setBrush(QColor(theme.calm(ph.color)))
+            p.drawRoundedRect(rect, 4, 4)
             if ph is cur or self.selected == ("phases", ph.id):
                 p.setBrush(Qt.NoBrush)
                 p.setPen(QPen(QColor(theme.ACCENT if ph is cur else theme.TEXT), 1.5))
-                p.drawRoundedRect(rect.adjusted(0.75, 0.75, -0.75, -0.75), 6, 6)
-            p.setPen(QColor(theme.text_on(ph.color)))
+                p.drawRoundedRect(rect.adjusted(0.75, 0.75, -0.75, -0.75), 4, 4)
+            p.setPen(QColor(theme.text_on(theme.calm(ph.color))))
             numbered = ph.name.lower().startswith(("pedalada", "stroke", "zancada", "stride"))   # already "Stride 3"
             full_lbl = ph.name if (ph.name.startswith(f"{i + 1} ") or numbered) else f"{i + 1} · {ph.name}"
             label = fm.elidedText(full_lbl if rect.width() >= 75 else f"P{i + 1}", Qt.ElideRight, int(rect.width() - 8))
@@ -436,13 +436,13 @@ class Timeline(QWidget):
             x1 = self.x_of(ph.end + 1) if ph.end + 1 < project.frame_count else r.right()
             rect = QRectF(x0 + 1, r.top() + 2, max(2, x1 - x0 - 2), r.height() - 4)
             p.setPen(Qt.NoPen)
-            p.setBrush(QColor(ph.color))
-            p.drawRoundedRect(rect, 4, 4)
+            p.setBrush(QColor(theme.calm(ph.color)))
+            p.drawRoundedRect(rect, 3, 3)
             if ph is cur:
                 p.setBrush(Qt.NoBrush)
                 p.setPen(QPen(QColor(theme.ACCENT), 1.5))
-                p.drawRoundedRect(rect.adjusted(0.75, 0.75, -0.75, -0.75), 4, 4)
-            p.setPen(QColor(theme.text_on(ph.color)))
+                p.drawRoundedRect(rect.adjusted(0.75, 0.75, -0.75, -0.75), 3, 3)
+            p.setPen(QColor(theme.text_on(theme.calm(ph.color))))
             w = rect.width()
             if w >= 55:
                 lbl = fm.elidedText(ph.name, Qt.ElideRight, int(w - 4))

@@ -23,7 +23,7 @@ VIDEO_EXT = {".mp4", ".mov", ".avi", ".mkv", ".m4v", ".webm", ".wmv", ".mpg", ".
 def thumbnail(path: str, w: int = 96, h: int = 54) -> QPixmap:
     """First frame of a video (cached on disk); a neutral tile when unavailable."""
     pm = QPixmap(w * 2, h * 2)
-    pm.fill(QColor("#2B3037"))
+    pm.fill(QColor(theme.RAISED))
     src = Path(path)
     if src.suffix.lower() in (".okick", ".kva", ".ok3d"):
         try:
@@ -71,19 +71,14 @@ class DropZone(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setAcceptDrops(True)
-        self.setMinimumHeight(250)
+        self.setMinimumHeight(170)
         self._hover = False
         lay = QVBoxLayout(self)
         lay.setAlignment(Qt.AlignCenter)
         lay.setSpacing(16)
-        ic = QLabel()
-        ic.setFixedSize(56, 56)
-        ic.setAlignment(Qt.AlignCenter)
-        ic.setStyleSheet(f"background: {theme.RAISED}; border-radius: 16px;")
-        ic.setPixmap(icons.pixmap("upload", theme.ACCENT, 28))
-        lay.addWidget(ic, 0, Qt.AlignHCenter)
+        lay.setSpacing(12)
         t = QLabel(tr("Drop a video here"))
-        t.setStyleSheet("font-size: 18px; font-weight: 600;")
+        t.setStyleSheet("font-size: 16px; font-weight: 600;")
         t.setAlignment(Qt.AlignCenter)
         lay.addWidget(t)
         s = QLabel(tr("MP4, MOV or AVI · also .okick projects and Kinovea .kva annotations"))
@@ -96,11 +91,11 @@ class DropZone(QFrame):
         row.addStretch(1)
         b1 = QPushButton(tr("Open video"))
         b1.setProperty("primary", True)
-        b1.setMinimumHeight(44)
+        b1.setMinimumHeight(36)
         b1.clicked.connect(self.openVideo)
         row.addWidget(b1)
         b2 = QPushButton(tr("Open project or KVA"))
-        b2.setMinimumHeight(44)
+        b2.setMinimumHeight(36)
         b2.clicked.connect(self.openProject)
         row.addWidget(b2)
         row.addStretch(1)
@@ -108,9 +103,9 @@ class DropZone(QFrame):
         self._style()
 
     def _style(self):
-        border = theme.ACCENT if self._hover else "#353D4B"
-        bg = "#131A0E" if self._hover else theme.PANEL
-        self.setStyleSheet(f"DropZone {{ border: 2px dashed {border}; border-radius: 18px; background: {bg}; }}")
+        border = theme.ACCENT if self._hover else theme.BORDER
+        bg = theme.SELECT if self._hover else theme.PANEL
+        self.setStyleSheet(f"DropZone {{ border: 1px dashed {border}; border-radius: 6px; background: {bg}; }}")
 
     def dragEnterEvent(self, e):
         if e.mimeData().hasUrls():
@@ -135,22 +130,22 @@ class TemplateCard(QToolButton):
         super().__init__(parent)
         self.t = t
         self.setCursor(Qt.PointingHandCursor)
-        self.setMinimumHeight(170)
+        self.setMinimumHeight(128)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setToolTip(tr("Open a video and analyze it with this template"))
-        self.setStyleSheet(f"QToolButton {{ background: {theme.CARD_2}; border: 1px solid #222834; border-radius: 14px; }}"
-                           f"QToolButton:hover {{ border-color: {t.color}; background: #151A21; }}")
+        self.setStyleSheet(f"QToolButton {{ background: {theme.CARD_2}; border: 1px solid {theme.CARD_LINE}; border-radius: 6px; }}"
+                           f"QToolButton:hover {{ border-color: {theme.BORDER_HOVER}; background: {theme.HOVER}; }}")
         lay = QVBoxLayout(self)
-        lay.setContentsMargins(16, 16, 16, 16)
-        lay.setSpacing(10)
+        lay.setContentsMargins(14, 14, 14, 14)
+        lay.setSpacing(8)
         ic = QLabel()
-        ic.setFixedSize(56, 56)
-        ic.setAlignment(Qt.AlignCenter)
-        ic.setStyleSheet(f"background: {theme.RAISED}; border-radius: 12px; border: 0;")
-        ic.setPixmap(icons.template_icon(t.icon or "M24 14v20M14 24h20", t.color, 44))
+        ic.setFixedSize(32, 32)
+        ic.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        ic.setStyleSheet("background: transparent; border: 0;")
+        ic.setPixmap(icons.template_icon(t.icon or "M24 14v20M14 24h20", theme.TEXT_2, 30))
         lay.addWidget(ic)
         n = QLabel(t.label)
-        n.setStyleSheet("font-size: 15px; font-weight: 600; border: 0; background: transparent;")
+        n.setStyleSheet("font-size: 14px; font-weight: 600; border: 0; background: transparent;")
         lay.addWidget(n)
         d = QLabel(t.summary)
         d.setWordWrap(True)
@@ -169,14 +164,14 @@ class RecentItem(QToolButton):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setFixedHeight(76)
         self.setToolTip(path)
-        self.setStyleSheet(f"QToolButton {{ background: {theme.PANEL}; border: 1px solid #1E232C; border-radius: 12px; }}"
-                           f"QToolButton:hover {{ border-color: {theme.BORDER}; background: #12161C; }}")
+        self.setStyleSheet(f"QToolButton {{ background: {theme.PANEL}; border: 1px solid {theme.CARD_LINE}; border-radius: 6px; }}"
+                           f"QToolButton:hover {{ border-color: {theme.BORDER_HOVER}; background: {theme.HOVER}; }}")
         lay = QHBoxLayout(self)
         lay.setContentsMargins(10, 10, 12, 10)
         lay.setSpacing(14)
         th = QLabel()
         th.setFixedSize(96, 54)
-        th.setStyleSheet("border-radius: 8px; border: 0;")
+        th.setStyleSheet("border-radius: 5px; border: 0;")
         th.setPixmap(thumbnail(path))
         lay.addWidget(th)
         col = QVBoxLayout()
@@ -209,8 +204,8 @@ NAV = [
     ("Analyze", [
         ("video", "video", "2D analysis", "One video: angles, trajectories, phases", ""),
         ("3d", "cube", "3D analysis", "Two or more videos, up to OpenSim", "BETA"),
-        ("compare", "compare", "Comparative analysis", "Several patients or conditions side by side", "NEW"),
-        ("patients", "user", "Patients", "Their records and analyses, to pick them again", "NEW"),
+        ("compare", "compare", "Comparative analysis", "Several patients or conditions side by side", ""),
+        ("patients", "user", "Patients", "Their records and analyses, to pick them again", ""),
     ]),
     ("Open", [
         ("project", "folder", "Project or Kinovea file", "Continue a saved analysis", ""),
@@ -236,7 +231,7 @@ class NavItem(QPushButton):
         self.setCursor(Qt.PointingHandCursor)
         self.setFocusPolicy(Qt.NoFocus)
         h = 56 if hint else 38
-        self.setStyleSheet(f"QPushButton {{ background: transparent; border: 1px solid transparent; border-radius: 10px;"
+        self.setStyleSheet(f"QPushButton {{ background: transparent; border: 1px solid transparent; border-radius: 6px;"
                            f" min-height: {h}px; max-height: {h}px; padding: 0; text-align: left; }}"
                            f"QPushButton:hover {{ background: {theme.RAISED}; }} QPushButton:pressed {{ background: {theme.ACTIVE}; }}"
                            f"QPushButton:focus {{ border-color: {theme.BORDER}; }}")
@@ -247,8 +242,8 @@ class NavItem(QPushButton):
         ic.setFixedSize(34, 34)
         ic.setAlignment(Qt.AlignCenter)
         if hint:
-            ic.setStyleSheet(f"background: {theme.CARD}; border: 1px solid {theme.LINE}; border-radius: 9px;")
-        ic.setPixmap(icons.pixmap(icon, theme.ACCENT if hint else theme.MUTED, 18))
+            ic.setStyleSheet(f"background: {theme.CARD}; border: 1px solid {theme.LINE}; border-radius: 5px;")
+        ic.setPixmap(icons.pixmap(icon, theme.TEXT_2 if hint else theme.MUTED, 18))
         lay.addWidget(ic)
         self.text = QWidget()
         self.text.setStyleSheet("background: transparent;")
@@ -264,7 +259,7 @@ class NavItem(QPushButton):
         if badge:
             b = QLabel(badge)
             b.setFixedHeight(16)
-            b.setStyleSheet(f"color: {theme.WARN_TEXT}; background: #2A2016; border-radius: 4px; padding: 0 5px; font-size: 9px; font-weight: 700;")
+            b.setStyleSheet(f"color: {theme.MUTED}; border: 1px solid {theme.BORDER}; border-radius: 3px; padding: 0 4px; font-size: 10px;")
             row.addWidget(b)
         row.addStretch(1)
         col.addLayout(row)
@@ -301,7 +296,7 @@ class SideBar(QFrame):
         for i, (section, entries) in enumerate(NAV):
             if i:
                 lay.addSpacing(14)
-            head = QLabel(tr(section).upper())
+            head = QLabel(tr(section))
             head.setObjectName("SectionTitle")
             head.setContentsMargins(10, 0, 0, 4)
             lay.addWidget(head)
@@ -375,23 +370,11 @@ class WelcomePage(QWidget):
         page.setObjectName("Page")
         scroll.setWidget(page)
         body = QHBoxLayout(page)
-        body.setContentsMargins(44, 44, 44, 24)
+        body.setContentsMargins(40, 32, 40, 24)
         body.setSpacing(40)
 
         left = QVBoxLayout()
-        left.setSpacing(36)
-        hero = QVBoxLayout()
-        hero.setSpacing(14)
-        h1 = QLabel(tr("Analyze the movement,\nnot the software."))
-        h1.setFont(theme.display(44))
-        hero.addWidget(h1)
-        sub = QLabel(tr("Load a video: OpenKick detects the skeleton with MediaPipe or RTMPose, measures angles and "
-                        "trajectories frame by frame, and you only fix what needs fixing."))
-        sub.setWordWrap(True)
-        sub.setMaximumWidth(640)
-        sub.setStyleSheet(f"color: {theme.MUTED}; font-size: 16px; line-height: 150%;")
-        hero.addWidget(sub)
-        left.addLayout(hero)
+        left.setSpacing(28)
         self.drop = DropZone()
         self.drop.openVideo.connect(self.openVideo)
         self.drop.openProject.connect(self.openProject)

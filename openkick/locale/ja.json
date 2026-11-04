@@ -1195,5 +1195,22 @@
     "The best in gait (knee about 4° off against 9° with MediaPipe), as fast as MediaPipe accurate.": "歩行で最も正確（膝の誤差は約4°、MediaPipeでは9°）。速さはMediaPipe高精度と同じです。",
     "RTMPose · accurate": "RTMPose · 高精度",
     "The best ankle. About three times slower: for powerful computers.": "足首が最も正確。約3倍遅いので、高性能なパソコン向けです。",
-    "RTMPose does not find the hands, the mouth or the corners of the eyes.": "RTMPoseは手、口、目の端を検出しません。"
+    "RTMPose does not find the hands, the mouth or the corners of the eyes.": "RTMPoseは手、口、目の端を検出しません。",
+    "Shortcuts": "ショートカット",
+    "Summary": "概要",
+    "Average phase": "平均フェーズ",
+    "Each phase stretched from 0 to 100 %. Line: mean of the phases; band: ± 1 standard deviation.": "各フェーズを0〜100 %に揃えています。線：フェーズの平均、帯：± 1標準偏差。",
+    "How it is measured": "測定方法",
+    "Max.": "最大",
+    "Min.": "最小",
+    "max": "最大",
+    "min": "最小",
+    "Over the whole clip. Mark phases to see the typical one and how much it varies.": "クリップ全体での値です。フェーズを付けると、典型値とそのばらつきが表示されます。",
+    "Over the whole video": "動画全体",
+    "Right − left": "右 − 左",
+    "Show all {n} phases": "{n}フェーズすべてを表示",
+    "Show fewer": "表示を減らす",
+    "Typical phase ± how much it changes from one phase to the next ({n} phases).": "典型的なフェーズ ± フェーズごとの変動（{n}フェーズ）。",
+    "far from the camera": "カメラから遠い側",
+    "Elbow": "肘"
 }

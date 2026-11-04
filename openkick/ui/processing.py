@@ -111,7 +111,7 @@ class StepRow(QHBoxLayout):
 
     def set_state(self, state: str, meta: str = ""):
         if state == "done":
-            self.mark.setStyleSheet("background: #1F3A1C; border-radius: 11px;")
+            self.mark.setStyleSheet(f"background: {theme.SELECT}; border-radius: 11px;")
             self.mark.setPixmap(icons.pixmap("check", "#86EFAC", 13, 3))
             self.mark.setAlignment(Qt.AlignCenter)
         elif state == "now":
@@ -120,7 +120,7 @@ class StepRow(QHBoxLayout):
                                     f"cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 {theme.ACCENT}, stop:0.36 {theme.ACCENT}, stop:0.42 transparent);")
         else:
             self.mark.setPixmap(QPixmap())
-            self.mark.setStyleSheet(f"border: 2px solid #353D4B; border-radius: 11px;")
+            self.mark.setStyleSheet(f"border: 2px solid {theme.BORDER}; border-radius: 11px;")
         self.label.setStyleSheet(f"color: {theme.FAINT if state == 'todo' else theme.TEXT};")
         self.meta.setText(meta)
 
@@ -153,7 +153,7 @@ class ProcessingDialog(QDialog):
         lay.addWidget(sub)
         self.preview = QLabel()
         self.preview.setFixedSize(PREVIEW_W, PREVIEW_H)
-        self.preview.setStyleSheet(f"background: {theme.STAGE}; border-radius: 12px; border: 1px solid #222834;")
+        self.preview.setStyleSheet(f"background: {theme.STAGE}; border-radius: 6px; border: 1px solid {theme.CARD_LINE};")
         self.preview.setAlignment(Qt.AlignCenter)
         lay.addWidget(self.preview, 0, Qt.AlignHCenter)
         row = QHBoxLayout()

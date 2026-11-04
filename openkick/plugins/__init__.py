@@ -49,6 +49,7 @@ class Table:
     columns: list[str]
     rows: list[list]
     title: str = ""
+    detail: bool = False      # a detail table: the results page shows it folded, under the main ones
 
 
 @dataclass

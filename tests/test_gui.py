@@ -271,3 +271,60 @@ def test_detection_result_for_a_video_no_longer_open_is_dropped(qapp, project):
     w._detected(res, "gait", project.video.path)                     # its project was closed meanwhile
     assert w.ctl.project is None
     w.close()
+
+
+def test_shortcuts_button_in_tool_bar(qapp, project, monkeypatch):
+    """The bar under the menus has a button that shows what each key does."""
+    from openkick.ui import main_window as MW
+    opened = []
+    monkeypatch.setattr(MW.ShortcutsDialog, "exec", lambda self: opened.append(self) or 0)
+    w = MW.MainWindow()
+    w.resize(1440, 900)
+    w.show()
+    w.ctl.set_project(project)
+    w.show_workspace()
+    qapp.processEvents()
+    btn = w.workspace.context.keys_btn
+    assert btn.isVisible()
+    btn.click()
+    assert len(opened) == 1
+    import os
+    if os.environ.get("OPENKICK_SHOT"):
+        w.workspace.context.grab().save(os.environ["OPENKICK_SHOT"])
+    w.close()
+
+
+def test_results_page_sums_up_and_folds(qapp, project):
+    """Results: the typical phase first, the odd phase pointed out, the long table folded."""
+    from openkick.core import templates
+    from openkick.core.project import Phase
+    from openkick.i18n import tr
+    from openkick.ui import results as R
+    from openkick.ui.main_window import MainWindow
+    templates.apply(project, templates.find("squat"))
+    n = project.frame_count
+    k = 12
+    size = n // k
+    project.phases = [Phase(f"P{i + 1}", i * size, (i + 1) * size - 1) for i in range(k)]
+    odd = 8                                        # past the rows shown folded
+    project.pose.xy[odd * size:(odd + 1) * size, 25:27, 0] += 60.0     # both knees well off in one phase
+    w = MainWindow()
+    w.resize(1440, 900)
+    w.show()
+    w.ctl.set_project(project)
+    w.show_results()
+    qapp.processEvents()
+    table = w.results.table
+    assert table.item(0, 0).text() == tr("Typical")
+    names = [table.item(r, 0).text() for r in range(table.rowCount())]
+    assert f"P{odd + 1}" in names and table.rowCount() < k + 1
+    row = names.index(f"P{odd + 1}")
+    assert table.item(row, table.columnCount() - 1).text() == tr("Review")
+    assert w.results.more.isVisible()
+    w.results.more.click()
+    assert w.results.table.rowCount() == k + 1
+    assert w.results.findChildren(R.JointCard) and w.results.findChildren(R.CycleChart)
+    project.saved_revision = project.revision
+    w.close()
+    w.deleteLater()
+    qapp.processEvents()

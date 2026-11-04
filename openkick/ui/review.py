@@ -82,7 +82,7 @@ class ReviewWindow(QWidget):
         self.picture = QLabel()
         self.picture.setFixedSize(PREVIEW, PREVIEW)
         self.picture.setAlignment(Qt.AlignCenter)
-        self.picture.setStyleSheet(f"background: {theme.PANEL}; border-radius: 10px;")
+        self.picture.setStyleSheet(f"background: {theme.PANEL}; border-radius: 6px;")
         side.addWidget(self.picture)
         self.caption = QLabel()
         self.caption.setWordWrap(True)

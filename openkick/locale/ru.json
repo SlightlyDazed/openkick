@@ -1195,5 +1195,22 @@
     "The best in gait (knee about 4° off against 9° with MediaPipe), as fast as MediaPipe accurate.": "Лучший в ходьбе (колено примерно 4° против 9° с MediaPipe), так же быстр, как MediaPipe точный.",
     "RTMPose · accurate": "RTMPose · точный",
     "The best ankle. About three times slower: for powerful computers.": "Лучший голеностоп. Примерно втрое медленнее: для мощных компьютеров.",
-    "RTMPose does not find the hands, the mouth or the corners of the eyes.": "RTMPose не находит кисти, рот и уголки глаз."
+    "RTMPose does not find the hands, the mouth or the corners of the eyes.": "RTMPose не находит кисти, рот и уголки глаз.",
+    "Shortcuts": "Клавиши",
+    "Summary": "Сводка",
+    "Average phase": "Средняя фаза",
+    "Each phase stretched from 0 to 100 %. Line: mean of the phases; band: ± 1 standard deviation.": "Каждая фаза растянута от 0 до 100 %. Линия: среднее по фазам; полоса: ± 1 стандартное отклонение.",
+    "How it is measured": "Как измеряется",
+    "Max.": "Макс.",
+    "Min.": "Мин.",
+    "max": "макс.",
+    "min": "мин.",
+    "Over the whole clip. Mark phases to see the typical one and how much it varies.": "По всему клипу. Отметьте фазы, чтобы увидеть типичную и её разброс.",
+    "Over the whole video": "На протяжении всего видео",
+    "Right − left": "Прав. − лев.",
+    "Show all {n} phases": "Показать все фазы ({n})",
+    "Show fewer": "Показать меньше",
+    "Typical phase ± how much it changes from one phase to the next ({n} phases).": "Типичная фаза ± насколько она меняется от фазы к фазе ({n} фаз).",
+    "far from the camera": "дальняя от камеры",
+    "Elbow": "Локоть"
 }

@@ -1195,5 +1195,22 @@
     "The best in gait (knee about 4° off against 9° with MediaPipe), as fast as MediaPipe accurate.": "Das beste beim Gehen (Knie etwa 4° daneben gegen 9° mit MediaPipe), so schnell wie MediaPipe genau.",
     "RTMPose · accurate": "RTMPose · genau",
     "The best ankle. About three times slower: for powerful computers.": "Der beste Knöchel. Etwa dreimal langsamer: für leistungsstarke Computer.",
-    "RTMPose does not find the hands, the mouth or the corners of the eyes.": "RTMPose findet weder die Hände noch den Mund noch die Augenwinkel."
+    "RTMPose does not find the hands, the mouth or the corners of the eyes.": "RTMPose findet weder die Hände noch den Mund noch die Augenwinkel.",
+    "Shortcuts": "Tastenkürzel",
+    "Summary": "Übersicht",
+    "Average phase": "Mittlere Phase",
+    "Each phase stretched from 0 to 100 %. Line: mean of the phases; band: ± 1 standard deviation.": "Jede Phase auf 0 bis 100 % gebracht. Linie: Mittel der Phasen; Band: ± 1 Standardabweichung.",
+    "How it is measured": "Wie gemessen wird",
+    "Max.": "Max.",
+    "Min.": "Min.",
+    "max": "max.",
+    "min": "min.",
+    "Over the whole clip. Mark phases to see the typical one and how much it varies.": "Über den ganzen Clip. Markiere Phasen, um die typische und ihre Streuung zu sehen.",
+    "Over the whole video": "Über das ganze Video",
+    "Right − left": "Rechts − links",
+    "Show all {n} phases": "Alle {n} Phasen zeigen",
+    "Show fewer": "Weniger zeigen",
+    "Typical phase ± how much it changes from one phase to the next ({n} phases).": "Typische Phase ± wie stark sie sich von Phase zu Phase ändert ({n} Phasen).",
+    "far from the camera": "kamerafern",
+    "Elbow": "Ellbogen"
 }

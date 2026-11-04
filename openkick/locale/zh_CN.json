@@ -1195,5 +1195,22 @@
     "The best in gait (knee about 4° off against 9° with MediaPipe), as fast as MediaPipe accurate.": "行走中最准（膝误差约 4°，MediaPipe 为 9°），速度与 MediaPipe 精确相同。",
     "RTMPose · accurate": "RTMPose · 精确",
     "The best ankle. About three times slower: for powerful computers.": "踝关节最准。约慢三倍：适合性能强的电脑。",
-    "RTMPose does not find the hands, the mouth or the corners of the eyes.": "RTMPose 不检测手、嘴和眼角。"
+    "RTMPose does not find the hands, the mouth or the corners of the eyes.": "RTMPose 不检测手、嘴和眼角。",
+    "Shortcuts": "快捷键",
+    "Summary": "摘要",
+    "Average phase": "平均阶段",
+    "Each phase stretched from 0 to 100 %. Line: mean of the phases; band: ± 1 standard deviation.": "每个阶段拉伸到 0–100 %。线：各阶段的平均值；带：± 1 个标准差。",
+    "How it is measured": "测量方法",
+    "Max.": "最大",
+    "Min.": "最小",
+    "max": "最大",
+    "min": "最小",
+    "Over the whole clip. Mark phases to see the typical one and how much it varies.": "基于整段视频。标记阶段即可看到典型值及其变化幅度。",
+    "Over the whole video": "整段视频",
+    "Right − left": "右 − 左",
+    "Show all {n} phases": "显示全部 {n} 个阶段",
+    "Show fewer": "收起",
+    "Typical phase ± how much it changes from one phase to the next ({n} phases).": "典型阶段 ± 各阶段之间的变化（{n} 个阶段）。",
+    "far from the camera": "远离摄像头",
+    "Elbow": "肘"
 }

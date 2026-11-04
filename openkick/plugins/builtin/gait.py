@@ -165,9 +165,12 @@ class GaitCycle(AnalysisPlugin):
             tables.append(Table([tr("Phase"), tr("Strides")] + [G.name(k) for k in BY_PHASE],
                                 [[ph.name, len(g)] + [G.cell(g, k) if g else "—" for k in BY_PHASE] for ph, g in groups],
                                 tr("By phase")))
+        checks.detail = not advice
         tables.append(checks)
-        tables.append(G.stride_table(strides, lambda s: next(
-            (q.name for q in p.phases if q.start <= s["first"] and s["last"] <= q.end), "—")))
+        strides_table = G.stride_table(strides, lambda s: next(
+            (q.name for q in p.phases if q.start <= s["first"] and s["last"] <= q.end), "—"))
+        strides_table.detail = True
+        tables.append(strides_table)
 
         sides = {s["side"] for s in strides}
         side = tr("Left and right sides") if len(sides) > 1 else tr("Left side") if "left" in sides else tr("Right side")

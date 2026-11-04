@@ -571,8 +571,10 @@ def test_opensim_step_and_model_view(tmp_path, monkeypatch):
     for col in (slice(0, 400), slice(400, 800)):
         assert top[:, col].std() > 8                                                  # a real video picture above
         assert (bottom[:, col].min(axis=2) > 150).sum() > 150                         # bones below
-        green = (bottom[:, col, 1].astype(int) - bottom[:, col, 2] > 90) & (bottom[:, col, 1] > 180)
-        assert green.sum() > 30                                                       # and the green points
+        from openkick.ui import theme
+        accent = np.array([int(theme.ACCENT[i:i + 2], 16) for i in (1, 3, 5)])           # frames are RGB
+        points = np.abs(bottom[:, col].astype(int) - accent).max(axis=2) < 40
+        assert points.sum() > 30                                                      # and the points, in the accent colour
     dirs = MV.camera_directions(s)
     assert len(dirs) == 2 and all(abs(np.linalg.det(B) - 1) < 1e-6 and B[2][1] >= 0.15 for B in dirs)
     assert np.degrees(np.arccos(np.clip(dirs[0][2] @ dirs[1][2], -1, 1))) > 40        # two really different viewpoints

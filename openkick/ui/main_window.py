@@ -204,9 +204,18 @@ class ContextBar(QWidget):
         self.hint = ElidedLabel()
         self.hint.setStyleSheet(f"color: {theme.MUTED};")
         lay.addWidget(self.hint, 1)
+        pill = (f"QPushButton {{ min-height: 26px; padding: 0 10px; border-radius: 5px; font-size: 12px;"
+                f" color: {theme.TEXT_2}; background: {theme.CARD}; border: 1px solid {theme.BORDER}; }}")
+        # what each key does, right where the tools are used (also F1 and Help)
+        self.keys_btn = QPushButton(icons.icon("keyboard", theme.MUTED, 14), " " + tr("Shortcuts") + " ")
+        self.keys_btn.setFocusPolicy(Qt.NoFocus)
+        self.keys_btn.setStyleSheet(pill)
+        self.keys_btn.setToolTip(tr("Keyboard shortcuts") + " (F1)")
+        self.keys_btn.clicked.connect(lambda: ShortcutsDialog(self).exec())
+        lay.addWidget(self.keys_btn)
         self.layers_btn = QPushButton(icons.icon("eye", theme.MUTED, 14), " " + tr("Layers") + " ")
         self.layers_btn.setFocusPolicy(Qt.NoFocus)
-        self.layers_btn.setStyleSheet(f"QPushButton {{ min-height: 26px; padding: 0 10px; border-radius: 13px; font-size: 12px;"
+        self.layers_btn.setStyleSheet(f"QPushButton {{ min-height: 26px; padding: 0 10px; border-radius: 5px; font-size: 12px;"
                                       f" color: {theme.TEXT_2}; background: {theme.CARD}; border: 1px solid {theme.BORDER}; }}")
         menu = QMenu(self)
         for key, label, color in (("skeleton", tr("Skeleton"), theme.RIGHT), ("angles", tr("Angles and distances"), "#FF8A3D"),

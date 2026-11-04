@@ -1195,5 +1195,22 @@
     "The best in gait (knee about 4° off against 9° with MediaPipe), as fast as MediaPipe accurate.": "보행에서 가장 좋습니다(무릎 오차 약 4°, MediaPipe는 9°). 속도는 MediaPipe 정확과 같습니다.",
     "RTMPose · accurate": "RTMPose · 정확",
     "The best ankle. About three times slower: for powerful computers.": "발목이 가장 정확합니다. 약 세 배 느려서 성능 좋은 컴퓨터용입니다.",
-    "RTMPose does not find the hands, the mouth or the corners of the eyes.": "RTMPose는 손, 입, 눈꼬리를 찾지 않습니다."
+    "RTMPose does not find the hands, the mouth or the corners of the eyes.": "RTMPose는 손, 입, 눈꼬리를 찾지 않습니다.",
+    "Shortcuts": "단축키",
+    "Summary": "요약",
+    "Average phase": "평균 단계",
+    "Each phase stretched from 0 to 100 %. Line: mean of the phases; band: ± 1 standard deviation.": "각 단계를 0~100 %로 맞췄습니다. 선: 단계 평균, 띠: ± 1 표준편차.",
+    "How it is measured": "측정 방법",
+    "Max.": "최대",
+    "Min.": "최소",
+    "max": "최대",
+    "min": "최소",
+    "Over the whole clip. Mark phases to see the typical one and how much it varies.": "클립 전체 기준입니다. 단계를 표시하면 대표값과 변동 폭을 볼 수 있습니다.",
+    "Over the whole video": "영상 전체",
+    "Right − left": "오른쪽 − 왼쪽",
+    "Show all {n} phases": "{n}개 단계 모두 보기",
+    "Show fewer": "간단히 보기",
+    "Typical phase ± how much it changes from one phase to the next ({n} phases).": "대표 단계 ± 단계마다 달라지는 정도 ({n}개 단계).",
+    "far from the camera": "카메라에서 먼 쪽",
+    "Elbow": "팔꿈치"
 }

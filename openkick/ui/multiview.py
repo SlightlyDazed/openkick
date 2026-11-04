@@ -427,9 +427,9 @@ class ViewCanvas(QWidget):
         self.solo_btn.setToolTip(tr("Back to the 3D view with every video (Esc)") if on else
                                  tr("Open this video on its own, large, to correct it frame by frame"))
         self.solo_btn.setStyleSheet(
-            f"QPushButton {{ background: {theme.ACCENT}; color: {theme.ON_ACCENT}; border: 0; border-radius: 13px; min-height: 26px;"
+            f"QPushButton {{ background: {theme.ACCENT}; color: {theme.ON_ACCENT}; border: 0; border-radius: 5px; min-height: 26px;"
             f" padding: 0 12px; font-size: 12px; font-weight: 600; }} QPushButton:hover {{ background: {theme.ACCENT_HOVER}; }}" if on else
-            f"QPushButton {{ background: rgba(11, 13, 17, 215); color: {theme.TEXT}; border: 1px solid {theme.BORDER}; border-radius: 13px;"
+            f"QPushButton {{ background: rgba(11, 13, 17, 215); color: {theme.TEXT}; border: 1px solid {theme.BORDER}; border-radius: 5px;"
             f" min-height: 26px; padding: 0 12px; font-size: 12px; }} QPushButton:hover {{ border-color: {theme.ACCENT}; }}")
         self.solo_btn.adjustSize()
         self._place_button()
@@ -1546,7 +1546,7 @@ class BuildDialog(QDialog):
         lay.addWidget(sub)
         self.preview = QLabel()
         self.preview.setFixedSize(524, 295)
-        self.preview.setStyleSheet(f"background: {theme.STAGE}; border-radius: 12px; border: 1px solid #222834;")
+        self.preview.setStyleSheet(f"background: {theme.STAGE}; border-radius: 6px; border: 1px solid {theme.CARD_LINE};")
         self.preview.setAlignment(Qt.AlignCenter)
         lay.addWidget(self.preview, 0, Qt.AlignHCenter)
         self.bar = QProgressBar()
@@ -1642,7 +1642,7 @@ class VideoCard(QFrame):
         from openkick.ui.welcome import thumbnail
         self.path = path
         self.setFixedSize(196, 156)
-        self.setStyleSheet(f"VideoCard {{ background: {theme.CARD}; border: 1px solid {theme.BORDER}; border-radius: 12px; }}")
+        self.setStyleSheet(f"VideoCard {{ background: {theme.CARD}; border: 1px solid {theme.BORDER}; border-radius: 6px; }}")
         lay = QVBoxLayout(self)
         lay.setContentsMargins(10, 10, 10, 8)
         lay.setSpacing(4)
@@ -1667,7 +1667,7 @@ class VideoCard(QFrame):
         x.move(self.width() - 32, 8)
         x.setToolTip(tr("Remove this video"))
         x.setCursor(Qt.PointingHandCursor)
-        x.setStyleSheet("QToolButton { background: rgba(11, 13, 17, 215); border-radius: 12px; }"
+        x.setStyleSheet("QToolButton { background: rgba(11, 13, 17, 215); border-radius: 6px; }"
                         "QToolButton:hover { background: #7F1D1D; }")
         x.clicked.connect(lambda: self.removed.emit(self.path))
 
@@ -1694,8 +1694,8 @@ class VideoPicker(QFrame):
         self._rebuild()
 
     def _style(self, hot: bool):
-        self.setStyleSheet(f"VideoPicker {{ background: {'#171D12' if hot else theme.CARD_2}; border: 1.5px dashed "
-                           f"{theme.ACCENT if hot else theme.BORDER}; border-radius: 14px; }}")
+        self.setStyleSheet(f"VideoPicker {{ background: {theme.SELECT if hot else theme.CARD_2}; border: 1.5px dashed "
+                           f"{theme.ACCENT if hot else theme.BORDER}; border-radius: 6px; }}")
 
     def _rebuild(self):
         self.body.hide()
@@ -1734,7 +1734,7 @@ class VideoPicker(QFrame):
                 add = QPushButton(icons.icon("plus", theme.ACCENT, 22), "  " + tr("Add video"))
                 add.setFixedSize(196, 156)
                 add.setCursor(Qt.PointingHandCursor)
-                add.setStyleSheet(f"QPushButton {{ background: transparent; border: 1.5px dashed {theme.BORDER}; border-radius: 12px;"
+                add.setStyleSheet(f"QPushButton {{ background: transparent; border: 1.5px dashed {theme.BORDER}; border-radius: 6px;"
                                   f" color: {theme.MUTED}; }} QPushButton:hover {{ border-color: {theme.ACCENT}; color: {theme.TEXT}; }}")
                 add.clicked.connect(self.browse)
                 i = len(self.paths)
@@ -1899,7 +1899,7 @@ class SetupPage(QWidget):
         self.warn.setWordWrap(True)
         self.warn.setAlignment(Qt.AlignCenter)
         self.warn.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        self.warn.setStyleSheet(f"color: {theme.WARN_TEXT}; background: #2A2016; border-radius: 8px; padding: 10px;")
+        self.warn.setStyleSheet(f"color: {theme.WARN_TEXT}; background: {theme.WARN_BG}; border-radius: 5px; padding: 10px;")
         col.addWidget(self.warn)
         btns = QHBoxLayout()
         btns.addStretch(1)
@@ -2016,7 +2016,7 @@ def _card() -> tuple[QFrame, QVBoxLayout]:
 
 
 def _section(text: str) -> QLabel:
-    lb = QLabel(text.upper())
+    lb = QLabel(text)
     lb.setObjectName("SectionTitle")
     return lb
 
@@ -2768,7 +2768,7 @@ class MultiviewWindow(QMainWindow):
         title.setFont(theme.display(17, 600))
         t.addWidget(title)
         chip = QLabel(tr("EXPERIMENTAL"))
-        chip.setStyleSheet(f"color: {theme.WARN_TEXT}; background: #2A2016; border-radius: 6px; padding: 0 8px; font-size: 11px; font-weight: 600;")
+        chip.setStyleSheet(f"color: {theme.WARN_TEXT}; background: {theme.WARN_BG}; border-radius: 6px; padding: 0 8px; font-size: 11px; font-weight: 600;")
         chip.setFixedHeight(22)
         t.addWidget(chip, 0, Qt.AlignVCenter)
         self.name_lbl = QLabel()
@@ -2785,7 +2785,7 @@ class MultiviewWindow(QMainWindow):
             b.setToolTip(tip)
             b.setCursor(Qt.PointingHandCursor)
             b.setStyleSheet(f"QPushButton {{ background: transparent; border: 1px solid {theme.BORDER}; min-height: 30px; padding: 0 14px; }}"
-                            f"QPushButton:checked {{ background: #171D12; border-color: {theme.ACCENT}; color: {theme.ACCENT}; font-weight: 600; }}")
+                            f"QPushButton:checked {{ background: {theme.SELECT}; border-color: {theme.ACCENT}; color: {theme.ACCENT}; font-weight: 600; }}")
             b.clicked.connect(lambda _=False, k=k: self.set_phase(k))
             group.addButton(b)
             t.addWidget(b)

@@ -268,11 +268,11 @@ class PedalStroke(AnalysisPlugin):
             stab_rows.append([names[key], _show(mid, units[key]), f"± {spread:.1f}",
                               _show(lo, units[key]), _show(hi, units[key]), verdict])
         tables.append(Table([tr("Measure"), tr("Typical"), tr("Variation"), tr("Lowest"), tr("Highest"), tr("Stability")],
-                            stab_rows, tr("Pedaling")))
+                            stab_rows, tr("Pedaling"), detail=True))
 
         # ── 3. Phases: comparison ──
         groups = [(ph, [s for s in strokes if ph.start <= s["first"] and s["last"] <= ph.end]) for ph in p.phases]
-        if groups:
+        if any(len(g) >= 2 for _, g in groups):     # phases of one stroke each have nothing to sum up
             tables.append(Table([tr("Phase"), tr("Strokes")] + [names[k] for k in BY_PHASE],
                                 [[ph.name, len(g)] + [cell(g, k) if g else "—" for k in BY_PHASE] for ph, g in groups],
                                 tr("By phase")))
@@ -314,9 +314,10 @@ class PedalStroke(AnalysisPlugin):
                 [tr("Propulsion"), f"{pmid_t:.2f} s", f"{pmid_p:.1f} %", f"± {pspread_p:.1f} %"]
             ]
             tables.append(Table([tr("Subphase"), tr("Duration"), tr("Percentage"), tr("Variation")],
-                                subphase_rows, tr("Pedal Subphases")))
+                                subphase_rows, tr("Pedal Subphases"), detail=True))
 
         # ── 5. Recording check ──
+        checks.detail = not advice
         tables.append(checks)
 
         # ── 6. Stroke by stroke ──
@@ -326,7 +327,7 @@ class PedalStroke(AnalysisPlugin):
             ph = next((q.name for q in p.phases if q.start <= s["first"] and s["last"] <= q.end), "—")
             rows.append([n, f"{s['time']:.2f} s"] + ([ph] if p.phases else []) + [_show(s[k], units[k]) for k in shown])
         tables.append(Table([tr("Stroke"), tr("At")] + ([tr("Phase")] if p.phases else []) + [names[k] for k in shown],
-                            rows, tr("Stroke by stroke")))
+                            rows, tr("Stroke by stroke"), detail=True))
 
         sides = {s["side"] for s in strokes}
         side = tr("Left and right sides") if len(sides) > 1 else tr("Left side") if "left" in sides else tr("Right side")

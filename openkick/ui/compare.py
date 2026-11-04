@@ -130,7 +130,7 @@ class AnalysisCard(QFrame):
         self.item = item
         self.setObjectName("Card")
         self.setStyleSheet(f"QFrame#Card {{ background: {theme.CARD}; border: 1px solid {theme.BORDER}; "
-                           f"border-left: 4px solid {color}; border-radius: 10px; }}")
+                           f"border-left: 4px solid {color}; border-radius: 6px; }}")
         lay = QVBoxLayout(self)
         lay.setContentsMargins(12, 8, 8, 10)
         lay.setSpacing(4)

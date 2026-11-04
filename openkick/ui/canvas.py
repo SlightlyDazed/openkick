@@ -266,10 +266,10 @@ class VideoCanvas(QWidget):
             fm = QFontMetricsF(p.font())
             if sph:
                 text = f"{ph.name} · {sph.name} · {project.video.time_of(sph.start):.2f}–{project.video.time_of(sph.end):.2f} s"
-                c = sph.color
+                c = theme.calm(sph.color)
             else:
                 text = f"{ph.name} · {project.video.time_of(ph.start):.2f}–{project.video.time_of(ph.end):.2f} s"
-                c = ph.color
+                c = theme.calm(ph.color)
             w = fm.horizontalAdvance(text) + 20
             pr = QRectF(r.right() + 8, top, w, 26)
             p.setPen(Qt.NoPen)
