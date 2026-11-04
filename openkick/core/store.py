@@ -55,7 +55,7 @@ CATALOG = [
      "plugins": [], "templates": ["jump"], "activity": None, "base": False, "icon": "template"},
 ]
 CATEGORIES = ["Sport", "Clinical", "Strength", "Analysis", "Export"]
-VERSION = "0.1"
+VERSION = "0.2"
 
 
 def _file():

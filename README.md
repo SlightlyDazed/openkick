@@ -11,7 +11,7 @@ For health and sports professionals who don't code — and compatible with Kinov
 ![Python](https://img.shields.io/badge/python-3.10_|_3.11_|_3.12-c6ef3f?style=flat-square&labelColor=0b0e12&logo=python&logoColor=white)
 ![Platforms](https://img.shields.io/badge/platform-Windows_|_Linux-c6ef3f?style=flat-square&labelColor=0b0e12)
 ![Languages](https://img.shields.io/badge/UI-10_languages-c6ef3f?style=flat-square&labelColor=0b0e12)
-![Version](https://img.shields.io/badge/version-0.1.0-c6ef3f?style=flat-square&labelColor=0b0e12)
+![Version](https://img.shields.io/badge/version-0.2.0-c6ef3f?style=flat-square&labelColor=0b0e12)
 
 [**Download**](../../releases) · [Quick start](#quick-start) · [Accuracy](#accuracy) · [Docs](#documentation) · [Roadmap](#roadmap)
 

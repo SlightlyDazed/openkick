@@ -1,7 +1,7 @@
 ; Inno Setup script for the Windows installer.
-;   ISCC.exe /DDistDir=<folder containing OpenKick\> /DAppVersion=0.1.0 packaging\openkick.iss
+;   ISCC.exe /DDistDir=<folder containing OpenKick\> /DAppVersion=0.2.0 packaging\openkick.iss
 #ifndef AppVersion
-  #define AppVersion "0.1.0"
+  #define AppVersion "0.2.0"
 #endif
 #ifndef DistDir
   #define DistDir "..\dist"
