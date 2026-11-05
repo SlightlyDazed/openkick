@@ -114,7 +114,6 @@ The reference is the lab's own OpenSim joint angles; OpenKick's are the clinical
 | **Hip**      | 6–8   | **5.4** [4.4–6.5] | 6.9 *(flexion)* |
 | **Ankle**    | 12–20 | **6.1** [5.6–6.6] | 6.2 |
 | **Shoulder** | 7–21  | 7.8 [6.6–9.2]     | — |
-| **Elbow**    | 16–27 ⚠️ | 18.2 ⚠️        | — |
 
 </div>
 
@@ -127,7 +126,7 @@ which sit 3–8 cm outside the joints.</sub>
 - ✅ In 3D the knee is the most reliable joint, and the ankle needs two cameras.
 - ⚠️ **In 2D the knee reads 4–9° less flexion than the lab** in squats, sit-to-stand and jumps (the side
   cameras of this dataset are 30–40° off a true side view); the hip is as good as the knee.
-- ⚠️ **The elbow is not valid** (15–19° constant under-flexion, in 2D and 3D). The OpenSim model's hip
+- ⚠️ **The elbow is not valid**, so it is left out of the table (15–19° constant under-flexion, in 2D and 3D). The OpenSim model's hip
   flexion is still too high in sit-to-stand and jumps (bias +8 to +12°); the app's own 3D hip is not.
 - ⚠️ **Comparing people by their gait is not reliable**: the error is as large as the differences
   between healthy people.

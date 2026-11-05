@@ -85,7 +85,7 @@ class Chart(QWidget):
         else:
             lo, hi = 0.0, 180.0
         if self.mode == "angle":
-            lo, hi = max(0.0, math.floor(lo / 10) * 10 - 10), min(180.0, math.ceil(hi / 10) * 10 + 10)
+            lo, hi = math.floor(lo / 10) * 10 - 10, math.ceil(hi / 10) * 10 + 10   # clinical angles go below 0°
         else:
             lo, hi = 0.0, hi * 1.1 if hi > 0 else 1.0
         if hi - lo < 1e-6:
